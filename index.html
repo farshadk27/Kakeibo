@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="./logo.jpg">
     <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg">
     <link rel="apple-touch-icon" href="./logo.jpg">
@@ -19,7 +18,6 @@
         :root {
             --ios-bg: #000000;
             --ios-card: rgba(28, 28, 30, 0.75);
-            --ios-card-solid: #1c1c1e;
             --ios-border: rgba(255, 255, 255, 0.08);
             --ios-blue: #0a84ff;
             --ios-green: #30d158;
@@ -54,12 +52,6 @@
             background-color: rgba(58, 58, 60, 0.8);
         }
 
-        .ios-segmented-btn.active {
-            background-color: #636366;
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
         .tab-btn.active {
             color: var(--ios-blue);
         }
@@ -75,7 +67,7 @@
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col justify-between select-none">
 
-    <!-- iOS Top Navigation Bar -->
+    <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
@@ -88,14 +80,13 @@
                 </div>
             </div>
 
-            <!-- Date Selectors (Year & Month) -->
+            <!-- Date Selectors -->
             <div class="flex items-center gap-1.5">
                 <select id="globalYearSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-white rounded-xl px-2 py-1.5 focus:outline-none">
                 </select>
                 <select id="globalMonthSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-[#0a84ff] rounded-xl px-2.5 py-1.5 focus:outline-none">
                 </select>
                 
-                <!-- Google Account Auth -->
                 <div id="authContainer" class="flex items-center">
                     <button id="loginBtn" onclick="handleAuthClick()" class="bg-[#2c2c2e] hover:bg-[#3a3a3c] text-[11px] px-2.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1 font-medium transition active:scale-95">
                         <i class="fa-brands fa-google text-slate-300"></i>
@@ -115,13 +106,13 @@
     <!-- Main Content Container -->
     <main class="max-w-md mx-auto w-full flex-1 p-4 pb-28 overflow-y-auto no-scrollbar space-y-4">
 
-        <!-- iOS Due Reminders Banner -->
+        <!-- Due Reminders Banner -->
         <div id="dueAlertBox" class="hidden ios-blur bg-amber-500/[0.08] border-amber-500/20 rounded-3xl p-3.5 flex items-center justify-between text-xs text-amber-300 shadow-sm">
             <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400">
                     <i class="fa-solid fa-bell text-xs"></i>
                 </div>
-                <span id="dueAlertText" class="font-medium text-[11px]">اقساط یا هزینه ثابت نزدیک دارید!</span>
+                <span id="dueAlertText" class="font-medium text-[11px]">اقساط سررسید این ماه در انتظار پرداخت دارید!</span>
             </div>
             <button onclick="switchTab('reminders')" class="bg-amber-400/20 active:bg-amber-400/30 text-amber-300 px-3 py-1 rounded-full text-[11px] font-bold">
                 بررسی
@@ -130,7 +121,6 @@
 
         <!-- TAB 1: DAILY OVERVIEW & TRANSACTIONS -->
         <section id="tab-daily" class="tab-content space-y-3.5">
-            <!-- iOS Metric Cards Widget -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between">
                     <div>
@@ -159,7 +149,6 @@
                 </div>
             </div>
 
-            <!-- Apple Action Buttons -->
             <div class="flex gap-2.5 pt-0.5">
                 <button onclick="openModal('expenseModal')" class="flex-1 bg-[#ff453a] hover:bg-[#ff3b30] active:scale-[0.98] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-red-500/15 transition text-xs">
                     <i class="fa-solid fa-minus text-xs"></i>
@@ -171,7 +160,6 @@
                 </button>
             </div>
 
-            <!-- Transactions iOS List -->
             <div class="ios-blur rounded-3xl p-4">
                 <div class="flex items-center justify-between mb-3.5 px-1">
                     <h3 class="font-bold text-xs text-zinc-300 flex items-center gap-2">
@@ -192,14 +180,14 @@
                     </h2>
                     <p class="text-[11px] text-zinc-400 mt-0.5">مدیریت چک‌ها، وام‌ها و هزینه‌های ثابت</p>
                 </div>
-                <button onclick="openModal('reminderModal')" class="bg-[#ffd60a] hover:bg-yellow-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                <button onclick="openReminderCreateModal()" class="bg-[#ffd60a] hover:bg-yellow-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
                     <i class="fa-solid fa-plus text-xs"></i> جدید
                 </button>
             </div>
 
             <div class="ios-blur rounded-3xl p-4 space-y-3">
                 <h3 class="font-bold text-[11px] text-[#ffd60a] flex items-center gap-1.5 px-1">
-                    <i class="fa-regular fa-clock"></i> در انتظار پرداخت
+                    <i class="fa-regular fa-clock"></i> سررسیدهای این ماه (در انتظار پرداخت)
                 </h3>
                 <div id="pendingReminderList" class="space-y-2"></div>
             </div>
@@ -337,11 +325,11 @@
         </section>
     </main>
 
-    <!-- iOS MODAL: NEW REMINDER -->
-    <div id="reminderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+    <!-- MODAL: REMINDER CREATE/EDIT -->
+    <div id="reminderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                <h3 id="remModalTitle" class="font-bold text-xs text-white flex items-center gap-2">
                     <i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید
                 </h3>
                 <button onclick="closeModal('reminderModal')" class="text-zinc-400 hover:text-white p-1">
@@ -350,13 +338,14 @@
             </div>
 
             <form onsubmit="submitReminder(event)" class="space-y-3">
+                <input type="hidden" id="editRemId" value="">
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">عنوان یادآور / هزینه</label>
-                    <input type="text" id="remTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: قسط وام بانک، اجاره، شهریه" required autofocus>
+                    <input type="text" id="remTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: قسط وام، اجاره" required>
                 </div>
 
                 <div>
-                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ پرداختی (تومان)</label>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ پرداختی هر قسط (تومان)</label>
                     <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ffd60a]" placeholder="۰" required>
                 </div>
 
@@ -365,7 +354,7 @@
                         <label class="text-[11px] text-zinc-400 block mb-1">تاریخ اولین سررسید</label>
                         <input type="text" id="remDate" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white" placeholder="۱۴۰۵/۰۶/۲۵" required>
                     </div>
-                    <div>
+                    <div id="remCycleWrap">
                         <label class="text-[11px] text-zinc-400 block mb-1">دوره تکرار</label>
                         <select id="remCycle" onchange="toggleCustomCycleInput(this.value)" class="w-full ios-input rounded-2xl px-2.5 py-2 text-xs text-white">
                             <option value="once">یک‌بار پرداخت</option>
@@ -378,10 +367,9 @@
                     </div>
                 </div>
 
-                <!-- Custom Cycle Fields (Hidden by default) -->
                 <div id="customCycleBox" class="hidden grid grid-cols-2 gap-2 p-3 bg-white/[0.03] rounded-2xl border border-white/[0.06]">
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1">هر چند وقت یک‌بار؟</label>
+                        <label class="text-[10px] text-zinc-400 block mb-1">هر چند وقت؟</label>
                         <input type="number" id="remCustomIntervalVal" min="1" value="45" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-xs text-white">
                     </div>
                     <div>
@@ -393,40 +381,29 @@
                     </div>
                 </div>
 
-                <!-- End Condition / Total Installments -->
-                <div class="grid grid-cols-2 gap-2 pt-1">
+                <div id="remInstallmentsWrap" class="grid grid-cols-2 gap-2 pt-1">
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط (اختیاری)</label>
                         <input type="number" id="remTotalCount" min="1" placeholder="مثلاً: 12" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
                     </div>
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1">تاریخ سررسید نهایی (اختیاری)</label>
+                        <label class="text-[10px] text-zinc-400 block mb-1">تاریخ پایان (اختیاری)</label>
                         <input type="text" id="remEndDate" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
                     </div>
                 </div>
 
-                <div>
-                    <label class="text-[11px] text-zinc-400 block mb-1">زمان هشدار</label>
-                    <select id="remNotifyDays" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
-                        <option value="0">دقیقاً در روز سررسید</option>
-                        <option value="1">۱ روز قبل</option>
-                        <option value="3" selected>۳ روز قبل</option>
-                        <option value="5">۵ روز قبل</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
+                <button type="submit" id="remSubmitBtn" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
                     ذخیره یادآور
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- iOS MODAL: EXPENSE -->
-    <div id="expenseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+    <!-- MODAL: EXPENSE CREATE/EDIT -->
+    <div id="expenseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                <h3 id="expModalTitle" class="font-bold text-xs text-white flex items-center gap-2">
                     <i class="fa-solid fa-receipt text-[#ff453a]"></i> ثبت هزینه جدید
                 </h3>
                 <button onclick="closeModal('expenseModal')" class="text-zinc-400 hover:text-white p-1">
@@ -435,6 +412,7 @@
             </div>
 
             <form onsubmit="submitExpense(event)" class="space-y-3">
+                <input type="hidden" id="editExpId" value="">
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">مبلغ هزینه (تومان)</label>
                     <input type="text" id="expAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ff453a]" placeholder="۰" required autofocus>
@@ -443,23 +421,23 @@
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">دسته‌بندی کاکیبو</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="expCat" value="needs" checked class="accent-[#30d158]">
                             <span>🍜 نیازها</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="expCat" value="wants" class="accent-[#ffd60a]">
                             <span>🛍️ خواسته‌ها</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="expCat" value="culture" class="accent-[#0a84ff]">
                             <span>📚 رشد و آموزش</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="expCat" value="unexpected" class="accent-[#ff453a]">
                             <span>⚡ غیرمنتظره</span>
                         </label>
-                        <label class="col-span-2 flex items-center gap-2 p-2.5 rounded-2xl bg-[#5e5ce6]/15 border border-[#5e5ce6]/30 text-xs cursor-pointer hover:border-[#5e5ce6]/60 text-[#a5a4f3] font-medium">
+                        <label class="col-span-2 flex items-center gap-2 p-2.5 rounded-2xl bg-[#5e5ce6]/15 border border-[#5e5ce6]/30 text-xs cursor-pointer text-[#a5a4f3]">
                             <input type="radio" name="expCat" value="fixed" class="accent-[#5e5ce6]">
                             <span>🔒 هزینه ثابت (قسط، اجاره...) — از بودجه روزمره کم نمی‌شود</span>
                         </label>
@@ -476,18 +454,18 @@
                     <input type="text" id="expDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: خرید سوپرمارکت">
                 </div>
 
-                <button type="submit" class="w-full bg-[#ff453a] hover:bg-[#ff3b30] active:scale-[0.98] text-white font-semibold py-3 rounded-2xl shadow-lg shadow-red-500/20 text-xs transition">
+                <button type="submit" id="expSubmitBtn" class="w-full bg-[#ff453a] hover:bg-[#ff3b30] active:scale-[0.98] text-white font-semibold py-3 rounded-2xl shadow-lg shadow-red-500/20 text-xs transition">
                     ثبت نهایی هزینه
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- iOS MODAL: INCOME -->
-    <div id="incomeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+    <!-- MODAL: INCOME CREATE/EDIT -->
+    <div id="incomeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                <h3 id="incModalTitle" class="font-bold text-xs text-white flex items-center gap-2">
                     <i class="fa-solid fa-arrow-down text-[#30d158]"></i> ثبت ورودی پول یا درآمد
                 </h3>
                 <button onclick="closeModal('incomeModal')" class="text-zinc-400 hover:text-white p-1">
@@ -496,17 +474,18 @@
             </div>
 
             <form onsubmit="submitIncome(event)" class="space-y-3">
+                <input type="hidden" id="editIncId" value="">
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">نوع واریزی درآمد</label>
                     <div class="space-y-2">
-                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="incType" value="planned" checked class="accent-[#30d158] mt-0.5">
                             <div>
                                 <span class="font-bold text-white block">💼 واریز درآمد پیش‌بینی‌شده (حقوق اصلی)</span>
                                 <span class="text-[10px] text-zinc-400">فقط وصول حقوق ثبت می‌شود؛ سقف خرج ماه دوبار اضافه نمی‌شود.</span>
                             </div>
                         </label>
-                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
                             <input type="radio" name="incType" value="extra" class="accent-[#0a84ff] mt-0.5">
                             <div>
                                 <span class="font-bold text-white block">✨ درآمد یا پاداش جدید (مازاد)</span>
@@ -528,10 +507,10 @@
 
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">منبع یا توضیح (اختیاری)</label>
-                    <input type="text" id="incDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: حقوق ماه، پاداش پروژه">
+                    <input type="text" id="incDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: حقوق ماه، پاداش">
                 </div>
 
-                <button type="submit" class="w-full bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-500/20 text-xs transition">
+                <button type="submit" id="incSubmitBtn" class="w-full bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-500/20 text-xs transition">
                     ثبت ورودی پول
                 </button>
             </form>
@@ -574,7 +553,7 @@
             return {
                 activeMonth: '1405-06',
                 months: {},
-                reminders: []
+                reminders: [] // Recurring / generated reminder instances
             };
         }
 
@@ -621,17 +600,35 @@
             }
         }
 
+        // Helper to add months to Jalali date (yyyy/mm/dd)
+        function addJalaliMonths(jalaliDateStr, monthsToAdd) {
+            try {
+                let [y, m, d] = jalaliDateStr.split('/').map(v => parseInt(v, 10));
+                let totalMonths = (y * 12 + (m - 1)) + monthsToAdd;
+                let newY = Math.floor(totalMonths / 12);
+                let newM = (totalMonths % 12) + 1;
+                let mStr = String(newM).padStart(2, '0');
+                let dStr = String(Math.min(d, newM > 6 ? 30 : 31)).padStart(2, '0');
+                return `${newY}/${mStr}/${dStr}`;
+            } catch (e) {
+                return jalaliDateStr;
+            }
+        }
+
         window.addEventListener('load', () => {
             loadLocalState();
             populateYearAndMonthDropdowns();
             initGoogleClient();
-            document.getElementById('expDate').value = getTodayJalali();
-            document.getElementById('incDate').value = getTodayJalali();
-            document.getElementById('remDate').value = getTodayJalali();
+            resetModalDates();
             renderAll();
         });
 
-        // Generate 10 years forward (1404 to 1415)
+        function resetModalDates() {
+            document.getElementById('expDate').value = getTodayJalali();
+            document.getElementById('incDate').value = getTodayJalali();
+            document.getElementById('remDate').value = getTodayJalali();
+        }
+
         function populateYearAndMonthDropdowns() {
             const yearSel = document.getElementById('globalYearSelect');
             const monthSel = document.getElementById('globalMonthSelect');
@@ -639,7 +636,7 @@
             monthSel.innerHTML = '';
 
             const startYear = 1404;
-            const totalYears = 12; // 1404 to 1415
+            const totalYears = 12;
 
             for (let i = 0; i < totalYears; i++) {
                 const y = startYear + i;
@@ -651,7 +648,6 @@
                 monthSel.add(new Option(name, mNum));
             });
 
-            // Set default selected date from state
             const [curYear, curMonth] = state.activeMonth.split('-');
             yearSel.value = curYear || '1405';
             monthSel.value = curMonth || '06';
@@ -798,14 +794,15 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="font-bold font-mono ${amountColor}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
-                        <button onclick="deleteTx('${t.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        <button onclick="editTransaction('${t.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                        <button onclick="deleteTx('${t.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // REMINDER & INSTALLMENTS SYSTEM
+        // REMINDER & INSTALLMENTS SYSTEM (Filtered per active month)
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -815,17 +812,16 @@
             paidContainer.innerHTML = '';
 
             let urgentCount = 0;
+            const [activeY, activeM] = state.activeMonth.split('-');
 
-            const cycleLabels = {
-                once: 'یک‌بار',
-                monthly: 'ماهانه',
-                bimonthly: '۲ ماهه',
-                quarterly: 'فصلی',
-                yearly: 'سالانه',
-                custom: 'دوره دلخواه'
-            };
+            // Filter reminders whose dueDate matches activeMonth (yyyy/mm)
+            const thisMonthReminders = state.reminders.filter(r => {
+                if (!r.dueDate) return false;
+                const [rY, rM] = r.dueDate.split('/');
+                return rY === activeY && rM === activeM;
+            });
 
-            state.reminders.forEach(r => {
+            thisMonthReminders.forEach(r => {
                 const isPaid = currMonthPaid.includes(r.id);
 
                 if (isPaid) {
@@ -839,22 +835,19 @@
                                 <div class="text-[10px] text-zinc-500 font-mono">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
                             </div>
                         </div>
-                        <button onclick="unmarkReminderPaid('${r.id}')" class="text-zinc-400 hover:text-amber-300 text-[11px] px-2.5 py-1 bg-white/[0.06] rounded-xl">
-                            لغو پرداخت
-                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="unmarkReminderPaid('${r.id}')" class="text-zinc-400 hover:text-amber-300 text-[11px] px-2.5 py-1 bg-white/[0.06] rounded-xl">
+                                لغو پرداخت
+                            </button>
+                        </div>
                     `;
                     paidContainer.appendChild(item);
                 } else {
                     urgentCount++;
-                    
-                    let cycleText = cycleLabels[r.cycle] || 'دوره‌ای';
-                    if (r.cycle === 'custom') {
-                        cycleText = `هر ${r.customVal} ${r.customUnit === 'days' ? 'روز' : 'ماه'}`;
-                    }
 
                     let installmentBadge = '';
-                    if (r.totalCount) {
-                        installmentBadge = ` • قسط ${r.paidCount || 0} از ${r.totalCount}`;
+                    if (r.installmentIndex && r.totalCount) {
+                        installmentBadge = ` • قسط ${r.installmentIndex} از ${r.totalCount}`;
                     }
 
                     const item = document.createElement('div');
@@ -867,7 +860,6 @@
                             <div>
                                 <div class="font-bold text-white flex items-center gap-1.5">
                                     <span>${r.title}</span>
-                                    <span class="text-[9px] bg-[#ffd60a]/15 text-[#ffd60a] font-medium px-1.5 py-0.5 rounded-full">${cycleText}</span>
                                 </div>
                                 <div class="text-[10px] text-zinc-400 font-mono mt-0.5">
                                     سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span> ${installmentBadge}
@@ -876,7 +868,8 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold font-mono text-[#a5a4f3]">${formatNumber(r.amount)} تومان</span>
-                            <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            <button onclick="editReminder('${r.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                            <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                         </div>
                     `;
                     pendingContainer.appendChild(item);
@@ -884,7 +877,7 @@
             });
 
             if (pendingContainer.children.length === 0) {
-                pendingContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">یادآور فعالی برای پرداخت وجود ندارد.</div>`;
+                pendingContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">هیچ یادآور یا سررسیدی برای این ماه تعریف نشده است.</div>`;
             }
             if (paidContainer.children.length === 0) {
                 paidContainer.innerHTML = `<div class="text-center py-3 text-zinc-600 text-[11px]">موردی در این ماه تسویه نشده است.</div>`;
@@ -896,48 +889,88 @@
             if (urgentCount > 0) {
                 alertBox.classList.remove('hidden');
                 navBadge.classList.remove('hidden');
-                document.getElementById('dueAlertText').innerText = `${formatNumber(urgentCount)} قسط / هزینه ثابت در انتظار پرداخت دارید!`;
+                document.getElementById('dueAlertText').innerText = `${formatNumber(urgentCount)} قسط / هزینه ثابت در انتظار پرداخت این ماه دارید!`;
             } else {
                 alertBox.classList.add('hidden');
                 navBadge.classList.add('hidden');
             }
         }
 
+        function openReminderCreateModal() {
+            document.getElementById('editRemId').value = '';
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره یادآور';
+            document.getElementById('remTitle').value = '';
+            document.getElementById('remAmount').value = '';
+            document.getElementById('remDate').value = getTodayJalali();
+            document.getElementById('remCycleWrap').classList.remove('hidden');
+            document.getElementById('remInstallmentsWrap').classList.remove('hidden');
+            openModal('reminderModal');
+        }
+
+        function editReminder(remId) {
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem) return;
+
+            document.getElementById('editRemId').value = rem.id;
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ffd60a]"></i> ویرایش یادآور';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره تغییرات';
+            document.getElementById('remTitle').value = rem.title;
+            document.getElementById('remAmount').value = Number(rem.amount).toLocaleString('en-US');
+            document.getElementById('remDate').value = rem.dueDate;
+            document.getElementById('remCycleWrap').classList.add('hidden');
+            document.getElementById('remInstallmentsWrap').classList.add('hidden');
+            document.getElementById('customCycleBox').classList.add('hidden');
+            openModal('reminderModal');
+        }
+
         function submitReminder(e) {
             e.preventDefault();
+            const editId = document.getElementById('editRemId').value;
             const title = document.getElementById('remTitle').value.trim();
             const amount = cleanNumber(document.getElementById('remAmount').value);
             const dueDate = document.getElementById('remDate').value.trim();
-            const cycle = document.getElementById('remCycle').value;
-            const notifyDays = parseInt(document.getElementById('remNotifyDays').value, 10);
-            
-            const customVal = cleanNumber(document.getElementById('remCustomIntervalVal')?.value);
-            const customUnit = document.getElementById('remCustomIntervalUnit')?.value;
-            const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value);
-            const endDate = document.getElementById('remEndDate')?.value.trim();
 
-            if (!title || !amount) return;
+            if (!title || !amount || !dueDate) return;
 
-            const rem = {
-                id: Date.now().toString(),
-                title,
-                amount,
-                dueDate,
-                cycle,
-                customVal,
-                customUnit,
-                totalCount,
-                paidCount: 0,
-                endDate,
-                notifyDays
-            };
+            // Update existing reminder
+            if (editId) {
+                const target = state.reminders.find(r => r.id === editId);
+                if (target) {
+                    target.title = title;
+                    target.amount = amount;
+                    target.dueDate = dueDate;
+                }
+            } else {
+                // Create New (With multi-month generation support)
+                const cycle = document.getElementById('remCycle').value;
+                const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
+                
+                let stepMonths = 1;
+                if (cycle === 'bimonthly') stepMonths = 2;
+                if (cycle === 'quarterly') stepMonths = 3;
+                if (cycle === 'yearly') stepMonths = 12;
 
-            state.reminders.push(rem);
+                const countToGenerate = cycle === 'once' ? 1 : Math.max(1, totalCount);
+
+                for (let i = 0; i < countToGenerate; i++) {
+                    const instDate = addJalaliMonths(dueDate, i * stepMonths);
+                    const remInstance = {
+                        id: (Date.now() + i).toString(),
+                        title: countToGenerate > 1 ? `${title} (قسط ${i + 1})` : title,
+                        amount,
+                        dueDate: instDate,
+                        cycle,
+                        installmentIndex: countToGenerate > 1 ? (i + 1) : null,
+                        totalCount: countToGenerate > 1 ? countToGenerate : null
+                    };
+                    state.reminders.push(remInstance);
+                }
+            }
+
             saveState();
             renderAll();
             closeModal('reminderModal');
-            document.getElementById('remTitle').value = '';
-            document.getElementById('remAmount').value = '';
         }
 
         function markReminderPaid(remId) {
@@ -950,11 +983,6 @@
             if (!state.months[state.activeMonth].paidReminders) state.months[state.activeMonth].paidReminders = [];
             state.months[state.activeMonth].paidReminders.push(remId);
 
-            if (rem.totalCount) {
-                rem.paidCount = (rem.paidCount || 0) + 1;
-            }
-
-            // Record as Fixed Expense transaction
             const tx = {
                 id: Date.now().toString(),
                 type: 'expense',
@@ -978,8 +1006,117 @@
         }
 
         function deleteReminder(remId) {
-            if (!confirm('آیا این یادآور به طور کامل حذف شود؟')) return;
+            if (!confirm('آیا این یادآور حذف شود؟')) return;
             state.reminders = state.reminders.filter(r => r.id !== remId);
+            saveState();
+            renderAll();
+        }
+
+        // EDIT & SUBMIT EXPENSE
+        function editTransaction(txId) {
+            const curr = state.months[state.activeMonth];
+            const tx = curr.transactions.find(t => t.id === txId);
+            if (!tx) return;
+
+            if (tx.type === 'expense') {
+                document.getElementById('editExpId').value = tx.id;
+                document.getElementById('expModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ff453a]"></i> ویرایش هزینه';
+                document.getElementById('expSubmitBtn').innerText = 'ذخیره تغییرات';
+                document.getElementById('expAmount').value = Number(tx.amount).toLocaleString('en-US');
+                document.getElementById('expDate').value = tx.date;
+                document.getElementById('expDesc').value = tx.desc || '';
+                
+                const catRadio = document.querySelector(`input[name="expCat"][value="${tx.category}"]`);
+                if (catRadio) catRadio.checked = true;
+                
+                openModal('expenseModal');
+            } else if (tx.type === 'income') {
+                document.getElementById('editIncId').value = tx.id;
+                document.getElementById('incModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#30d158]"></i> ویرایش ورودی پول';
+                document.getElementById('incSubmitBtn').innerText = 'ذخیره تغییرات';
+                document.getElementById('incAmount').value = Number(tx.amount).toLocaleString('en-US');
+                document.getElementById('incDate').value = tx.date;
+                document.getElementById('incDesc').value = tx.desc || '';
+                
+                const typeRadio = document.querySelector(`input[name="incType"][value="${tx.incomeType || 'planned'}"]`);
+                if (typeRadio) typeRadio.checked = true;
+                
+                openModal('incomeModal');
+            }
+        }
+
+        function submitExpense(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editExpId').value;
+            const amount = cleanNumber(document.getElementById('expAmount').value);
+            if (!amount) return;
+
+            const category = document.querySelector('input[name="expCat"]:checked').value;
+            const date = document.getElementById('expDate').value;
+            const desc = document.getElementById('expDesc').value.trim();
+
+            const curr = state.months[state.activeMonth];
+
+            if (editId) {
+                const target = curr.transactions.find(t => t.id === editId);
+                if (target) {
+                    target.amount = amount;
+                    target.category = category;
+                    target.date = date;
+                    target.desc = desc;
+                }
+            } else {
+                const tx = { id: Date.now().toString(), type: 'expense', amount, category, date, desc };
+                curr.transactions.push(tx);
+            }
+
+            saveState();
+            renderAll();
+            closeModal('expenseModal');
+            document.getElementById('editExpId').value = '';
+            document.getElementById('expAmount').value = '';
+            document.getElementById('expDesc').value = '';
+            document.getElementById('expSubmitBtn').innerText = 'ثبت نهایی هزینه';
+        }
+
+        function submitIncome(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editIncId').value;
+            const amount = cleanNumber(document.getElementById('incAmount').value);
+            if (!amount) return;
+
+            const incomeType = document.querySelector('input[name="incType"]:checked').value;
+            const date = document.getElementById('incDate').value;
+            const desc = document.getElementById('incDesc').value.trim();
+
+            const curr = state.months[state.activeMonth];
+
+            if (editId) {
+                const target = curr.transactions.find(t => t.id === editId);
+                if (target) {
+                    target.amount = amount;
+                    target.incomeType = incomeType;
+                    target.date = date;
+                    target.desc = desc;
+                }
+            } else {
+                const tx = { id: Date.now().toString(), type: 'income', incomeType, amount, date, desc };
+                curr.transactions.push(tx);
+            }
+
+            saveState();
+            renderAll();
+            closeModal('incomeModal');
+            document.getElementById('editIncId').value = '';
+            document.getElementById('incAmount').value = '';
+            document.getElementById('incDesc').value = '';
+            document.getElementById('incSubmitBtn').innerText = 'ثبت ورودی پول';
+        }
+
+        function deleteTx(id) {
+            if (!confirm('آیا این تراکنش حذف شود؟')) return;
+            const list = state.months[state.activeMonth].transactions;
+            state.months[state.activeMonth].transactions = list.filter(item => item.id !== id);
             saveState();
             renderAll();
         }
@@ -1043,52 +1180,6 @@
             saveState();
             renderAll();
             alert('بودجه این ماه با موفقیت ذخیره شد.');
-        }
-
-        function submitExpense(e) {
-            e.preventDefault();
-            const amount = cleanNumber(document.getElementById('expAmount').value);
-            if (!amount) return;
-
-            const category = document.querySelector('input[name="expCat"]:checked').value;
-            const date = document.getElementById('expDate').value;
-            const desc = document.getElementById('expDesc').value.trim();
-
-            const tx = { id: Date.now().toString(), type: 'expense', amount, category, date, desc };
-            state.months[state.activeMonth].transactions.push(tx);
-
-            saveState();
-            renderAll();
-            closeModal('expenseModal');
-            document.getElementById('expAmount').value = '';
-            document.getElementById('expDesc').value = '';
-        }
-
-        function submitIncome(e) {
-            e.preventDefault();
-            const amount = cleanNumber(document.getElementById('incAmount').value);
-            if (!amount) return;
-
-            const incomeType = document.querySelector('input[name="incType"]:checked').value;
-            const date = document.getElementById('incDate').value;
-            const desc = document.getElementById('incDesc').value.trim();
-
-            const tx = { id: Date.now().toString(), type: 'income', incomeType, amount, date, desc };
-            state.months[state.activeMonth].transactions.push(tx);
-
-            saveState();
-            renderAll();
-            closeModal('incomeModal');
-            document.getElementById('incAmount').value = '';
-            document.getElementById('incDesc').value = '';
-        }
-
-        function deleteTx(id) {
-            if (!confirm('آیا این تراکنش حذف شود؟')) return;
-            const list = state.months[state.activeMonth].transactions;
-            state.months[state.activeMonth].transactions = list.filter(item => item.id !== id);
-            saveState();
-            renderAll();
         }
 
         function switchTab(tabId) {
