@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Vazirmatn Font -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
@@ -50,10 +46,8 @@
                 </div>
             </div>
 
-            <!-- Month Selector & Cloud Auth -->
             <div class="flex items-center gap-2">
                 <select id="globalMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-slate-900/90 text-xs border border-slate-700 text-sky-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500">
-                    <!-- Dynamic Month List -->
                 </select>
                 <button id="authBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
                     <i class="fa-brands fa-google text-slate-300"></i>
@@ -63,12 +57,11 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Content Container -->
     <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar">
 
-        <!-- TAB 1: OVERVIEW & EXPENSES -->
+        <!-- TAB 1: DAILY & TRANSACTIONS -->
         <section id="tab-daily" class="tab-content space-y-4">
-            <!-- Budget Metric Cards -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
                     <div class="flex items-center justify-between text-slate-400 mb-1">
@@ -89,7 +82,6 @@
                 </div>
             </div>
 
-            <!-- Quick Action Buttons -->
             <div class="flex gap-2">
                 <button onclick="openModal('expenseModal')" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-95 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 active:scale-[0.98] transition">
                     <i class="fa-solid fa-minus-circle"></i>
@@ -101,27 +93,24 @@
                 </button>
             </div>
 
-            <!-- Recent Transaction History -->
             <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-bold text-xs text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt text-slate-400"></i> تراکنش‌های اخیر این ماه
+                        <i class="fa-solid fa-receipt text-slate-400"></i> تراکنش‌های این ماه
                     </h3>
                     <span id="txCount" class="text-[10px] bg-slate-700/50 px-2 py-0.5 rounded-md text-slate-400">۰ مورد</span>
                 </div>
-                <div id="txList" class="space-y-2.5">
-                    <!-- Dynamic TX Items -->
-                </div>
+                <div id="txList" class="space-y-2.5"></div>
             </div>
         </section>
 
-        <!-- TAB 2: BUDGET PLANNING (EDITABLE) -->
+        <!-- TAB 2: BUDGET PLANNING -->
         <section id="tab-budget" class="tab-content hidden space-y-4">
             <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
                 <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
                     <div>
-                        <h2 class="font-bold text-sm text-slate-100">برنامه‌ریزی و بودجه ابتدای ماه</h2>
-                        <p class="text-[11px] text-slate-400">این مقادیر در هر زمان قابل ویرایش هستند.</p>
+                        <h2 class="font-bold text-sm text-slate-100">بودجه‌ریزی اول ماه</h2>
+                        <p class="text-[11px] text-slate-400">در هر زمان می‌توانید مقادیر را تغییر دهید.</p>
                     </div>
                     <span id="budgetMonthBadge" class="text-[11px] bg-sky-500/20 text-sky-400 px-2.5 py-1 rounded-lg"></span>
                 </div>
@@ -129,45 +118,42 @@
                 <form id="budgetForm" onsubmit="saveMonthlyBudget(event)" class="space-y-3.5">
                     <div>
                         <label class="text-xs text-slate-300 mb-1 block">درآمد کل تخمینی این ماه (تومان)</label>
-                        <input type="text" id="planIncome" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500" placeholder="مثلاً: ۲۰,۰۰۰,۰۰۰" required>
+                        <input type="text" id="planIncome" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500" placeholder="۰" required>
                     </div>
 
                     <div>
                         <label class="text-xs text-slate-300 mb-1 block">هدف پس‌انداز ماه (تومان)</label>
-                        <input type="text" id="planSavings" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="مثلاً: ۵,۰۰۰,۰۰۰" required>
+                        <input type="text" id="planSavings" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="۰" required>
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-300 mb-1 block">هزینه‌های ثابت و اجباری ماه (تومان)</label>
-                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-rose-400 focus:outline-none focus:border-rose-500" placeholder="اجاره، قبوض، اقساط..." required>
+                        <label class="text-xs text-slate-300 mb-1 block">هزینه‌های ثابت ماه (تومان)</label>
+                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-rose-400 focus:outline-none focus:border-rose-500" placeholder="۰" required>
                     </div>
 
                     <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                        <span class="text-slate-400">بودجه خالص مجاز برای خرج روزمره:</span>
+                        <span class="text-slate-400">سقف بودجه مجاز برای خرج روزمره:</span>
                         <span id="calcDisposable" class="font-bold text-sky-400">۰ تومان</span>
                     </div>
 
                     <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-sm">
-                        ذخیره و به‌روزرسانی بودجه
+                        ذخیره تغییرات بودجه
                     </button>
                 </form>
             </div>
         </section>
 
-        <!-- TAB 3: MONTHLY REFLECTION -->
+        <!-- TAB 3: REFLECTION -->
         <section id="tab-reflection" class="tab-content hidden space-y-4">
             <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-700 pb-3">
                     <h2 class="font-bold text-sm text-slate-100">کارنامه و بازتاب ماهانه</h2>
                     <select id="reflectionMonthSelect" onchange="renderReflection(this.value)" class="bg-slate-900 text-xs border border-slate-700 text-sky-400 rounded-lg px-2 py-1">
-                        <!-- Dynamic Month List -->
                     </select>
                 </div>
 
-                <!-- 4 Kakeibo Categories Breakdown -->
                 <div class="space-y-2.5">
                     <h3 class="text-xs font-semibold text-slate-300">تفکیک مخارج ۴ دسته کاکیبو:</h3>
-                    
                     <div class="space-y-2">
                         <div>
                             <div class="flex justify-between text-[11px] mb-1">
@@ -175,7 +161,7 @@
                                 <span id="refNeeds" class="font-bold text-slate-200">۰ تومان</span>
                             </div>
                             <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barNeeds" class="bg-emerald-400 h-full w-0"></div>
+                                <div id="barNeeds" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
 
@@ -185,17 +171,17 @@
                                 <span id="refWants" class="font-bold text-slate-200">۰ تومان</span>
                             </div>
                             <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barWants" class="bg-amber-400 h-full w-0"></div>
+                                <div id="barWants" class="bg-amber-400 h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
 
                         <div>
                             <div class="flex justify-between text-[11px] mb-1">
-                                <span class="text-slate-300">📚 فرهنگ و آموزش (رشد)</span>
+                                <span class="text-slate-300">📚 رشد و آموزش</span>
                                 <span id="refCulture" class="font-bold text-slate-200">۰ تومان</span>
                             </div>
                             <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barCulture" class="bg-sky-400 h-full w-0"></div>
+                                <div id="barCulture" class="bg-sky-400 h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
 
@@ -205,16 +191,15 @@
                                 <span id="refUnexpected" class="font-bold text-slate-200">۰ تومان</span>
                             </div>
                             <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barUnexpected" class="bg-rose-400 h-full w-0"></div>
+                                <div id="barUnexpected" class="bg-rose-400 h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Planned vs Actual Summary Table -->
                 <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-2">
                     <div class="flex justify-between text-slate-400">
-                        <span>درآمد پیش‌بینی اول ماه:</span>
+                        <span>درآمد پیش‌بینی:</span>
                         <span id="refPlanIncome" class="font-bold text-slate-200">۰ تومان</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
@@ -222,11 +207,11 @@
                         <span id="refPlanSavings" class="font-bold text-emerald-400">۰ تومان</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
-                        <span>هزینه‌های ثابت پیش‌بینی:</span>
+                        <span>هزینه‌های ثابت:</span>
                         <span id="refPlanFixed" class="font-bold text-slate-200">۰ تومان</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-300 font-bold">
-                        <span>کل هزینه‌های متغیر ثبت‌شده:</span>
+                        <span>کل هزینه‌های ثبت‌شده:</span>
                         <span id="refTotalSpent" class="text-rose-400">۰ تومان</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-100 font-bold text-sm">
@@ -236,7 +221,6 @@
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- EXPENSE MODAL -->
@@ -262,31 +246,31 @@
                     <div class="grid grid-cols-2 gap-2">
                         <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
                             <input type="radio" name="expCat" value="needs" checked class="accent-emerald-400">
-                            <span>🍜 نیازها (خوراک، درمان)</span>
+                            <span>🍜 نیازها</span>
                         </label>
                         <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
                             <input type="radio" name="expCat" value="wants" class="accent-amber-400">
-                            <span>🛍️ خواسته‌ها (تفریح، خرید)</span>
+                            <span>🛍️ خواسته‌ها</span>
                         </label>
                         <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
                             <input type="radio" name="expCat" value="culture" class="accent-sky-400">
-                            <span>📚 رشد و فرهنگ (کتاب، دوره)</span>
+                            <span>📚 رشد و آموزش</span>
                         </label>
                         <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
                             <input type="radio" name="expCat" value="unexpected" class="accent-rose-400">
-                            <span>⚡ غیرمنتظره (تعمیرات...)</span>
+                            <span>⚡ غیرمنتظره</span>
                         </label>
                     </div>
                 </div>
 
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="expDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="۱۴۰۵/۰۶/۰۸" required>
+                    <input type="text" id="expDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" required>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">توضیح یا عنوان خرج (اختیاری)</label>
-                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید سوپرمارکت">
+                    <label class="text-xs text-slate-400 block mb-1">عنوان یا توضیح (اختیاری)</label>
+                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید میوه">
                 </div>
 
                 <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-rose-500/20 text-sm transition">
@@ -316,12 +300,12 @@
 
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="incDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="۱۴۰۵/۰۶/۰۸" required>
+                    <input type="text" id="incDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" required>
                 </div>
 
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">منبع یا توضیح (اختیاری)</label>
-                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: واریز فریلنس، پاداش">
+                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: حقوق، واریز متفرقه">
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-emerald-500/20 text-sm transition">
@@ -331,7 +315,7 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur border-t border-slate-700/60 z-30">
         <div class="max-w-md mx-auto flex justify-around items-center py-2 text-xs text-slate-400">
             <button onclick="switchTab('daily')" class="tab-btn active flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
@@ -349,9 +333,7 @@
         </div>
     </nav>
 
-    <!-- Application Script -->
     <script>
-        // CLIENT_ID (Set dynamically from your Google Cloud Console)
         const CLIENT_ID = '1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com';
         const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 
@@ -360,17 +342,15 @@
             'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
         ];
 
-        // Global State Structure
         let state = {
-            activeMonth: '1405-06', // Year-Month key
-            months: {} // Key: "1405-06" => { budget: {income, savings, fixed}, transactions: [] }
+            activeMonth: '1405-06',
+            months: {}
         };
 
         let tokenClient;
         let accessToken = null;
         let driveFileId = null;
 
-        // Utilities: Persian Number Formatting & Comma Separator
         function formatNumber(num) {
             if (num === null || num === undefined || isNaN(num)) return '۰';
             return Number(num).toLocaleString('fa-IR');
@@ -378,7 +358,6 @@
 
         function cleanNumber(str) {
             if (!str) return 0;
-            // Convert Persian/Arabic digits to English
             const p2e = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
             const cleaned = p2e(str.toString()).replace(/,/g, '').replace(/[^0-9]/g, '');
             return parseInt(cleaned, 10) || 0;
@@ -390,7 +369,6 @@
             if (input.id.startsWith('plan')) updateLiveDisposable();
         }
 
-        // Jalali Simple Date Formatter
         function getTodayJalali() {
             try {
                 const now = new Date();
@@ -406,8 +384,8 @@
             }
         }
 
-        // Lifecycle Init
         window.addEventListener('load', () => {
+            migrateOldData();
             loadLocalState();
             populateMonthDropdowns();
             initGoogleClient();
@@ -415,6 +393,29 @@
             document.getElementById('incDate').value = getTodayJalali();
             renderAll();
         });
+
+        // Migration logic for previous single-month data
+        function migrateOldData() {
+            const legacyKeys = ['kakeibo_data', 'kakeibo_app_data', 'kakeibo_state'];
+            legacyKeys.forEach(k => {
+                const old = localStorage.getItem(k);
+                if (old) {
+                    try {
+                        const parsed = JSON.parse(old);
+                        ensureMonthExists('1405-06');
+                        if (parsed.budget) state.months['1405-06'].budget = parsed.budget;
+                        if (parsed.expenses && parsed.expenses.length > 0) {
+                            parsed.expenses.forEach(e => {
+                                if (!e.type) e.type = 'expense';
+                                state.months['1405-06'].transactions.push(e);
+                            });
+                        }
+                        saveState();
+                        localStorage.removeItem(k);
+                    } catch (e) {}
+                }
+            });
+        }
 
         function populateMonthDropdowns() {
             const currentYear = 1405;
@@ -453,12 +454,10 @@
             }
         }
 
-        // Render Functions
         function renderAll() {
             ensureMonthExists(state.activeMonth);
             const curr = state.months[state.activeMonth];
 
-            // Budget calculations
             const dispBudget = Math.max(0, (curr.budget.income || 0) - (curr.budget.savings || 0) - (curr.budget.fixed || 0));
             let totalSpent = 0;
             let totalIncomeExtra = 0;
@@ -471,23 +470,18 @@
             const remBudget = (dispBudget + totalIncomeExtra) - totalSpent;
             const daily = Math.round(Math.max(0, remBudget) / 30);
 
-            // Populate Overview Card
             document.getElementById('remBudgetDisplay').innerText = `${formatNumber(remBudget)} تومان`;
             document.getElementById('dailyAllowanceDisplay').innerText = `سهمیه روز: ${formatNumber(daily)} تومان`;
             document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalIncomeExtra)} تومان`;
             document.getElementById('totalExpenseDisplay').innerText = `خرج کل: ${formatNumber(totalSpent + (curr.budget.fixed || 0))} تومان`;
 
-            // Populate Budget Form Fields
             document.getElementById('budgetMonthBadge').innerText = document.getElementById('globalMonthSelect').selectedOptions[0]?.text || '';
             document.getElementById('planIncome').value = curr.budget.income ? Number(curr.budget.income).toLocaleString('en-US') : '';
             document.getElementById('planSavings').value = curr.budget.savings ? Number(curr.budget.savings).toLocaleString('en-US') : '';
             document.getElementById('planFixed').value = curr.budget.fixed ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
             updateLiveDisposable();
 
-            // Populate Transactions List
             renderTxList(curr.transactions);
-
-            // Populate Reflection
             renderReflection(state.activeMonth);
         }
 
@@ -502,15 +496,15 @@
             }
 
             const catMap = {
-                needs: { label: 'نیازها', icon: '🍜', color: 'text-emerald-400' },
-                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-amber-400' },
-                culture: { label: 'رشد و فرهنگ', icon: '📚', color: 'text-sky-400' },
-                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-rose-400' }
+                needs: { label: 'نیازها', icon: '🍜' },
+                wants: { label: 'خواسته‌ها', icon: '🛍️' },
+                culture: { label: 'رشد و آموزش', icon: '📚' },
+                unexpected: { label: 'غیرمنتظره', icon: '⚡' }
             };
 
             [...list].reverse().forEach(t => {
                 const isExp = t.type === 'expense';
-                const catInfo = catMap[t.category] || { label: 'درآمد', icon: '💰', color: 'text-emerald-400' };
+                const catInfo = catMap[t.category] || { label: 'درآمد', icon: '💰' };
                 const item = document.createElement('div');
                 item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs';
                 item.innerHTML = `
@@ -571,7 +565,6 @@
             document.getElementById('calcDisposable').innerText = `${formatNumber(disp)} تومان`;
         }
 
-        // Form Submissions
         function saveMonthlyBudget(e) {
             e.preventDefault();
             const curr = state.months[state.activeMonth];
@@ -582,7 +575,7 @@
             };
             saveState();
             renderAll();
-            alert('بودجه این ماه با موفقیت به‌روزرسانی شد.');
+            alert('بودجه ذخیره شد.');
         }
 
         function submitExpense(e) {
@@ -630,7 +623,6 @@
             renderAll();
         }
 
-        // UI Tabs & Modals
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -641,7 +633,6 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        // Local & Cloud Storage Management
         function saveState() {
             localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
             if (accessToken) syncToDrive();
@@ -654,7 +645,6 @@
             }
         }
 
-        // Google Drive AppData Sync
         function initGoogleClient() {
             if (typeof google === 'undefined') return;
             tokenClient = google.accounts.oauth2.initTokenClient({
@@ -688,8 +678,14 @@
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
                     const cloudData = await fileRes.json();
-                    if (cloudData && cloudData.months) {
-                        state = cloudData;
+                    if (cloudData) {
+                        if (cloudData.months) {
+                            state = cloudData;
+                        } else if (cloudData.budget || cloudData.expenses) {
+                            ensureMonthExists('1405-06');
+                            if (cloudData.budget) state.months['1405-06'].budget = cloudData.budget;
+                            if (cloudData.expenses) state.months['1405-06'].transactions = cloudData.expenses;
+                        }
                         localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
                         populateMonthDropdowns();
                         renderAll();
