@@ -41,7 +41,7 @@
                 <div>
                     <h1 class="font-bold text-sm leading-tight text-slate-100">کاکیبو ژاپنی</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> ذخیره محلی فعال
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)
                     </span>
                 </div>
             </div>
@@ -49,10 +49,20 @@
             <div class="flex items-center gap-2">
                 <select id="globalMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-slate-900/90 text-xs border border-slate-700 text-sky-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500">
                 </select>
-                <button id="authBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
-                    <i class="fa-brands fa-google text-slate-300"></i>
-                    <span id="authBtnText">ورود به گوگل</span>
-                </button>
+                
+                <!-- Auth Container (Login / User Info & Logout) -->
+                <div id="authContainer" class="flex items-center gap-1.5">
+                    <button id="loginBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
+                        <i class="fa-brands fa-google text-slate-300"></i>
+                        <span>ورود</span>
+                    </button>
+                    <div id="userProfile" class="hidden flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 px-2 py-1 rounded-lg">
+                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[90px] truncate"></span>
+                        <button onclick="handleLogout()" title="خروج از حساب" class="text-rose-400 hover:text-rose-300 p-0.5">
+                            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -335,21 +345,29 @@
 
     <script>
         const CLIENT_ID = '1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
 
         const MONTH_NAMES = [
             'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
             'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
         ];
 
-        let state = {
-            activeMonth: '1405-06',
-            months: {}
-        };
+        function getEmptyState() {
+            return {
+                activeMonth: '1405-06',
+                months: {}
+            };
+        }
 
+        let state = getEmptyState();
+        let currentUserEmail = null;
         let tokenClient;
         let accessToken = null;
         let driveFileId = null;
+
+        function getStorageKey() {
+            return currentUserEmail ? `kakeibo_user_${currentUserEmail}` : 'kakeibo_guest_data';
+        }
 
         function formatNumber(num) {
             if (num === null || num === undefined || isNaN(num)) return '۰';
@@ -610,16 +628,20 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function saveState() {
-            localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
+            localStorage.setItem(getStorageKey(), JSON.stringify(state));
             if (accessToken) syncToDrive();
         }
 
         function loadLocalState() {
-            const saved = localStorage.getItem('kakeibo_multi_data');
+            const saved = localStorage.getItem(getStorageKey());
             if (saved) {
                 try { 
                     state = JSON.parse(saved); 
-                } catch (e) {}
+                } catch (e) {
+                    state = getEmptyState();
+                }
+            } else {
+                state = getEmptyState();
             }
         }
 
@@ -631,17 +653,58 @@
                 callback: async (resp) => {
                     if (resp.error) return;
                     accessToken = resp.access_token;
-                    document.getElementById('authBtnText').innerText = 'متصل به گوگل';
-                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
-                    document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
+                    
+                    // Fetch user email to separate profile data
+                    await fetchUserProfile();
                     await fetchFromDrive();
                 }
             });
         }
 
+        async function fetchUserProfile() {
+            try {
+                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const info = await res.json();
+                if (info && info.email) {
+                    currentUserEmail = info.email;
+                    document.getElementById('loginBtn').classList.add('hidden');
+                    document.getElementById('userProfile').classList.remove('hidden');
+                    document.getElementById('userEmailText').innerText = info.email;
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
+                    
+                    // Load this specific user local state first
+                    loadLocalState();
+                    renderAll();
+                }
+            } catch (e) {
+                console.error('Fetch Profile error', e);
+            }
+        }
+
         function handleAuthClick() {
             if (!tokenClient) initGoogleClient();
-            if (tokenClient) tokenClient.requestAccessToken({ prompt: '' });
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: 'select_account' });
+        }
+
+        function handleLogout() {
+            if (accessToken) {
+                google.accounts.oauth2.revoke(accessToken, () => {});
+            }
+            accessToken = null;
+            currentUserEmail = null;
+            driveFileId = null;
+
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('userProfile').classList.add('hidden');
+            document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)';
+            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1';
+
+            // Reset UI state to guest
+            loadLocalState();
+            renderAll();
         }
 
         async function fetchFromDrive() {
@@ -658,11 +721,12 @@
                     const cloudData = await fileRes.json();
                     if (cloudData && cloudData.months) {
                         state = cloudData;
-                        localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
+                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
                         populateMonthDropdowns();
                         renderAll();
                     }
                 } else {
+                    // Create new empty store for this new Google account in their drive
                     syncToDrive();
                 }
             } catch (err) {
