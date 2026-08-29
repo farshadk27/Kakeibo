@@ -1,505 +1,735 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>دفترچه کاکیبو | همگام با گوگل درایو</title>
-  
-  <!-- تنظیمات iOS PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="کاکیبو">
-  <meta name="theme-color" content="#0f172a">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>دفترچه مالی کاکیبو | Kakeibo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vazirmatn Font -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <!-- کتابخانه‌ها -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Vazirmatn', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-  </style>
+    <style>
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn.active {
+            color: #38bdf8;
+            border-color: #38bdf8;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 select-none">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between select-none">
 
-  <!-- هدر اپلیکیشن -->
-  <header class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/90 backdrop-blur sticky top-0 z-30">
-    <div>
-      <h1 class="text-xl font-black text-amber-400">کاکیبو (家計簿)</h1>
-      <p id="sync-status" class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-        <span class="inline-block w-2 h-2 rounded-full bg-slate-500" id="sync-dot"></span>
-        <span id="sync-text">ذخیره آفلاین</span>
-      </p>
-    </div>
-    
-    <div class="flex items-center gap-2">
-      <button id="auth-btn" onclick="handleAuthClick()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 transition shadow-sm">
-        <span>ورود به گوگل</span>
-      </button>
-      <button onclick="openBudgetModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-xl transition shadow-sm">
-        بودجه ماه
-      </button>
-    </div>
-  </header>
-
-  <main class="p-4 max-w-md mx-auto space-y-4">
-
-    <!-- تب داشبورد و ثبت هزینه -->
-    <div id="tab-dashboard" class="space-y-4">
-      <!-- کارت وضعیت مالی -->
-      <div class="bg-slate-800/90 border border-slate-700/80 p-4 rounded-2xl shadow-xl space-y-3">
-        <div class="flex justify-between items-center text-xs text-slate-400">
-          <span>بودجه قابل خرج ماه:</span>
-          <span id="stat-allowance" class="font-bold text-slate-200">۰ تومان</span>
-        </div>
-        <div class="flex justify-between items-baseline">
-          <div>
-            <span class="text-xs text-slate-400 block">مانده بودجه جاری:</span>
-            <span id="stat-remaining" class="text-2xl font-black text-emerald-400">۰</span>
-            <span class="text-xs text-slate-400">تومان</span>
-          </div>
-          <div class="text-left">
-            <span class="text-xs text-slate-400 block">پس‌انداز هدف:</span>
-            <span id="stat-savings" class="text-sm font-bold text-amber-400">۰ تومان</span>
-          </div>
-        </div>
-        <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-          <div id="stat-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
-        </div>
-      </div>
-
-      <!-- فرم ثبت هزینه -->
-      <div class="bg-slate-800 border border-slate-700/80 p-4 rounded-2xl shadow-lg space-y-3">
-        <h2 class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
-          <span class="text-amber-400">✏️</span> ثبت تراکنش جدید
-        </h2>
-        <form id="expense-form" onsubmit="handleNewExpense(event)" class="space-y-3">
-          <input type="text" id="exp-title" placeholder="عنوان هزینه (مثلاً قهوه، خرید، قبض)" required
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100">
-          
-          <input type="number" id="exp-amount" placeholder="مبلغ (تومان)" required min="1"
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100">
-          
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1.5">انتخاب سطل کاکیبو:</label>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <label class="flex items-center gap-1.5 bg-slate-900 p-2.5 rounded-xl border border-slate-700 cursor-pointer">
-                <input type="radio" name="exp-cat" value="needs" checked class="accent-amber-400">
-                <span>🌱 بقا و نیازها</span>
-              </label>
-              <label class="flex items-center gap-1.5 bg-slate-900 p-2.5 rounded-xl border border-slate-700 cursor-pointer">
-                <input type="radio" name="exp-cat" value="wants" class="accent-amber-400">
-                <span>☕ اختیاری و هوس</span>
-              </label>
-              <label class="flex items-center gap-1.5 bg-slate-900 p-2.5 rounded-xl border border-slate-700 cursor-pointer">
-                <input type="radio" name="exp-cat" value="culture" class="accent-amber-400">
-                <span>📚 رشد و فرهنگ</span>
-              </label>
-              <label class="flex items-center gap-1.5 bg-slate-900 p-2.5 rounded-xl border border-slate-700 cursor-pointer">
-                <input type="radio" name="exp-cat" value="extra" class="accent-amber-400">
-                <span>⚡ پیش‌بینی‌نشده</span>
-              </label>
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition">
-            ثبت در حساب و درایو
-          </button>
-        </form>
-      </div>
-
-      <!-- لیست آخرین تراکنش‌ها -->
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold text-slate-400">تاریخچه هزینه‌ها</h3>
-        <div id="expense-list" class="space-y-2"></div>
-      </div>
-    </div>
-
-    <!-- تب ارزیابی ماهانه (هانسی) -->
-    <div id="tab-hansei" class="space-y-4 hidden">
-      <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl space-y-4">
-        <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
-          <span>🔍</span> بازتاب مالی ماهانه (Hansei)
-        </h2>
-        <div class="space-y-2 text-xs">
-          <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl">
-            <span>🌱 بقا و ضروریات:</span>
-            <span id="hansei-needs" class="font-bold text-slate-200">۰ تومان</span>
-          </div>
-          <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl">
-            <span>☕ اختیاری و هوس‌ها:</span>
-            <span id="hansei-wants" class="font-bold text-rose-400">۰ تومان</span>
-          </div>
-          <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl">
-            <span>📚 رشد فردی و آموزش:</span>
-            <span id="hansei-culture" class="font-bold text-sky-400">۰ تومان</span>
-          </div>
-          <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl">
-            <span>⚡ مخارج غیرمنتظره:</span>
-            <span id="hansei-extra" class="font-bold text-amber-400">۰ تومان</span>
-          </div>
-        </div>
-        <div class="border-t border-slate-700 pt-3 flex justify-between items-center text-sm font-bold">
-          <span>مجموع کل هزینه‌ها:</span>
-          <span id="hansei-total" class="text-emerald-400">۰ تومان</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- تب قانون تأخیر ۳۰ روزه -->
-    <div id="tab-wishlist" class="space-y-4 hidden">
-      <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl space-y-3">
-        <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
-          <span>⏳</span> قانون ۳۰ روز تأخیر
-        </h2>
-        <p class="text-xs text-slate-400">هوس خرید غیرضروری را اینجا بنویسید و ۳۰ روز بعد تصمیم نهایی را بگیرید.</p>
-        <form id="wishlist-form" onsubmit="handleNewWish(event)" class="space-y-2">
-          <input type="text" id="wish-title" placeholder="عنوان کالای مدنظر" required
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-slate-100">
-          <input type="number" id="wish-amount" placeholder="قیمت تقریبی (تومان)" required min="1"
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none text-slate-100">
-          <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs py-2 rounded-xl transition">
-            شروع مهلت ۳۰ روزه
-          </button>
-        </form>
-      </div>
-      <div id="wish-list" class="space-y-2"></div>
-    </div>
-
-  </main>
-
-  <!-- مودال بودجه ابتدای ماه -->
-  <div id="budget-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-2xl">
-      <h3 class="text-base font-bold text-amber-400">تنظیم بودجه ابتدای ماه</h3>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-400 mb-1">۱. درآمد کل در دسترس (تومان):</label>
-          <input type="number" id="setup-income" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-slate-100">
-        </div>
-        <div>
-          <label class="block text-slate-400 mb-1">۲. هدف پس‌انداز (سهم اول ماه خودتان):</label>
-          <input type="number" id="setup-savings" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-slate-100">
-        </div>
-        <div>
-          <label class="block text-slate-400 mb-1">۳. مخارج ثابت و قطعی (اجاره، قبوض):</label>
-          <input type="number" id="setup-fixed" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-slate-100">
-        </div>
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="saveBudgetPlan()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-xl text-xs">ذخیره و همگام‌سازی</button>
-        <button onclick="closeBudgetModal()" class="px-4 bg-slate-700 hover:bg-slate-600 rounded-xl text-xs">انصراف</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- تب‌بار پایین صفحه برای iOS -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-t border-slate-800 flex justify-around p-2 z-40">
-    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-amber-400 py-1 px-3 rounded-lg text-xs">
-      <span>📝</span>
-      <span>ثبت خرج</span>
-    </button>
-    <button onclick="switchTab('hansei')" id="nav-hansei" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-3 rounded-lg text-xs">
-      <span>🔍</span>
-      <span>بازتاب ماه</span>
-    </button>
-    <button onclick="switchTab('wishlist')" id="nav-wishlist" class="flex flex-col items-center gap-1 text-slate-400 py-1 px-3 rounded-lg text-xs">
-      <span>⏳</span>
-      <span>تأخیر ۳۰ روز</span>
-    </button>
-  </nav>
-
-  <script>
-    const CLIENT_ID = '1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com';
-    const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-
-    let tokenClient;
-    let accessToken = null;
-    let driveFileId = null;
-
-    let appData = JSON.parse(localStorage.getItem('kakeibo_data')) || {
-      income: 0,
-      savingsTarget: 0,
-      fixedExpenses: 0,
-      expenses: [],
-      wishes: []
-    };
-
-    window.onload = () => {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: async (resp) => {
-          if (resp.error) {
-            console.error(resp);
-            return;
-          }
-          accessToken = resp.access_token;
-          setSyncStatus('connected', 'متصل به گوگل درایو');
-          document.getElementById('auth-btn').innerText = 'همگام شد ✅';
-          await loadFromDrive();
-        },
-      });
-      renderAll();
-    };
-
-    function handleAuthClick() {
-      tokenClient.requestAccessToken({ prompt: 'consent' });
-    }
-
-    function setSyncStatus(status, message) {
-      const dot = document.getElementById('sync-dot');
-      const text = document.getElementById('sync-text');
-      text.innerText = message;
-      if (status === 'connected') {
-        dot.className = 'inline-block w-2 h-2 rounded-full bg-emerald-500';
-      } else if (status === 'syncing') {
-        dot.className = 'inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping';
-      } else {
-        dot.className = 'inline-block w-2 h-2 rounded-full bg-slate-500';
-      }
-    }
-
-    async function loadFromDrive() {
-      try {
-        setSyncStatus('syncing', 'در حال دریافت اطلاعات...');
-        const listRes = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='kakeibo_data.json'", {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        });
-        const listData = await listRes.json();
-
-        if (listData.files && listData.files.length > 0) {
-          driveFileId = listData.files[0].id;
-          const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
-            headers: { Authorization: `Bearer ${accessToken}` }
-          });
-          const cloudData = await fileRes.json();
-          appData = cloudData;
-          localStorage.setItem('kakeibo_data', JSON.stringify(appData));
-        } else {
-          await saveToDrive();
-        }
-        setSyncStatus('connected', 'همگام با گوگل درایو');
-        renderAll();
-      } catch (err) {
-        console.error('خطا در بارگذاری از درایو:', err);
-        setSyncStatus('error', 'خطا در بارگذاری');
-      }
-    }
-
-    async function saveToDrive() {
-      if (!accessToken) return;
-      try {
-        setSyncStatus('syncing', 'در حال ذخیره در درایو...');
-        const fileContent = JSON.stringify(appData);
-        
-        if (!driveFileId) {
-          const form = new FormData();
-          const metadata = { name: 'kakeibo_data.json', parents: ['appDataFolder'] };
-          form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-          form.append('file', new Blob([fileContent], { type: 'application/json' }));
-
-          const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${accessToken}` },
-            body: form
-          });
-          const data = await res.json();
-          driveFileId = data.id;
-        } else {
-          await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-            method: 'PATCH',
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json'
-            },
-            body: fileContent
-          });
-        }
-        setSyncStatus('connected', 'همگام با گوگل درایو');
-      } catch (err) {
-        console.error('خطا در ذخیره روی درایو:', err);
-        setSyncStatus('error', 'عدم اتصال به درایو');
-      }
-    }
-
-    function saveState() {
-      localStorage.setItem('kakeibo_data', JSON.stringify(appData));
-      renderAll();
-      if (accessToken) saveToDrive();
-    }
-
-    function formatNumber(num) {
-      return (Number(num) || 0).toLocaleString('fa-IR');
-    }
-
-    function openBudgetModal() {
-      document.getElementById('setup-income').value = appData.income || '';
-      document.getElementById('setup-savings').value = appData.savingsTarget || '';
-      document.getElementById('setup-fixed').value = appData.fixedExpenses || '';
-      document.getElementById('budget-modal').classList.remove('hidden');
-      document.getElementById('budget-modal').classList.add('flex');
-    }
-
-    function closeBudgetModal() {
-      document.getElementById('budget-modal').classList.add('hidden');
-      document.getElementById('budget-modal').classList.remove('flex');
-    }
-
-    function saveBudgetPlan() {
-      appData.income = Number(document.getElementById('setup-income').value) || 0;
-      appData.savingsTarget = Number(document.getElementById('setup-savings').value) || 0;
-      appData.fixedExpenses = Number(document.getElementById('setup-fixed').value) || 0;
-      closeBudgetModal();
-      saveState();
-    }
-
-    function handleNewExpense(e) {
-      e.preventDefault();
-      const title = document.getElementById('exp-title').value;
-      const amount = Number(document.getElementById('exp-amount').value);
-      const cat = document.querySelector('input[name="exp-cat"]:checked').value;
-
-      appData.expenses.unshift({
-        id: Date.now(),
-        title,
-        amount,
-        category: cat,
-        date: new Date().toLocaleDateString('fa-IR')
-      });
-
-      document.getElementById('expense-form').reset();
-      saveState();
-    }
-
-    function deleteExpense(id) {
-      appData.expenses = appData.expenses.filter(i => i.id !== id);
-      saveState();
-    }
-
-    function handleNewWish(e) {
-      e.preventDefault();
-      const title = document.getElementById('wish-title').value;
-      const amount = Number(document.getElementById('wish-amount').value);
-
-      appData.wishes.unshift({
-        id: Date.now(),
-        title,
-        amount,
-        date: new Date().toLocaleDateString('fa-IR'),
-        timestamp: Date.now()
-      });
-
-      document.getElementById('wishlist-form').reset();
-      saveState();
-    }
-
-    function deleteWish(id) {
-      appData.wishes = appData.wishes.filter(w => w.id !== id);
-      saveState();
-    }
-
-    const catMap = {
-      needs: { title: 'بقا و نیاز', color: 'text-emerald-400', badge: 'bg-emerald-950/70 text-emerald-400' },
-      wants: { title: 'اختیاری/هوس', color: 'text-rose-400', badge: 'bg-rose-950/70 text-rose-400' },
-      culture: { title: 'رشد و فرهنگ', color: 'text-sky-400', badge: 'bg-sky-950/70 text-sky-400' },
-      extra: { title: 'پیش‌بینی‌نشده', color: 'text-amber-400', badge: 'bg-amber-950/70 text-amber-400' }
-    };
-
-    function renderDashboard() {
-      const dailyAllowance = Math.max(0, appData.income - appData.savingsTarget - appData.fixedExpenses);
-      const totalSpent = appData.expenses.reduce((acc, curr) => acc + curr.amount, 0);
-      const remaining = dailyAllowance - totalSpent;
-
-      document.getElementById('stat-allowance').innerText = `${formatNumber(dailyAllowance)} تومان`;
-      document.getElementById('stat-savings').innerText = `${formatNumber(appData.savingsTarget)} تومان`;
-      
-      const remElem = document.getElementById('stat-remaining');
-      remElem.innerText = formatNumber(remaining);
-      remElem.className = remaining >= 0 ? 'text-2xl font-black text-emerald-400' : 'text-2xl font-black text-rose-500';
-
-      const progress = dailyAllowance > 0 ? Math.min(100, Math.max(0, ((dailyAllowance - totalSpent) / dailyAllowance) * 100)) : 0;
-      document.getElementById('stat-progress').style.width = `${progress}%`;
-
-      const listContainer = document.getElementById('expense-list');
-      if (appData.expenses.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">هنوز خرجی ثبت نشده است.</p>`;
-        return;
-      }
-
-      listContainer.innerHTML = appData.expenses.map(item => `
-        <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex justify-between items-center text-xs">
-          <div class="space-y-1">
-            <div class="font-bold text-slate-200">${item.title}</div>
+    <!-- Header & Sync Status -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30 px-4 py-3">
+        <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded ${catMap[item.category].badge} text-[10px]">${catMap[item.category].title}</span>
-              <span class="text-slate-500 text-[10px]">${item.date}</span>
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-wallet text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm leading-tight text-slate-100">کاکیبو ژاپنی</h1>
+                    <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> آفلاین (محلی)
+                    </span>
+                </div>
             </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="font-bold ${catMap[item.category].color}">${formatNumber(item.amount)} ت</span>
-            <button onclick="deleteExpense(${item.id})" class="text-slate-500 hover:text-rose-400 text-sm">✕</button>
-          </div>
+
+            <!-- Month Selector & Cloud Auth -->
+            <div class="flex items-center gap-2">
+                <select id="globalMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-slate-900/90 text-xs border border-slate-700 text-sky-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500">
+                    <!-- Dynamic Month List -->
+                </select>
+                <button id="authBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
+                    <i class="fa-brands fa-google text-slate-300"></i>
+                    <span id="authBtnText">ورود</span>
+                </button>
+            </div>
         </div>
-      `).join('');
-    }
+    </header>
 
-    function renderHansei() {
-      let totals = { needs: 0, wants: 0, culture: 0, extra: 0, all: 0 };
-      appData.expenses.forEach(e => {
-        if (totals[e.category] !== undefined) totals[e.category] += e.amount;
-        totals.all += e.amount;
-      });
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar">
 
-      document.getElementById('hansei-needs').innerText = `${formatNumber(totals.needs)} تومان`;
-      document.getElementById('hansei-wants').innerText = `${formatNumber(totals.wants)} تومان`;
-      document.getElementById('hansei-culture').innerText = `${formatNumber(totals.culture)} تومان`;
-      document.getElementById('hansei-extra').innerText = `${formatNumber(totals.extra)} تومان`;
-      document.getElementById('hansei-total').innerText = `${formatNumber(totals.all)} تومان`;
-    }
+        <!-- TAB 1: OVERVIEW & EXPENSES -->
+        <section id="tab-daily" class="tab-content space-y-4">
+            <!-- Budget Metric Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="text-xs">مانده بودجه خرج</span>
+                        <i class="fa-solid fa-coins text-sky-400 text-xs"></i>
+                    </div>
+                    <div id="remBudgetDisplay" class="text-lg font-black text-white">۰ تومان</div>
+                    <div id="dailyAllowanceDisplay" class="text-[10px] text-slate-400 mt-1">سهمیه روز: ۰ تومان</div>
+                </div>
 
-    function renderWishlist() {
-      const container = document.getElementById('wish-list');
-      if (appData.wishes.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">لیست انتظار ۳۰ روزه خالی است.</p>`;
-        return;
-      }
-
-      container.innerHTML = appData.wishes.map(w => {
-        const daysPassed = Math.floor((Date.now() - w.timestamp) / (1000 * 60 * 60 * 24));
-        const daysLeft = Math.max(0, 30 - daysPassed);
-        return `
-          <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl flex justify-between items-center text-xs">
-            <div>
-              <div class="font-bold text-slate-200">${w.title}</div>
-              <div class="text-[10px] text-slate-400 mt-1">${formatNumber(w.amount)} تومان | ${daysLeft === 0 ? '<span class="text-emerald-400 font-bold">مهلت ۳۰ روز سپری شد</span>' : `${daysLeft} روز باقیمانده`}</div>
+                <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="text-xs">مجموع ورودی ماه</span>
+                        <i class="fa-solid fa-arrow-down-long text-emerald-400 text-xs"></i>
+                    </div>
+                    <div id="totalIncomeDisplay" class="text-lg font-black text-emerald-400">۰ تومان</div>
+                    <div id="totalExpenseDisplay" class="text-[10px] text-rose-400 mt-1">خرج کل: ۰ تومان</div>
+                </div>
             </div>
-            <button onclick="deleteWish(${w.id})" class="text-slate-500 hover:text-rose-400 text-sm">✕</button>
-          </div>
-        `;
-      }).join('');
-    }
 
-    function switchTab(tab) {
-      ['dashboard', 'hansei', 'wishlist'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`nav-${t}`).classList.replace('text-amber-400', 'text-slate-400');
-      });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`nav-${tab}`).classList.replace('text-slate-400', 'text-amber-400');
-    }
+            <!-- Quick Action Buttons -->
+            <div class="flex gap-2">
+                <button onclick="openModal('expenseModal')" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-95 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 active:scale-[0.98] transition">
+                    <i class="fa-solid fa-minus-circle"></i>
+                    <span>ثبت هزینه</span>
+                </button>
+                <button onclick="openModal('incomeModal')" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>ثبت ورودی پول</span>
+                </button>
+            </div>
 
-    function renderAll() {
-      renderDashboard();
-      renderHansei();
-      renderWishlist();
-    }
-  </script>
+            <!-- Recent Transaction History -->
+            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-xs text-slate-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt text-slate-400"></i> تراکنش‌های اخیر این ماه
+                    </h3>
+                    <span id="txCount" class="text-[10px] bg-slate-700/50 px-2 py-0.5 rounded-md text-slate-400">۰ مورد</span>
+                </div>
+                <div id="txList" class="space-y-2.5">
+                    <!-- Dynamic TX Items -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: BUDGET PLANNING (EDITABLE) -->
+        <section id="tab-budget" class="tab-content hidden space-y-4">
+            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+                    <div>
+                        <h2 class="font-bold text-sm text-slate-100">برنامه‌ریزی و بودجه ابتدای ماه</h2>
+                        <p class="text-[11px] text-slate-400">این مقادیر در هر زمان قابل ویرایش هستند.</p>
+                    </div>
+                    <span id="budgetMonthBadge" class="text-[11px] bg-sky-500/20 text-sky-400 px-2.5 py-1 rounded-lg"></span>
+                </div>
+
+                <form id="budgetForm" onsubmit="saveMonthlyBudget(event)" class="space-y-3.5">
+                    <div>
+                        <label class="text-xs text-slate-300 mb-1 block">درآمد کل تخمینی این ماه (تومان)</label>
+                        <input type="text" id="planIncome" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500" placeholder="مثلاً: ۲۰,۰۰۰,۰۰۰" required>
+                    </div>
+
+                    <div>
+                        <label class="text-xs text-slate-300 mb-1 block">هدف پس‌انداز ماه (تومان)</label>
+                        <input type="text" id="planSavings" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="مثلاً: ۵,۰۰۰,۰۰۰" required>
+                    </div>
+
+                    <div>
+                        <label class="text-xs text-slate-300 mb-1 block">هزینه‌های ثابت و اجباری ماه (تومان)</label>
+                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-rose-400 focus:outline-none focus:border-rose-500" placeholder="اجاره، قبوض، اقساط..." required>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">بودجه خالص مجاز برای خرج روزمره:</span>
+                        <span id="calcDisposable" class="font-bold text-sky-400">۰ تومان</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-sm">
+                        ذخیره و به‌روزرسانی بودجه
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 3: MONTHLY REFLECTION -->
+        <section id="tab-reflection" class="tab-content hidden space-y-4">
+            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                    <h2 class="font-bold text-sm text-slate-100">کارنامه و بازتاب ماهانه</h2>
+                    <select id="reflectionMonthSelect" onchange="renderReflection(this.value)" class="bg-slate-900 text-xs border border-slate-700 text-sky-400 rounded-lg px-2 py-1">
+                        <!-- Dynamic Month List -->
+                    </select>
+                </div>
+
+                <!-- 4 Kakeibo Categories Breakdown -->
+                <div class="space-y-2.5">
+                    <h3 class="text-xs font-semibold text-slate-300">تفکیک مخارج ۴ دسته کاکیبو:</h3>
+                    
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span class="text-slate-300">🍜 نیازها (ضروریات)</span>
+                                <span id="refNeeds" class="font-bold text-slate-200">۰ تومان</span>
+                            </div>
+                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
+                                <div id="barNeeds" class="bg-emerald-400 h-full w-0"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span class="text-slate-300">🛍️ خواسته‌ها (لذت و تنوع)</span>
+                                <span id="refWants" class="font-bold text-slate-200">۰ تومان</span>
+                            </div>
+                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
+                                <div id="barWants" class="bg-amber-400 h-full w-0"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span class="text-slate-300">📚 فرهنگ و آموزش (رشد)</span>
+                                <span id="refCulture" class="font-bold text-slate-200">۰ تومان</span>
+                            </div>
+                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
+                                <div id="barCulture" class="bg-sky-400 h-full w-0"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span class="text-slate-300">⚡ غیرمنتظره و متفرقه</span>
+                                <span id="refUnexpected" class="font-bold text-slate-200">۰ تومان</span>
+                            </div>
+                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
+                                <div id="barUnexpected" class="bg-rose-400 h-full w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Planned vs Actual Summary Table -->
+                <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-2">
+                    <div class="flex justify-between text-slate-400">
+                        <span>درآمد پیش‌بینی اول ماه:</span>
+                        <span id="refPlanIncome" class="font-bold text-slate-200">۰ تومان</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>هدف پس‌انداز:</span>
+                        <span id="refPlanSavings" class="font-bold text-emerald-400">۰ تومان</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>هزینه‌های ثابت پیش‌بینی:</span>
+                        <span id="refPlanFixed" class="font-bold text-slate-200">۰ تومان</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-300 font-bold">
+                        <span>کل هزینه‌های متغیر ثبت‌شده:</span>
+                        <span id="refTotalSpent" class="text-rose-400">۰ تومان</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-100 font-bold text-sm">
+                        <span>پس‌انداز نهایی تحقق‌یافته:</span>
+                        <span id="refActualSavings" class="text-sky-400">۰ تومان</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- EXPENSE MODAL -->
+    <div id="expenseModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-rose-400"></i> ثبت هزینه جدید
+                </h3>
+                <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitExpense(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">مبلغ هزینه (تومان)</label>
+                    <input type="text" id="expAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-white focus:outline-none focus:border-rose-500" placeholder="۰" required autofocus>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">دسته‌بندی کاکیبو</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="expCat" value="needs" checked class="accent-emerald-400">
+                            <span>🍜 نیازها (خوراک، درمان)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="expCat" value="wants" class="accent-amber-400">
+                            <span>🛍️ خواسته‌ها (تفریح، خرید)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="expCat" value="culture" class="accent-sky-400">
+                            <span>📚 رشد و فرهنگ (کتاب، دوره)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="expCat" value="unexpected" class="accent-rose-400">
+                            <span>⚡ غیرمنتظره (تعمیرات...)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
+                    <input type="text" id="expDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="۱۴۰۵/۰۶/۰۸" required>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">توضیح یا عنوان خرج (اختیاری)</label>
+                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید سوپرمارکت">
+                </div>
+
+                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-rose-500/20 text-sm transition">
+                    ثبت نهایی هزینه
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- INCOME MODAL -->
+    <div id="incomeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-holding-dollar text-emerald-400"></i> ثبت ورودی پول یا درآمد
+                </h3>
+                <button onclick="closeModal('incomeModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitIncome(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">مبلغ ورودی (تومان)</label>
+                    <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="۰" required autofocus>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
+                    <input type="text" id="incDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="۱۴۰۵/۰۶/۰۸" required>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">منبع یا توضیح (اختیاری)</label>
+                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: واریز فریلنس، پاداش">
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-emerald-500/20 text-sm transition">
+                    ثبت ورودی پول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur border-t border-slate-700/60 z-30">
+        <div class="max-w-md mx-auto flex justify-around items-center py-2 text-xs text-slate-400">
+            <button onclick="switchTab('daily')" class="tab-btn active flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
+                <i class="fa-solid fa-house-chimney text-base"></i>
+                <span class="text-[11px]">روزمره</span>
+            </button>
+            <button onclick="switchTab('budget')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
+                <i class="fa-solid fa-pen-ruler text-base"></i>
+                <span class="text-[11px]">بودجه اول ماه</span>
+            </button>
+            <button onclick="switchTab('reflection')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
+                <i class="fa-solid fa-chart-pie text-base"></i>
+                <span class="text-[11px]">بازتاب ماه</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Application Script -->
+    <script>
+        // CLIENT_ID (Set dynamically from your Google Cloud Console)
+        const CLIENT_ID = '350616180556-91up0m69q00v7o8n0oekek3v7qksr281.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+
+        const MONTH_NAMES = [
+            'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+        ];
+
+        // Global State Structure
+        let state = {
+            activeMonth: '1405-06', // Year-Month key
+            months: {} // Key: "1405-06" => { budget: {income, savings, fixed}, transactions: [] }
+        };
+
+        let tokenClient;
+        let accessToken = null;
+        let driveFileId = null;
+
+        // Utilities: Persian Number Formatting & Comma Separator
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '۰';
+            return Number(num).toLocaleString('fa-IR');
+        }
+
+        function cleanNumber(str) {
+            if (!str) return 0;
+            // Convert Persian/Arabic digits to English
+            const p2e = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            const cleaned = p2e(str.toString()).replace(/,/g, '').replace(/[^0-9]/g, '');
+            return parseInt(cleaned, 10) || 0;
+        }
+
+        function formatInputNumber(input) {
+            const raw = cleanNumber(input.value);
+            input.value = raw ? raw.toLocaleString('en-US') : '';
+            if (input.id.startsWith('plan')) updateLiveDisposable();
+        }
+
+        // Jalali Simple Date Formatter
+        function getTodayJalali() {
+            try {
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const parts = formatter.formatToParts(now);
+                const y = parts.find(p => p.type === 'year').value;
+                const m = parts.find(p => p.type === 'month').value;
+                const d = parts.find(p => p.type === 'day').value;
+                const p2e = s => s.replace(/[۰-۹]/g, dig => '۰۱۲۳۴۵۶۷۸۹'.indexOf(dig));
+                return `${p2e(y)}/${p2e(m)}/${p2e(d)}`;
+            } catch (e) {
+                return '1405/06/08';
+            }
+        }
+
+        // Lifecycle Init
+        window.addEventListener('load', () => {
+            loadLocalState();
+            populateMonthDropdowns();
+            initGoogleClient();
+            document.getElementById('expDate').value = getTodayJalali();
+            document.getElementById('incDate').value = getTodayJalali();
+            renderAll();
+        });
+
+        function populateMonthDropdowns() {
+            const currentYear = 1405;
+            const globalSel = document.getElementById('globalMonthSelect');
+            const refSel = document.getElementById('reflectionMonthSelect');
+            globalSel.innerHTML = '';
+            refSel.innerHTML = '';
+
+            MONTH_NAMES.forEach((name, idx) => {
+                const monthNum = String(idx + 1).padStart(2, '0');
+                const key = `${currentYear}-${monthNum}`;
+                const opt1 = new Option(`${name} ${currentYear}`, key);
+                const opt2 = new Option(`${name} ${currentYear}`, key);
+                globalSel.add(opt1);
+                refSel.add(opt2);
+            });
+
+            globalSel.value = state.activeMonth;
+            refSel.value = state.activeMonth;
+        }
+
+        function changeActiveMonth(mKey) {
+            state.activeMonth = mKey;
+            document.getElementById('reflectionMonthSelect').value = mKey;
+            ensureMonthExists(mKey);
+            saveState();
+            renderAll();
+        }
+
+        function ensureMonthExists(mKey) {
+            if (!state.months[mKey]) {
+                state.months[mKey] = {
+                    budget: { income: 0, savings: 0, fixed: 0 },
+                    transactions: []
+                };
+            }
+        }
+
+        // Render Functions
+        function renderAll() {
+            ensureMonthExists(state.activeMonth);
+            const curr = state.months[state.activeMonth];
+
+            // Budget calculations
+            const dispBudget = Math.max(0, (curr.budget.income || 0) - (curr.budget.savings || 0) - (curr.budget.fixed || 0));
+            let totalSpent = 0;
+            let totalIncomeExtra = 0;
+
+            curr.transactions.forEach(t => {
+                if (t.type === 'expense') totalSpent += t.amount;
+                if (t.type === 'income') totalIncomeExtra += t.amount;
+            });
+
+            const remBudget = (dispBudget + totalIncomeExtra) - totalSpent;
+            const daily = Math.round(Math.max(0, remBudget) / 30);
+
+            // Populate Overview Card
+            document.getElementById('remBudgetDisplay').innerText = `${formatNumber(remBudget)} تومان`;
+            document.getElementById('dailyAllowanceDisplay').innerText = `سهمیه روز: ${formatNumber(daily)} تومان`;
+            document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalIncomeExtra)} تومان`;
+            document.getElementById('totalExpenseDisplay').innerText = `خرج کل: ${formatNumber(totalSpent + (curr.budget.fixed || 0))} تومان`;
+
+            // Populate Budget Form Fields
+            document.getElementById('budgetMonthBadge').innerText = document.getElementById('globalMonthSelect').selectedOptions[0]?.text || '';
+            document.getElementById('planIncome').value = curr.budget.income ? Number(curr.budget.income).toLocaleString('en-US') : '';
+            document.getElementById('planSavings').value = curr.budget.savings ? Number(curr.budget.savings).toLocaleString('en-US') : '';
+            document.getElementById('planFixed').value = curr.budget.fixed ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
+            updateLiveDisposable();
+
+            // Populate Transactions List
+            renderTxList(curr.transactions);
+
+            // Populate Reflection
+            renderReflection(state.activeMonth);
+        }
+
+        function renderTxList(list) {
+            const container = document.getElementById('txList');
+            document.getElementById('txCount').innerText = `${formatNumber(list.length)} مورد`;
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">تراکنشی در این ماه ثبت نشده است.</div>`;
+                return;
+            }
+
+            const catMap = {
+                needs: { label: 'نیازها', icon: '🍜', color: 'text-emerald-400' },
+                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-amber-400' },
+                culture: { label: 'رشد و فرهنگ', icon: '📚', color: 'text-sky-400' },
+                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-rose-400' }
+            };
+
+            [...list].reverse().forEach(t => {
+                const isExp = t.type === 'expense';
+                const catInfo = catMap[t.category] || { label: 'درآمد', icon: '💰', color: 'text-emerald-400' };
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs';
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base">${isExp ? catInfo.icon : '💰'}</span>
+                        <div>
+                            <div class="font-bold text-slate-200">${t.desc || (isExp ? catInfo.label : 'ورودی پول')}</div>
+                            <div class="text-[10px] text-slate-500">${t.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${isExp ? 'text-rose-400' : 'text-emerald-400'}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
+                        <button onclick="deleteTx('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderReflection(mKey) {
+            ensureMonthExists(mKey);
+            const m = state.months[mKey];
+            const cats = { needs: 0, wants: 0, culture: 0, unexpected: 0 };
+            let totalSpent = 0;
+
+            m.transactions.forEach(t => {
+                if (t.type === 'expense' && cats[t.category] !== undefined) {
+                    cats[t.category] += t.amount;
+                    totalSpent += t.amount;
+                }
+            });
+
+            document.getElementById('refNeeds').innerText = `${formatNumber(cats.needs)} تومان`;
+            document.getElementById('refWants').innerText = `${formatNumber(cats.wants)} تومان`;
+            document.getElementById('refCulture').innerText = `${formatNumber(cats.culture)} تومان`;
+            document.getElementById('refUnexpected').innerText = `${formatNumber(cats.unexpected)} تومان`;
+
+            const calcPercent = val => totalSpent > 0 ? `${Math.round((val / totalSpent) * 100)}%` : '0%';
+            document.getElementById('barNeeds').style.width = calcPercent(cats.needs);
+            document.getElementById('barWants').style.width = calcPercent(cats.wants);
+            document.getElementById('barCulture').style.width = calcPercent(cats.culture);
+            document.getElementById('barUnexpected').style.width = calcPercent(cats.unexpected);
+
+            document.getElementById('refPlanIncome').innerText = `${formatNumber(m.budget.income)} تومان`;
+            document.getElementById('refPlanSavings').innerText = `${formatNumber(m.budget.savings)} تومان`;
+            document.getElementById('refPlanFixed').innerText = `${formatNumber(m.budget.fixed)} تومان`;
+            document.getElementById('refTotalSpent').innerText = `${formatNumber(totalSpent)} تومان`;
+
+            const actualSavings = (m.budget.income || 0) - (m.budget.fixed || 0) - totalSpent;
+            document.getElementById('refActualSavings').innerText = `${formatNumber(actualSavings)} تومان`;
+        }
+
+        function updateLiveDisposable() {
+            const inc = cleanNumber(document.getElementById('planIncome').value);
+            const sav = cleanNumber(document.getElementById('planSavings').value);
+            const fix = cleanNumber(document.getElementById('planFixed').value);
+            const disp = Math.max(0, inc - sav - fix);
+            document.getElementById('calcDisposable').innerText = `${formatNumber(disp)} تومان`;
+        }
+
+        // Form Submissions
+        function saveMonthlyBudget(e) {
+            e.preventDefault();
+            const curr = state.months[state.activeMonth];
+            curr.budget = {
+                income: cleanNumber(document.getElementById('planIncome').value),
+                savings: cleanNumber(document.getElementById('planSavings').value),
+                fixed: cleanNumber(document.getElementById('planFixed').value)
+            };
+            saveState();
+            renderAll();
+            alert('بودجه این ماه با موفقیت به‌روزرسانی شد.');
+        }
+
+        function submitExpense(e) {
+            e.preventDefault();
+            const amount = cleanNumber(document.getElementById('expAmount').value);
+            if (!amount) return;
+
+            const category = document.querySelector('input[name="expCat"]:checked').value;
+            const date = document.getElementById('expDate').value;
+            const desc = document.getElementById('expDesc').value.trim();
+
+            const tx = { id: Date.now().toString(), type: 'expense', amount, category, date, desc };
+            state.months[state.activeMonth].transactions.push(tx);
+
+            saveState();
+            renderAll();
+            closeModal('expenseModal');
+            document.getElementById('expAmount').value = '';
+            document.getElementById('expDesc').value = '';
+        }
+
+        function submitIncome(e) {
+            e.preventDefault();
+            const amount = cleanNumber(document.getElementById('incAmount').value);
+            if (!amount) return;
+
+            const date = document.getElementById('incDate').value;
+            const desc = document.getElementById('incDesc').value.trim();
+
+            const tx = { id: Date.now().toString(), type: 'income', amount, date, desc };
+            state.months[state.activeMonth].transactions.push(tx);
+
+            saveState();
+            renderAll();
+            closeModal('incomeModal');
+            document.getElementById('incAmount').value = '';
+            document.getElementById('incDesc').value = '';
+        }
+
+        function deleteTx(id) {
+            if (!confirm('آیا این تراکنش حذف شود؟')) return;
+            const list = state.months[state.activeMonth].transactions;
+            state.months[state.activeMonth].transactions = list.filter(item => item.id !== id);
+            saveState();
+            renderAll();
+        }
+
+        // UI Tabs & Modals
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // Local & Cloud Storage Management
+        function saveState() {
+            localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
+            if (accessToken) syncToDrive();
+        }
+
+        function loadLocalState() {
+            const saved = localStorage.getItem('kakeibo_multi_data');
+            if (saved) {
+                try { state = JSON.parse(saved); } catch (e) {}
+            }
+        }
+
+        // Google Drive AppData Sync
+        function initGoogleClient() {
+            if (typeof google === 'undefined') return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: async (resp) => {
+                    if (resp.error) return;
+                    accessToken = resp.access_token;
+                    document.getElementById('authBtnText').innerText = 'متصل';
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
+                    await fetchFromDrive();
+                }
+            });
+        }
+
+        function handleAuthClick() {
+            if (!tokenClient) initGoogleClient();
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: '' });
+        }
+
+        async function fetchFromDrive() {
+            try {
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const searchData = await searchRes.json();
+                if (searchData.files && searchData.files.length > 0) {
+                    driveFileId = searchData.files[0].id;
+                    const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
+                    const cloudData = await fileRes.json();
+                    if (cloudData && cloudData.months) {
+                        state = cloudData;
+                        localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
+                        populateMonthDropdowns();
+                        renderAll();
+                    }
+                } else {
+                    syncToDrive();
+                }
+            } catch (err) {
+                console.error('Fetch Drive error', err);
+            }
+        }
+
+        async function syncToDrive() {
+            if (!accessToken) return;
+            const fileContent = JSON.stringify(state);
+            const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
+
+            try {
+                if (!driveFileId) {
+                    const form = new FormData();
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', new Blob([fileContent], { type: 'application/json' }));
+                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        body: form
+                    });
+                    const data = await res.json();
+                    driveFileId = data.id;
+                } else {
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: fileContent
+                    });
+                }
+            } catch (err) {
+                console.error('Sync Drive error', err);
+            }
+        }
+    </script>
 </body>
 </html>
