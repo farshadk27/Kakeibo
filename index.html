@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
+    
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="apple-touch-icon" href="logo.jpg">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=2">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=2">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=2">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -39,7 +41,7 @@
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30 px-4 py-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <img src="logo.jpg" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1e293b/38bdf8?text=K';" class="w-8 h-8 rounded-xl object-cover border border-slate-700 shadow-md">
+                <img src="./logo.jpg?v=2" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1e293b/38bdf8?text=K';" class="w-8 h-8 rounded-xl object-cover border border-slate-700 shadow-md">
                 <div>
                     <h1 class="font-bold text-sm leading-tight text-slate-100">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
@@ -71,7 +73,7 @@
     <!-- Main Content Container -->
     <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar space-y-4">
 
-        <!-- Quick Overdue/Due Reminders Banner (Shows on top of Overview) -->
+        <!-- Quick Overdue/Due Reminders Banner -->
         <div id="dueAlertBox" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-300">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-bell animate-bounce text-amber-400"></i>
@@ -140,7 +142,6 @@
                 </button>
             </div>
 
-            <!-- Pending Reminders -->
             <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
                 <h3 class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
                     <i class="fa-regular fa-clock"></i> در انتظار پرداخت / سررسیدهای پیش‌رو
@@ -148,7 +149,6 @@
                 <div id="pendingReminderList" class="space-y-2.5"></div>
             </div>
 
-            <!-- Completed Reminders -->
             <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
                 <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">
                     <i class="fa-regular fa-circle-check"></i> تسویه‌شده‌های این ماه
@@ -490,7 +490,7 @@
             return {
                 activeMonth: '1405-06',
                 months: {},
-                reminders: [] // Global list of recurring/single reminders
+                reminders: []
             };
         }
 
@@ -588,7 +588,7 @@
                 state.months[mKey] = {
                     budget: { income: 0, savings: 0, fixed: 0 },
                     transactions: [],
-                    paidReminders: [] // Reminder IDs paid in this month
+                    paidReminders: []
                 };
             }
             if (!state.months[mKey].paidReminders) {
@@ -714,7 +714,6 @@
             paidContainer.innerHTML = '';
 
             let urgentCount = 0;
-            const today = getTodayJalali();
 
             const cycleLabels = {
                 once: 'یک‌بار',
@@ -859,11 +858,10 @@
         }
 
         function checkOverdueRemindersForMonth(newMonthKey) {
-            // If there are uncompleted reminders and user switched forward, prompt rollover
             const prevMonthPaid = state.months[state.activeMonth]?.paidReminders || [];
             const unpaid = state.reminders.filter(r => !prevMonthPaid.includes(r.id));
             if (unpaid.length > 0) {
-                // Reminders automatically carry over to next month's checklist
+                // Carry over handled dynamically
             }
         }
 
