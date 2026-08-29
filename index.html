@@ -6,9 +6,9 @@
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=3">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=3">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=3">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=4">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=4">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=4">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -72,7 +72,7 @@
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <img src="./logo.jpg?v=3" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
+                <img src="./logo.jpg?v=4" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
                 <div>
                     <h1 class="font-bold text-[13px] tracking-tight leading-none text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400/90 flex items-center gap-1 mt-1 font-medium">
@@ -190,14 +190,14 @@
                 <h3 class="font-bold text-[11px] text-[#ffd60a] flex items-center gap-1.5 px-1">
                     <i class="fa-regular fa-clock"></i> سررسیدهای این ماه (در انتظار پرداخت)
                 </h3>
-                <div id="pendingReminderList" class="space-y-2"></div>
+                <div id="pendingReminderList" class="space-y-2.5"></div>
             </div>
 
             <div class="ios-blur rounded-3xl p-4 space-y-3">
                 <h3 class="font-bold text-[11px] text-[#30d158] flex items-center gap-1.5 px-1">
                     <i class="fa-regular fa-circle-check"></i> تسویه‌شده‌های این ماه
                 </h3>
-                <div id="paidReminderList" class="space-y-2"></div>
+                <div id="paidReminderList" class="space-y-2.5"></div>
             </div>
         </section>
 
@@ -249,7 +249,7 @@
         <!-- TAB 4: REFLECTION -->
         <section id="tab-reflection" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-4">
-                <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
                     <h2 class="font-bold text-xs text-white">کارنامه و بازتاب ماهانه</h2>
                     <span class="text-[11px] text-zinc-400 font-mono" id="reflectionPeriodBadge"></span>
                 </div>
@@ -342,7 +342,7 @@
                 <input type="hidden" id="editRemId" value="">
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">عنوان یادآور / هزینه</label>
-                    <input type="text" id="remTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: قسط وام، اجاره" required>
+                    <input type="text" id="remTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: وام ازدواج، اجاره خانه" required>
                 </div>
 
                 <div>
@@ -802,7 +802,7 @@
             });
         }
 
-        // REMINDER SYSTEM (Filtered per active month)
+        // REMINDER SYSTEM
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -823,15 +823,21 @@
             thisMonthReminders.forEach(r => {
                 const isPaid = currMonthPaid.includes(r.id);
 
+                let installmentBadge = '';
+                if (r.installmentIndex && r.totalCount) {
+                    installmentBadge = `<span class="text-[10px] bg-amber-400/15 text-amber-300 font-medium px-2 py-0.5 rounded-full inline-block mt-1">قسط ${formatNumber(r.installmentIndex)} از ${formatNumber(r.totalCount)}</span>`;
+                }
+
                 if (isPaid) {
                     const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-3 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/20 text-xs opacity-75';
+                    item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/20 text-xs opacity-80';
                     item.innerHTML = `
-                        <div class="flex items-center gap-2.5">
+                        <div class="flex items-center gap-3">
                             <span class="text-[#30d158] text-base"><i class="fa-solid fa-circle-check"></i></span>
                             <div>
                                 <div class="font-bold text-zinc-300 line-through">${r.title}</div>
-                                <div class="text-[10px] text-zinc-500 font-mono">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
+                                ${installmentBadge}
+                                <div class="text-[10px] text-zinc-500 font-mono mt-0.5">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
@@ -844,31 +850,27 @@
                 } else {
                     urgentCount++;
 
-                    let installmentBadge = '';
-                    if (r.installmentIndex && r.totalCount) {
-                        installmentBadge = ` • قسط ${r.installmentIndex} از ${r.totalCount}`;
-                    }
-
                     const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs';
+                    item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs';
                     item.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <button onclick="markReminderPaid('${r.id}')" class="w-5 h-5 rounded-full border-2 border-[#ffd60a] hover:bg-[#ffd60a]/20 flex items-center justify-center text-transparent hover:text-[#ffd60a] transition" title="ثبت پرداخت">
+                        <div class="flex items-start gap-3">
+                            <button onclick="markReminderPaid('${r.id}')" class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#ffd60a] hover:bg-[#ffd60a]/20 flex items-center justify-center text-transparent hover:text-[#ffd60a] transition shrink-0" title="ثبت پرداخت">
                                 <i class="fa-solid fa-check text-[10px]"></i>
                             </button>
                             <div>
-                                <div class="font-bold text-white flex items-center gap-1.5">
-                                    <span>${r.title}</span>
-                                </div>
-                                <div class="text-[10px] text-zinc-400 font-mono mt-0.5">
-                                    سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span> ${installmentBadge}
+                                <div class="font-bold text-white text-[13px] leading-tight">${r.title}</div>
+                                ${installmentBadge}
+                                <div class="text-[10px] text-zinc-400 font-mono mt-1">
+                                    سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold font-mono text-[#a5a4f3]">${formatNumber(r.amount)} تومان</span>
-                            <button onclick="editReminder('${r.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
-                            <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        <div class="flex flex-col items-end gap-1.5">
+                            <span class="font-bold font-mono text-[#a5a4f3] text-[13px] whitespace-nowrap">${formatNumber(r.amount)} تومان</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editReminder('${r.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                                <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            </div>
                         </div>
                     `;
                     pendingContainer.appendChild(item);
@@ -954,7 +956,7 @@
                     const instDate = addJalaliMonths(dueDate, i * stepMonths);
                     const remInstance = {
                         id: (Date.now() + i).toString(),
-                        title: countToGenerate > 1 ? `${title} (قسط ${i + 1})` : title,
+                        title: title,
                         amount,
                         dueDate: instDate,
                         cycle,
