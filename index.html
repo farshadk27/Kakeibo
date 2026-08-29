@@ -6,9 +6,9 @@
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=5">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=5">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=5">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=6">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=6">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=6">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -27,8 +27,8 @@
             --ios-indigo: #5e5ce6;
         }
 
-        * {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        body, input, textarea, select, button {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
         }
 
         body {
@@ -75,7 +75,7 @@
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <img src="./logo.jpg?v=5" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
+                <img src="./logo.jpg?v=6" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
                 <div>
                     <h1 class="font-bold text-[13px] tracking-tight leading-none text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400/90 flex items-center gap-1 mt-1 font-medium">
@@ -204,7 +204,7 @@
             </div>
         </section>
 
-        <!-- TAB 3: 30-DAY WISHLIST (قانون ۳۰ روز انتظار) -->
+        <!-- TAB 3: 30-DAY WISHLIST -->
         <section id="tab-wishlist" class="tab-content hidden space-y-3.5">
             <div class="flex items-center justify-between ios-blur p-4 rounded-3xl">
                 <div>
@@ -226,7 +226,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: MONTHLY NOTES (یادداشت‌ها) -->
+        <!-- TAB 4: MONTHLY NOTES -->
         <section id="tab-notes" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-3">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -253,7 +253,9 @@
             <div class="ios-blur p-4 rounded-3xl space-y-4">
                 <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
                     <div>
-                        <h2 class="font-bold text-xs text-white">بودجه‌ریزی اول ماه</h2>
+                        <h2 class="font-bold text-xs text-white flex items-center gap-2">
+                            <i class="fa-solid fa-pen-ruler text-[#0a84ff]"></i> بودجه‌ریزی اول ماه
+                        </h2>
                         <p class="text-[11px] text-zinc-400">برنامه‌ریزی مالی ابتدای دوره</p>
                     </div>
                     <span id="budgetMonthBadge" class="text-[11px] bg-[#0a84ff]/15 text-[#0a84ff] font-semibold px-2.5 py-1 rounded-full"></span>
@@ -297,7 +299,9 @@
         <section id="tab-reflection" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-4">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                    <h2 class="font-bold text-xs text-white">کارنامه و بازتاب ماهانه</h2>
+                    <h2 class="font-bold text-xs text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-[#30d158]"></i> کارنامه و بازتاب ماهانه
+                    </h2>
                     <span class="text-[11px] text-zinc-400" id="reflectionPeriodBadge"></span>
                 </div>
 
@@ -373,7 +377,7 @@
         </section>
     </main>
 
-    <!-- MODAL: PAY REMINDER CONFIRM WITH EDITABLE AMOUNT (عکس ۳) -->
+    <!-- MODAL: PAY CONFIRMATION WITH EDITABLE AMOUNT (عکس ۳) -->
     <div id="payConfirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -658,31 +662,31 @@
         </div>
     </div>
 
-    <!-- Apple iOS Bottom Tab Bar (Expanded to 6 Tabs with Smooth Scrolling) -->
+    <!-- Apple iOS Bottom Tab Bar with High-Contrast Icons -->
     <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
-        <div class="max-w-md mx-auto flex justify-between items-center py-2 px-1 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('daily')" class="tab-btn active min-w-[55px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
+        <div class="max-w-md mx-auto flex justify-between items-center py-2 px-2 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('daily')" class="tab-btn active min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
                 <i class="fa-solid fa-house text-sm"></i>
                 <span class="text-[9px] font-medium">روزمره</span>
             </button>
-            <button onclick="switchTab('reminders')" class="tab-btn min-w-[55px] flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
+            <button onclick="switchTab('reminders')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
                 <i class="fa-solid fa-bell text-sm"></i>
                 <span class="text-[9px] font-medium">یادآورها</span>
-                <span id="navRemBadge" class="hidden absolute top-1 right-3 w-1.5 h-1.5 rounded-full bg-[#ffd60a]"></span>
+                <span id="navRemBadge" class="hidden absolute top-0.5 right-3 w-1.5 h-1.5 rounded-full bg-[#ffd60a]"></span>
             </button>
-            <button onclick="switchTab('wishlist')" class="tab-btn min-w-[55px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
+            <button onclick="switchTab('wishlist')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
                 <i class="fa-solid fa-hourglass-half text-sm"></i>
                 <span class="text-[9px] font-medium">۳۰ روز انتظار</span>
             </button>
-            <button onclick="switchTab('notes')" class="tab-btn min-w-[55px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
+            <button onclick="switchTab('notes')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
                 <i class="fa-solid fa-note-sticky text-sm"></i>
                 <span class="text-[9px] font-medium">یادداشت</span>
             </button>
-            <button onclick="switchTab('budget')" class="tab-btn min-w-[55px] flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
+            <button onclick="switchTab('budget')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
                 <i class="fa-solid fa-pen-ruler text-sm"></i>
                 <span class="text-[9px] font-medium">بودجه</span>
             </button>
-            <button onclick="switchTab('reflection')" class="tab-btn min-w-[55px] flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
+            <button onclick="switchTab('reflection')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
                 <i class="fa-solid fa-chart-pie text-sm"></i>
                 <span class="text-[9px] font-medium">بازتاب</span>
             </button>
@@ -729,6 +733,20 @@
             return parseInt(cleaned, 10) || 0;
         }
 
+        function normalizeJalaliDate(dStr) {
+            if (!dStr) return '';
+            const p2e = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            let cleaned = p2e(dStr.toString().trim()).replace(/-/g, '/');
+            let parts = cleaned.split('/').map(p => p.trim());
+            if (parts.length >= 3) {
+                let y = parts[0];
+                let m = String(parseInt(parts[1], 10) || 1).padStart(2, '0');
+                let d = String(parseInt(parts[2], 10) || 1).padStart(2, '0');
+                return `${y}/${m}/${d}`;
+            }
+            return cleaned;
+        }
+
         function formatInputNumber(input) {
             const raw = cleanNumber(input.value);
             input.value = raw ? raw.toLocaleString('en-US') : '';
@@ -752,7 +770,8 @@
 
         function addJalaliMonths(jalaliDateStr, monthsToAdd) {
             try {
-                let [y, m, d] = jalaliDateStr.split('/').map(v => parseInt(v, 10));
+                const norm = normalizeJalaliDate(jalaliDateStr);
+                let [y, m, d] = norm.split('/').map(v => parseInt(v, 10));
                 let totalMonths = (y * 12 + (m - 1)) + monthsToAdd;
                 let newY = Math.floor(totalMonths / 12);
                 let newM = (totalMonths % 12) + 1;
@@ -902,7 +921,6 @@
             renderReflection(state.activeMonth);
         }
 
-        // Clean & Robust Transactions List (Fixed layout issues from image 2)
         function renderTxList(list) {
             const container = document.getElementById('txList');
             document.getElementById('txCount').innerText = `${formatNumber(list.length)} مورد`;
@@ -969,7 +987,7 @@
             });
         }
 
-        // Reminder Rendering
+        // Reminders Filter & Render (with Date Normalization)
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -983,7 +1001,8 @@
 
             const thisMonthReminders = state.reminders.filter(r => {
                 if (!r.dueDate) return false;
-                const [rY, rM] = r.dueDate.split('/');
+                const norm = normalizeJalaliDate(r.dueDate);
+                const [rY, rM] = norm.split('/');
                 return rY === activeY && rM === activeM;
             });
 
@@ -1063,7 +1082,6 @@
             }
         }
 
-        // Open Payment Confirmation Modal with Editable Amount & Date (عکس ۳)
         function openPayConfirmModal(remId) {
             const rem = state.reminders.find(r => r.id === remId);
             if (!rem) return;
@@ -1092,7 +1110,7 @@
                 type: 'expense',
                 category: 'fixed',
                 amount: finalAmount,
-                date: payDate || getTodayJalali(),
+                date: normalizeJalaliDate(payDate) || getTodayJalali(),
                 desc: `پرداخت قسط/یادآور: ${rem.title}`
             };
             state.months[state.activeMonth].transactions.push(tx);
@@ -1143,7 +1161,7 @@
             const editId = document.getElementById('editRemId').value;
             const title = document.getElementById('remTitle').value.trim();
             const amount = cleanNumber(document.getElementById('remAmount').value);
-            const dueDate = document.getElementById('remDate').value.trim();
+            const dueDate = normalizeJalaliDate(document.getElementById('remDate').value.trim());
             const notifyTime = document.getElementById('remNotifyTime').value;
 
             if (!title || !amount || !dueDate) return;
@@ -1195,7 +1213,7 @@
             renderAll();
         }
 
-        // 30-Day Wishlist Logic (قانون ۳۰ روز انتظار)
+        // 30-Day Wishlist Logic
         function renderWishlist() {
             const container = document.getElementById('wishlistContainer');
             container.innerHTML = '';
@@ -1339,7 +1357,7 @@
             if (!amount) return;
 
             const category = document.querySelector('input[name="expCat"]:checked').value;
-            const date = document.getElementById('expDate').value;
+            const date = normalizeJalaliDate(document.getElementById('expDate').value.trim());
             const desc = document.getElementById('expDesc').value.trim();
 
             const curr = state.months[state.activeMonth];
@@ -1373,7 +1391,7 @@
             if (!amount) return;
 
             const incomeType = document.querySelector('input[name="incType"]:checked').value;
-            const date = document.getElementById('incDate').value;
+            const date = normalizeJalaliDate(document.getElementById('incDate').value.trim());
             const desc = document.getElementById('incDesc').value.trim();
 
             const curr = state.months[state.activeMonth];
