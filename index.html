@@ -50,7 +50,6 @@
                 <select id="globalMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-slate-900/90 text-xs border border-slate-700 text-sky-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500">
                 </select>
                 
-                <!-- Auth Container (Login / User Info & Logout) -->
                 <div id="authContainer" class="flex items-center gap-1.5">
                     <button id="loginBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
                         <i class="fa-brands fa-google text-slate-300"></i>
@@ -75,7 +74,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
                     <div class="flex items-center justify-between text-slate-400 mb-1">
-                        <span class="text-xs">مانده بودجه خرج</span>
+                        <span class="text-xs">مانده بودجه روزمره</span>
                         <i class="fa-solid fa-coins text-sky-400 text-xs"></i>
                     </div>
                     <div id="remBudgetDisplay" class="text-lg font-black text-white">۰ تومان</div>
@@ -88,7 +87,7 @@
                         <i class="fa-solid fa-arrow-down-long text-emerald-400 text-xs"></i>
                     </div>
                     <div id="totalIncomeDisplay" class="text-lg font-black text-emerald-400">۰ تومان</div>
-                    <div id="totalExpenseDisplay" class="text-[10px] text-rose-400 mt-1">خرج کل: ۰ تومان</div>
+                    <div id="incomeBreakdownDisplay" class="text-[10px] text-slate-400 mt-1">پاداش/مازاد: ۰ تومان</div>
                 </div>
             </div>
 
@@ -116,11 +115,11 @@
 
         <!-- TAB 2: BUDGET PLANNING -->
         <section id="tab-budget" class="tab-content hidden space-y-4">
-            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-3">
                     <div>
                         <h2 class="font-bold text-sm text-slate-100">بودجه‌ریزی اول ماه</h2>
-                        <p class="text-[11px] text-slate-400">در هر زمان می‌توانید مقادیر را تغییر دهید.</p>
+                        <p class="text-[11px] text-slate-400">در هر زمان می‌توانید مقادیر را ویرایش کنید.</p>
                     </div>
                     <span id="budgetMonthBadge" class="text-[11px] bg-sky-500/20 text-sky-400 px-2.5 py-1 rounded-lg"></span>
                 </div>
@@ -137,13 +136,19 @@
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-300 mb-1 block">هزینه‌های ثابت ماه (تومان)</label>
-                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-rose-400 focus:outline-none focus:border-rose-500" placeholder="۰" required>
+                        <label class="text-xs text-slate-300 mb-1 block">مجموع هزینه‌های ثابت ماه (اقساط، اجاره...)</label>
+                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-indigo-400 focus:outline-none focus:border-indigo-500" placeholder="۰" required>
                     </div>
 
-                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                        <span class="text-slate-400">سقف بودجه مجاز برای خرج روزمره:</span>
-                        <span id="calcDisposable" class="font-bold text-sky-400">۰ تومان</span>
+                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">سقف مجاز برای خرج‌های متغیر روزمره:</span>
+                            <span id="calcDisposable" class="font-bold text-sky-400">۰ تومان</span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-slate-800 pt-2 text-[11px]">
+                            <span class="text-slate-400">هزینه‌های ثابت تسویه شده:</span>
+                            <span id="planFixedPaidStatus" class="text-indigo-300 font-bold">۰ از ۰ تومان</span>
+                        </div>
                     </div>
 
                     <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-sm">
@@ -163,7 +168,7 @@
                 </div>
 
                 <div class="space-y-2.5">
-                    <h3 class="text-xs font-semibold text-slate-300">تفکیک مخارج ۴ دسته کاکیبو:</h3>
+                    <h3 class="text-xs font-semibold text-slate-300">تفکیک مخارج متغیر کاکیبو:</h3>
                     <div class="space-y-2">
                         <div>
                             <div class="flex justify-between text-[11px] mb-1">
@@ -209,7 +214,7 @@
 
                 <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-2">
                     <div class="flex justify-between text-slate-400">
-                        <span>درآمد پیش‌بینی:</span>
+                        <span>درآمد کل ماه (پیش‌بینی + مازاد):</span>
                         <span id="refPlanIncome" class="font-bold text-slate-200">۰ تومان</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
@@ -217,11 +222,11 @@
                         <span id="refPlanSavings" class="font-bold text-emerald-400">۰ تومان</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
-                        <span>هزینه‌های ثابت:</span>
-                        <span id="refPlanFixed" class="font-bold text-slate-200">۰ تومان</span>
+                        <span>هزینه‌های ثابت (پرداخت‌شده):</span>
+                        <span id="refPlanFixed" class="font-bold text-indigo-300">۰ تومان</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-300 font-bold">
-                        <span>کل هزینه‌های ثبت‌شده:</span>
+                        <span>کل مخارج روزمره (متغیر):</span>
                         <span id="refTotalSpent" class="text-rose-400">۰ تومان</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-100 font-bold text-sm">
@@ -270,6 +275,10 @@
                             <input type="radio" name="expCat" value="unexpected" class="accent-rose-400">
                             <span>⚡ غیرمنتظره</span>
                         </label>
+                        <label class="col-span-2 flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-500/40 text-xs cursor-pointer hover:border-indigo-400 text-indigo-300 font-medium">
+                            <input type="radio" name="expCat" value="fixed" class="accent-indigo-400">
+                            <span>🔒 هزینه ثابت (قسط، اجاره...) — از بودجه روزمره کم نمی‌شود</span>
+                        </label>
                     </div>
                 </div>
 
@@ -280,7 +289,7 @@
 
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">عنوان یا توضیح (اختیاری)</label>
-                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید میوه">
+                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید سوپرمارکت">
                 </div>
 
                 <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-rose-500/20 text-sm transition">
@@ -304,6 +313,26 @@
 
             <form onsubmit="submitIncome(event)" class="space-y-3">
                 <div>
+                    <label class="text-xs text-slate-400 block mb-1">نوع واریزی درآمد</label>
+                    <div class="space-y-2">
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="incType" value="planned" checked class="accent-emerald-400 mt-0.5">
+                            <div>
+                                <span class="font-bold text-slate-200 block">💼 واریز درآمد پیش‌بینی‌شده (حقوق اصلی)</span>
+                                <span class="text-[10px] text-slate-400">فقط وصول حقوق ثبت می‌شود؛ سقف خرج ماه دوبار اضافه نمی‌شود.</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
+                            <input type="radio" name="incType" value="extra" class="accent-sky-400 mt-0.5">
+                            <div>
+                                <span class="font-bold text-slate-200 block">✨ درآمد یا پاداش جدید (مازاد)</span>
+                                <span class="text-[10px] text-sky-400">مستقیماً به مانده بودجه خرج روزمره و مجموع درآمد ماه افزوده می‌شود.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
                     <label class="text-xs text-slate-400 block mb-1">مبلغ ورودی (تومان)</label>
                     <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="۰" required autofocus>
                 </div>
@@ -315,7 +344,7 @@
 
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">منبع یا توضیح (اختیاری)</label>
-                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: حقوق، واریز متفرقه">
+                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: حقوق شرکت، پاداش">
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-emerald-500/20 text-sm transition">
@@ -453,26 +482,42 @@
             const curr = state.months[state.activeMonth];
 
             const dispBudget = Math.max(0, (curr.budget.income || 0) - (curr.budget.savings || 0) - (curr.budget.fixed || 0));
-            let totalSpent = 0;
-            let totalIncomeExtra = 0;
+            let totalVariableSpent = 0;
+            let totalFixedSpent = 0;
+            let totalExtraIncome = 0;
+            let totalPlannedIncomeReceived = 0;
 
             curr.transactions.forEach(t => {
-                if (t.type === 'expense') totalSpent += t.amount;
-                if (t.type === 'income') totalIncomeExtra += t.amount;
+                if (t.type === 'expense') {
+                    if (t.category === 'fixed') {
+                        totalFixedSpent += t.amount;
+                    } else {
+                        totalVariableSpent += t.amount;
+                    }
+                }
+                if (t.type === 'income') {
+                    if (t.incomeType === 'extra') {
+                        totalExtraIncome += t.amount;
+                    } else {
+                        totalPlannedIncomeReceived += t.amount;
+                    }
+                }
             });
 
-            const remBudget = (dispBudget + totalIncomeExtra) - totalSpent;
+            // Disposable budget only adds extra income, not planned income
+            const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
             const daily = Math.round(Math.max(0, remBudget) / 30);
 
             document.getElementById('remBudgetDisplay').innerText = `${formatNumber(remBudget)} تومان`;
             document.getElementById('dailyAllowanceDisplay').innerText = `سهمیه روز: ${formatNumber(daily)} تومان`;
-            document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalIncomeExtra)} تومان`;
-            document.getElementById('totalExpenseDisplay').innerText = `خرج کل: ${formatNumber(totalSpent + (curr.budget.fixed || 0))} تومان`;
+            document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalExtraIncome)} تومان`;
+            document.getElementById('incomeBreakdownDisplay').innerText = `پاداش/مازاد: ${formatNumber(totalExtraIncome)} تومان`;
 
             document.getElementById('budgetMonthBadge').innerText = document.getElementById('globalMonthSelect').selectedOptions[0]?.text || '';
             document.getElementById('planIncome').value = curr.budget.income ? Number(curr.budget.income).toLocaleString('en-US') : '';
             document.getElementById('planSavings').value = curr.budget.savings ? Number(curr.budget.savings).toLocaleString('en-US') : '';
             document.getElementById('planFixed').value = curr.budget.fixed ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
+            document.getElementById('planFixedPaidStatus').innerText = `${formatNumber(totalFixedSpent)} از ${formatNumber(curr.budget.fixed || 0)} تومان`;
             updateLiveDisposable();
 
             renderTxList(curr.transactions);
@@ -490,27 +535,51 @@
             }
 
             const catMap = {
-                needs: { label: 'نیازها', icon: '🍜' },
-                wants: { label: 'خواسته‌ها', icon: '🛍️' },
-                culture: { label: 'رشد و آموزش', icon: '📚' },
-                unexpected: { label: 'غیرمنتظره', icon: '⚡' }
+                needs: { label: 'نیازها', icon: '🍜', color: 'text-rose-400' },
+                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-rose-400' },
+                culture: { label: 'رشد و آموزش', icon: '📚', color: 'text-rose-400' },
+                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-rose-400' },
+                fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-indigo-400' }
             };
 
             [...list].reverse().forEach(t => {
                 const isExp = t.type === 'expense';
-                const catInfo = catMap[t.category] || { label: 'درآمد', icon: '💰' };
+                const catInfo = catMap[t.category] || {};
+                
+                let titleText = t.desc;
+                let subLabel = t.date;
+                let amountColor = 'text-emerald-400';
+                let iconChar = '💰';
+
+                if (isExp) {
+                    amountColor = catInfo.color || 'text-rose-400';
+                    iconChar = catInfo.icon || '💸';
+                    if (!titleText) titleText = catInfo.label;
+                    if (t.category === 'fixed') subLabel += ' • (هزینه ثابت)';
+                } else {
+                    if (t.incomeType === 'planned') {
+                        iconChar = '💼';
+                        if (!titleText) titleText = 'واریز حقوق/درآمد اصلی';
+                        subLabel += ' • (درآمد پیش‌بینی)';
+                    } else {
+                        iconChar = '✨';
+                        if (!titleText) titleText = 'درآمد/پاداش مازاد';
+                        subLabel += ' • (افزوده‌شده به بودجه)';
+                    }
+                }
+
                 const item = document.createElement('div');
                 item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs';
                 item.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <span class="text-base">${isExp ? catInfo.icon : '💰'}</span>
+                        <span class="text-base">${iconChar}</span>
                         <div>
-                            <div class="font-bold text-slate-200">${t.desc || (isExp ? catInfo.label : 'ورودی پول')}</div>
-                            <div class="text-[10px] text-slate-500">${t.date}</div>
+                            <div class="font-bold text-slate-200">${titleText}</div>
+                            <div class="text-[10px] text-slate-500">${subLabel}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold ${isExp ? 'text-rose-400' : 'text-emerald-400'}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
+                        <span class="font-bold ${amountColor}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
                         <button onclick="deleteTx('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                     </div>
                 `;
@@ -521,13 +590,19 @@
         function renderReflection(mKey) {
             ensureMonthExists(mKey);
             const m = state.months[mKey];
-            const cats = { needs: 0, wants: 0, culture: 0, unexpected: 0 };
-            let totalSpent = 0;
+            const cats = { needs: 0, wants: 0, culture: 0, unexpected: 0, fixed: 0 };
+            let totalVarSpent = 0;
+            let totalExtra = 0;
 
             m.transactions.forEach(t => {
                 if (t.type === 'expense' && cats[t.category] !== undefined) {
                     cats[t.category] += t.amount;
-                    totalSpent += t.amount;
+                    if (t.category !== 'fixed') {
+                        totalVarSpent += t.amount;
+                    }
+                }
+                if (t.type === 'income' && t.incomeType === 'extra') {
+                    totalExtra += t.amount;
                 }
             });
 
@@ -536,18 +611,19 @@
             document.getElementById('refCulture').innerText = `${formatNumber(cats.culture)} تومان`;
             document.getElementById('refUnexpected').innerText = `${formatNumber(cats.unexpected)} تومان`;
 
-            const calcPercent = val => totalSpent > 0 ? `${Math.round((val / totalSpent) * 100)}%` : '0%';
+            const calcPercent = val => totalVarSpent > 0 ? `${Math.round((val / totalVarSpent) * 100)}%` : '0%';
             document.getElementById('barNeeds').style.width = calcPercent(cats.needs);
             document.getElementById('barWants').style.width = calcPercent(cats.wants);
             document.getElementById('barCulture').style.width = calcPercent(cats.culture);
             document.getElementById('barUnexpected').style.width = calcPercent(cats.unexpected);
 
-            document.getElementById('refPlanIncome').innerText = `${formatNumber(m.budget.income)} تومان`;
+            const totalMonthIncome = (m.budget.income || 0) + totalExtra;
+            document.getElementById('refPlanIncome').innerText = `${formatNumber(totalMonthIncome)} تومان`;
             document.getElementById('refPlanSavings').innerText = `${formatNumber(m.budget.savings)} تومان`;
-            document.getElementById('refPlanFixed').innerText = `${formatNumber(m.budget.fixed)} تومان`;
-            document.getElementById('refTotalSpent').innerText = `${formatNumber(totalSpent)} تومان`;
+            document.getElementById('refPlanFixed').innerText = `${formatNumber(cats.fixed)} از ${formatNumber(m.budget.fixed)} تومان`;
+            document.getElementById('refTotalSpent').innerText = `${formatNumber(totalVarSpent)} تومان`;
 
-            const actualSavings = (m.budget.income || 0) - (m.budget.fixed || 0) - totalSpent;
+            const actualSavings = totalMonthIncome - (m.budget.fixed || 0) - totalVarSpent;
             document.getElementById('refActualSavings').innerText = `${formatNumber(actualSavings)} تومان`;
         }
 
@@ -596,10 +672,11 @@
             const amount = cleanNumber(document.getElementById('incAmount').value);
             if (!amount) return;
 
+            const incomeType = document.querySelector('input[name="incType"]:checked').value;
             const date = document.getElementById('incDate').value;
             const desc = document.getElementById('incDesc').value.trim();
 
-            const tx = { id: Date.now().toString(), type: 'income', amount, date, desc };
+            const tx = { id: Date.now().toString(), type: 'income', incomeType, amount, date, desc };
             state.months[state.activeMonth].transactions.push(tx);
 
             saveState();
@@ -653,8 +730,6 @@
                 callback: async (resp) => {
                     if (resp.error) return;
                     accessToken = resp.access_token;
-                    
-                    // Fetch user email to separate profile data
                     await fetchUserProfile();
                     await fetchFromDrive();
                 }
@@ -675,7 +750,6 @@
                     document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
                     document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
                     
-                    // Load this specific user local state first
                     loadLocalState();
                     renderAll();
                 }
@@ -702,7 +776,6 @@
             document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)';
             document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1';
 
-            // Reset UI state to guest
             loadLocalState();
             renderAll();
         }
@@ -726,7 +799,6 @@
                         renderAll();
                     }
                 } else {
-                    // Create new empty store for this new Google account in their drive
                     syncToDrive();
                 }
             } catch (err) {
