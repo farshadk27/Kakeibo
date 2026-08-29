@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,12 +38,10 @@
     <!-- Header & Sync Status -->
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30 px-4 py-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-                    <i class="fa-solid fa-wallet text-white text-sm"></i>
-                </div>
+            <div class="flex items-center gap-2.5">
+                <img src="logo.jpg" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1e293b/38bdf8?text=K';" class="w-8 h-8 rounded-xl object-cover border border-slate-700 shadow-md">
                 <div>
-                    <h1 class="font-bold text-sm leading-tight text-slate-100">کاکیبو ژاپنی</h1>
+                    <h1 class="font-bold text-sm leading-tight text-slate-100">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)
                     </span>
@@ -56,7 +58,7 @@
                         <span>ورود</span>
                     </button>
                     <div id="userProfile" class="hidden flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 px-2 py-1 rounded-lg">
-                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[90px] truncate"></span>
+                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[85px] truncate"></span>
                         <button onclick="handleLogout()" title="خروج از حساب" class="text-rose-400 hover:text-rose-300 p-0.5">
                             <i class="fa-solid fa-right-from-bracket text-xs"></i>
                         </button>
@@ -67,7 +69,18 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar">
+    <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar space-y-4">
+
+        <!-- Quick Overdue/Due Reminders Banner (Shows on top of Overview) -->
+        <div id="dueAlertBox" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-300">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bell animate-bounce text-amber-400"></i>
+                <span id="dueAlertText">شما سررسید پرداخت نزدیک دارید!</span>
+            </div>
+            <button onclick="switchTab('reminders')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2.5 py-1 rounded-lg text-[11px] font-bold">
+                مشاهده
+            </button>
+        </div>
 
         <!-- TAB 1: DAILY & TRANSACTIONS -->
         <section id="tab-daily" class="tab-content space-y-4">
@@ -113,7 +126,38 @@
             </div>
         </section>
 
-        <!-- TAB 2: BUDGET PLANNING -->
+        <!-- TAB 2: REMINDERS & DUE DATES -->
+        <section id="tab-reminders" class="tab-content hidden space-y-4">
+            <div class="flex items-center justify-between bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+                <div>
+                    <h2 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-amber-400"></i> چک‌لیست و یادآور پرداخت‌ها
+                    </h2>
+                    <p class="text-[11px] text-slate-400">اقساط، چک‌ها و هزینه‌های دوره‌ای ثابت</p>
+                </div>
+                <button onclick="openModal('reminderModal')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-lg shadow-amber-500/20 transition">
+                    <i class="fa-solid fa-plus"></i> یادآور جدید
+                </button>
+            </div>
+
+            <!-- Pending Reminders -->
+            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
+                <h3 class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
+                    <i class="fa-regular fa-clock"></i> در انتظار پرداخت / سررسیدهای پیش‌رو
+                </h3>
+                <div id="pendingReminderList" class="space-y-2.5"></div>
+            </div>
+
+            <!-- Completed Reminders -->
+            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
+                <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">
+                    <i class="fa-regular fa-circle-check"></i> تسویه‌شده‌های این ماه
+                </h3>
+                <div id="paidReminderList" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: BUDGET PLANNING -->
         <section id="tab-budget" class="tab-content hidden space-y-4">
             <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-700 pb-3">
@@ -158,7 +202,7 @@
             </div>
         </section>
 
-        <!-- TAB 3: REFLECTION -->
+        <!-- TAB 4: REFLECTION -->
         <section id="tab-reflection" class="tab-content hidden space-y-4">
             <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-700 pb-3">
@@ -237,6 +281,62 @@
             </div>
         </section>
     </main>
+
+    <!-- NEW REMINDER MODAL -->
+    <div id="reminderModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-bell text-amber-400"></i> ثبت یادآور / قسط جدید
+                </h3>
+                <button onclick="closeModal('reminderModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitReminder(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">عنوان یادآور / هزینه</label>
+                    <input type="text" id="remTitle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500" placeholder="مثلاً: قسط وام مسکن، اجاره خانه، بیمه" required autofocus>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">مبلغ پرداختی (تومان)</label>
+                    <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-amber-400 focus:outline-none focus:border-amber-500" placeholder="۰" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">تاریخ سررسید (شمسی)</label>
+                        <input type="text" id="remDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500" placeholder="۱۴۰۵/۰۶/۲۵" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">دوره تکرار</label>
+                        <select id="remCycle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="once">یک‌بار پرداخت</option>
+                            <option value="monthly" selected>ماهانه (هر ماه)</option>
+                            <option value="bimonthly">دو ماه یک‌بار</option>
+                            <option value="quarterly">سه ماه یک‌بار (فصلی)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">زمان یادآوری / هشدار</label>
+                    <select id="remNotifyDays" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="0">دقیقاً در همان روز سررسید</option>
+                        <option value="1">۱ روز قبل</option>
+                        <option value="3" selected>۳ روز قبل</option>
+                        <option value="5">۵ روز قبل</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm transition">
+                    ذخیره یادآور
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- EXPENSE MODAL -->
     <div id="expenseModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -354,16 +454,21 @@
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Bottom Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur border-t border-slate-700/60 z-30">
         <div class="max-w-md mx-auto flex justify-around items-center py-2 text-xs text-slate-400">
             <button onclick="switchTab('daily')" class="tab-btn active flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
                 <i class="fa-solid fa-house-chimney text-base"></i>
                 <span class="text-[11px]">روزمره</span>
             </button>
+            <button onclick="switchTab('reminders')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
+                <i class="fa-solid fa-bell text-base"></i>
+                <span class="text-[11px]">یادآورها</span>
+                <span id="navRemBadge" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-amber-400"></span>
+            </button>
             <button onclick="switchTab('budget')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
                 <i class="fa-solid fa-pen-ruler text-base"></i>
-                <span class="text-[11px]">بودجه اول ماه</span>
+                <span class="text-[11px]">بودجه ماه</span>
             </button>
             <button onclick="switchTab('reflection')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
                 <i class="fa-solid fa-chart-pie text-base"></i>
@@ -384,7 +489,8 @@
         function getEmptyState() {
             return {
                 activeMonth: '1405-06',
-                months: {}
+                months: {},
+                reminders: [] // Global list of recurring/single reminders
             };
         }
 
@@ -431,12 +537,20 @@
             }
         }
 
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
         window.addEventListener('load', () => {
             loadLocalState();
             populateMonthDropdowns();
             initGoogleClient();
+            requestNotificationPermission();
             document.getElementById('expDate').value = getTodayJalali();
             document.getElementById('incDate').value = getTodayJalali();
+            document.getElementById('remDate').value = getTodayJalali();
             renderAll();
         });
 
@@ -464,6 +578,7 @@
             state.activeMonth = mKey;
             document.getElementById('reflectionMonthSelect').value = mKey;
             ensureMonthExists(mKey);
+            checkOverdueRemindersForMonth(mKey);
             saveState();
             renderAll();
         }
@@ -472,8 +587,15 @@
             if (!state.months[mKey]) {
                 state.months[mKey] = {
                     budget: { income: 0, savings: 0, fixed: 0 },
-                    transactions: []
+                    transactions: [],
+                    paidReminders: [] // Reminder IDs paid in this month
                 };
+            }
+            if (!state.months[mKey].paidReminders) {
+                state.months[mKey].paidReminders = [];
+            }
+            if (!state.reminders) {
+                state.reminders = [];
             }
         }
 
@@ -485,7 +607,6 @@
             let totalVariableSpent = 0;
             let totalFixedSpent = 0;
             let totalExtraIncome = 0;
-            let totalPlannedIncomeReceived = 0;
 
             curr.transactions.forEach(t => {
                 if (t.type === 'expense') {
@@ -495,16 +616,11 @@
                         totalVariableSpent += t.amount;
                     }
                 }
-                if (t.type === 'income') {
-                    if (t.incomeType === 'extra') {
-                        totalExtraIncome += t.amount;
-                    } else {
-                        totalPlannedIncomeReceived += t.amount;
-                    }
+                if (t.type === 'income' && t.incomeType === 'extra') {
+                    totalExtraIncome += t.amount;
                 }
             });
 
-            // Disposable budget only adds extra income, not planned income
             const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
             const daily = Math.round(Math.max(0, remBudget) / 30);
 
@@ -521,6 +637,7 @@
             updateLiveDisposable();
 
             renderTxList(curr.transactions);
+            renderReminders();
             renderReflection(state.activeMonth);
         }
 
@@ -585,6 +702,169 @@
                 `;
                 container.appendChild(item);
             });
+        }
+
+        // REMINDER SYSTEM
+        function renderReminders() {
+            const pendingContainer = document.getElementById('pendingReminderList');
+            const paidContainer = document.getElementById('paidReminderList');
+            const currMonthPaid = state.months[state.activeMonth].paidReminders || [];
+            
+            pendingContainer.innerHTML = '';
+            paidContainer.innerHTML = '';
+
+            let urgentCount = 0;
+            const today = getTodayJalali();
+
+            const cycleLabels = {
+                once: 'یک‌بار',
+                monthly: 'ماهانه',
+                bimonthly: '۲ ماه یک‌بار',
+                quarterly: 'فصلی'
+            };
+
+            state.reminders.forEach(r => {
+                const isPaid = currMonthPaid.includes(r.id);
+
+                if (isPaid) {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-emerald-900/30 text-xs opacity-80';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-emerald-400 text-base"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <div class="font-bold text-slate-300 line-through">${r.title}</div>
+                                <div class="text-[10px] text-slate-500">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
+                            </div>
+                        </div>
+                        <button onclick="unmarkReminderPaid('${r.id}')" class="text-slate-500 hover:text-amber-400 text-[11px] px-2 py-1 bg-slate-800 rounded-lg">
+                            لغو پرداخت
+                        </button>
+                    `;
+                    paidContainer.appendChild(item);
+                } else {
+                    urgentCount++;
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 text-xs';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <button onclick="markReminderPaid('${r.id}')" class="w-5 h-5 rounded-lg border-2 border-amber-400 hover:bg-amber-400/20 flex items-center justify-center text-transparent hover:text-amber-400 transition" title="ثبت پرداخت">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                            <div>
+                                <div class="font-bold text-slate-100 flex items-center gap-1.5">
+                                    <span>${r.title}</span>
+                                    <span class="text-[9px] bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded">${cycleLabels[r.cycle] || 'دوره‌ای'}</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 mt-0.5">
+                                    سررسید: <span class="text-amber-300 font-medium">${r.dueDate}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-indigo-300">${formatNumber(r.amount)} تومان</span>
+                            <button onclick="deleteReminder('${r.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        </div>
+                    `;
+                    pendingContainer.appendChild(item);
+                }
+            });
+
+            if (pendingContainer.children.length === 0) {
+                pendingContainer.innerHTML = `<div class="text-center py-4 text-slate-500 text-xs">یادآور فعالی برای پرداخت وجود ندارد.</div>`;
+            }
+            if (paidContainer.children.length === 0) {
+                paidContainer.innerHTML = `<div class="text-center py-3 text-slate-600 text-[11px]">موردی در این ماه تسویه نشده است.</div>`;
+            }
+
+            // Quick Top Banner Alert
+            const alertBox = document.getElementById('dueAlertBox');
+            const navBadge = document.getElementById('navRemBadge');
+            if (urgentCount > 0) {
+                alertBox.classList.remove('hidden');
+                navBadge.classList.remove('hidden');
+                document.getElementById('dueAlertText').innerText = `${formatNumber(urgentCount)} قسط / هزینه ثابت در انتظار پرداخت دارید!`;
+            } else {
+                alertBox.classList.add('hidden');
+                navBadge.classList.add('hidden');
+            }
+        }
+
+        function submitReminder(e) {
+            e.preventDefault();
+            const title = document.getElementById('remTitle').value.trim();
+            const amount = cleanNumber(document.getElementById('remAmount').value);
+            const dueDate = document.getElementById('remDate').value.trim();
+            const cycle = document.getElementById('remCycle').value;
+            const notifyDays = parseInt(document.getElementById('remNotifyDays').value, 10);
+
+            if (!title || !amount) return;
+
+            const rem = {
+                id: Date.now().toString(),
+                title,
+                amount,
+                dueDate,
+                cycle,
+                notifyDays
+            };
+
+            state.reminders.push(rem);
+            saveState();
+            renderAll();
+            closeModal('reminderModal');
+            document.getElementById('remTitle').value = '';
+            document.getElementById('remAmount').value = '';
+        }
+
+        function markReminderPaid(remId) {
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem) return;
+
+            const confirmPay = confirm(`آیا پرداخت «${rem.title}» به مبلغ ${formatNumber(rem.amount)} تومان تأیید شود و به عنوان هزینه ثابت ثبت گردد؟`);
+            if (!confirmPay) return;
+
+            // 1. Mark as paid in active month
+            if (!state.months[state.activeMonth].paidReminders) state.months[state.activeMonth].paidReminders = [];
+            state.months[state.activeMonth].paidReminders.push(remId);
+
+            // 2. Automatically record as Fixed Expense transaction
+            const tx = {
+                id: Date.now().toString(),
+                type: 'expense',
+                category: 'fixed',
+                amount: rem.amount,
+                date: getTodayJalali(),
+                desc: `پرداخت قسط/یادآور: ${rem.title}`
+            };
+            state.months[state.activeMonth].transactions.push(tx);
+
+            saveState();
+            renderAll();
+        }
+
+        function unmarkReminderPaid(remId) {
+            if (!confirm('آیا وضعیت پرداخت این مورد لغو شود؟')) return;
+            const list = state.months[state.activeMonth].paidReminders || [];
+            state.months[state.activeMonth].paidReminders = list.filter(id => id !== remId);
+            saveState();
+            renderAll();
+        }
+
+        function deleteReminder(remId) {
+            if (!confirm('آیا این یادآور به طور کامل حذف شود؟')) return;
+            state.reminders = state.reminders.filter(r => r.id !== remId);
+            saveState();
+            renderAll();
+        }
+
+        function checkOverdueRemindersForMonth(newMonthKey) {
+            // If there are uncompleted reminders and user switched forward, prompt rollover
+            const prevMonthPaid = state.months[state.activeMonth]?.paidReminders || [];
+            const unpaid = state.reminders.filter(r => !prevMonthPaid.includes(r.id));
+            if (unpaid.length > 0) {
+                // Reminders automatically carry over to next month's checklist
+            }
         }
 
         function renderReflection(mKey) {
@@ -714,6 +994,7 @@
             if (saved) {
                 try { 
                     state = JSON.parse(saved); 
+                    if (!state.reminders) state.reminders = [];
                 } catch (e) {
                     state = getEmptyState();
                 }
@@ -794,6 +1075,7 @@
                     const cloudData = await fileRes.json();
                     if (cloudData && cloudData.months) {
                         state = cloudData;
+                        if (!state.reminders) state.reminders = [];
                         localStorage.setItem(getStorageKey(), JSON.stringify(state));
                         populateMonthDropdowns();
                         renderAll();
