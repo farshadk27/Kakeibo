@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
-    <link rel="icon" type="image/jpeg" href="./logo.jpg">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg">
-    <link rel="apple-touch-icon" href="./logo.jpg">
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=3">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=3">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=3">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -71,7 +72,7 @@
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <img src="./logo.jpg" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
+                <img src="./logo.jpg?v=3" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
                 <div>
                     <h1 class="font-bold text-[13px] tracking-tight leading-none text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400/90 flex items-center gap-1 mt-1 font-medium">
@@ -553,7 +554,7 @@
             return {
                 activeMonth: '1405-06',
                 months: {},
-                reminders: [] // Recurring / generated reminder instances
+                reminders: []
             };
         }
 
@@ -600,7 +601,6 @@
             }
         }
 
-        // Helper to add months to Jalali date (yyyy/mm/dd)
         function addJalaliMonths(jalaliDateStr, monthsToAdd) {
             try {
                 let [y, m, d] = jalaliDateStr.split('/').map(v => parseInt(v, 10));
@@ -802,7 +802,7 @@
             });
         }
 
-        // REMINDER & INSTALLMENTS SYSTEM (Filtered per active month)
+        // REMINDER SYSTEM (Filtered per active month)
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -814,7 +814,6 @@
             let urgentCount = 0;
             const [activeY, activeM] = state.activeMonth.split('-');
 
-            // Filter reminders whose dueDate matches activeMonth (yyyy/mm)
             const thisMonthReminders = state.reminders.filter(r => {
                 if (!r.dueDate) return false;
                 const [rY, rM] = r.dueDate.split('/');
@@ -933,7 +932,6 @@
 
             if (!title || !amount || !dueDate) return;
 
-            // Update existing reminder
             if (editId) {
                 const target = state.reminders.find(r => r.id === editId);
                 if (target) {
@@ -942,7 +940,6 @@
                     target.dueDate = dueDate;
                 }
             } else {
-                // Create New (With multi-month generation support)
                 const cycle = document.getElementById('remCycle').value;
                 const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
                 
@@ -1012,7 +1009,6 @@
             renderAll();
         }
 
-        // EDIT & SUBMIT EXPENSE
         function editTransaction(txId) {
             const curr = state.months[state.activeMonth];
             const tx = curr.transactions.find(t => t.id === txId);
