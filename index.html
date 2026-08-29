@@ -2,13 +2,13 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=2">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=2">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=2">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg">
+    <link rel="apple-touch-icon" href="./logo.jpg">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -16,16 +16,54 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
+        :root {
+            --ios-bg: #000000;
+            --ios-card: rgba(28, 28, 30, 0.75);
+            --ios-card-solid: #1c1c1e;
+            --ios-border: rgba(255, 255, 255, 0.08);
+            --ios-blue: #0a84ff;
+            --ios-green: #30d158;
+            --ios-red: #ff453a;
+            --ios-amber: #ffd60a;
+            --ios-indigo: #5e5ce6;
+        }
+
         body {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background-color: var(--ios-bg);
+            color: #ffffff;
             -webkit-tap-highlight-color: transparent;
+            letter-spacing: -0.01em;
         }
+
+        .ios-blur {
+            background-color: var(--ios-card);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--ios-border);
+        }
+
+        .ios-input {
+            background-color: rgba(44, 44, 46, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .ios-input:focus {
+            outline: none;
+            border-color: var(--ios-blue);
+            background-color: rgba(58, 58, 60, 0.8);
+        }
+
+        .ios-segmented-btn.active {
+            background-color: #636366;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
         .tab-btn.active {
-            color: #38bdf8;
-            border-color: #38bdf8;
+            color: var(--ios-blue);
         }
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -35,33 +73,37 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between select-none">
+<body class="bg-black text-white min-h-screen flex flex-col justify-between select-none">
 
-    <!-- Header & Sync Status -->
-    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30 px-4 py-3">
+    <!-- iOS Top Navigation Bar -->
+    <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <img src="./logo.jpg?v=2" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1e293b/38bdf8?text=K';" class="w-8 h-8 rounded-xl object-cover border border-slate-700 shadow-md">
+                <img src="./logo.jpg" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
                 <div>
-                    <h1 class="font-bold text-sm leading-tight text-slate-100">دفترچه کاکیبو</h1>
-                    <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)
+                    <h1 class="font-bold text-[13px] tracking-tight leading-none text-white">دفترچه کاکیبو</h1>
+                    <span id="syncStatus" class="text-[10px] text-amber-400/90 flex items-center gap-1 mt-1 font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین
                     </span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
-                <select id="globalMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-slate-900/90 text-xs border border-slate-700 text-sky-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500">
+            <!-- Date Selectors (Year & Month) -->
+            <div class="flex items-center gap-1.5">
+                <select id="globalYearSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-white rounded-xl px-2 py-1.5 focus:outline-none">
+                </select>
+                <select id="globalMonthSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-[#0a84ff] rounded-xl px-2.5 py-1.5 focus:outline-none">
                 </select>
                 
-                <div id="authContainer" class="flex items-center gap-1.5">
-                    <button id="loginBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
+                <!-- Google Account Auth -->
+                <div id="authContainer" class="flex items-center">
+                    <button id="loginBtn" onclick="handleAuthClick()" class="bg-[#2c2c2e] hover:bg-[#3a3a3c] text-[11px] px-2.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1 font-medium transition active:scale-95">
                         <i class="fa-brands fa-google text-slate-300"></i>
                         <span>ورود</span>
                     </button>
-                    <div id="userProfile" class="hidden flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 px-2 py-1 rounded-lg">
-                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[85px] truncate"></span>
-                        <button onclick="handleLogout()" title="خروج از حساب" class="text-rose-400 hover:text-rose-300 p-0.5">
+                    <div id="userProfile" class="hidden flex items-center gap-1.5 bg-[#1c1c1e] border border-white/10 px-2 py-1 rounded-xl">
+                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[80px] truncate font-mono"></span>
+                        <button onclick="handleLogout()" title="خروج از حساب" class="text-[#ff453a] hover:opacity-80 p-0.5">
                             <i class="fa-solid fa-right-from-bracket text-xs"></i>
                         </button>
                     </div>
@@ -71,131 +113,144 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-md mx-auto w-full flex-1 p-4 pb-24 overflow-y-auto no-scrollbar space-y-4">
+    <main class="max-w-md mx-auto w-full flex-1 p-4 pb-28 overflow-y-auto no-scrollbar space-y-4">
 
-        <!-- Quick Overdue/Due Reminders Banner -->
-        <div id="dueAlertBox" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-300">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-bell animate-bounce text-amber-400"></i>
-                <span id="dueAlertText">شما سررسید پرداخت نزدیک دارید!</span>
+        <!-- iOS Due Reminders Banner -->
+        <div id="dueAlertBox" class="hidden ios-blur bg-amber-500/[0.08] border-amber-500/20 rounded-3xl p-3.5 flex items-center justify-between text-xs text-amber-300 shadow-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-bell text-xs"></i>
+                </div>
+                <span id="dueAlertText" class="font-medium text-[11px]">اقساط یا هزینه ثابت نزدیک دارید!</span>
             </div>
-            <button onclick="switchTab('reminders')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2.5 py-1 rounded-lg text-[11px] font-bold">
-                مشاهده
+            <button onclick="switchTab('reminders')" class="bg-amber-400/20 active:bg-amber-400/30 text-amber-300 px-3 py-1 rounded-full text-[11px] font-bold">
+                بررسی
             </button>
         </div>
 
-        <!-- TAB 1: DAILY & TRANSACTIONS -->
-        <section id="tab-daily" class="tab-content space-y-4">
+        <!-- TAB 1: DAILY OVERVIEW & TRANSACTIONS -->
+        <section id="tab-daily" class="tab-content space-y-3.5">
+            <!-- iOS Metric Cards Widget -->
             <div class="grid grid-cols-2 gap-3">
-                <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
-                    <div class="flex items-center justify-between text-slate-400 mb-1">
-                        <span class="text-xs">مانده بودجه روزمره</span>
-                        <i class="fa-solid fa-coins text-sky-400 text-xs"></i>
+                <div class="ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-zinc-400 mb-1.5">
+                            <span class="text-[11px] font-medium">مانده بودجه روزمره</span>
+                            <div class="w-6 h-6 rounded-full bg-[#0a84ff]/15 flex items-center justify-center">
+                                <i class="fa-solid fa-coins text-[#0a84ff] text-[10px]"></i>
+                            </div>
+                        </div>
+                        <div id="remBudgetDisplay" class="text-xl font-bold tracking-tight text-white">۰ تومان</div>
                     </div>
-                    <div id="remBudgetDisplay" class="text-lg font-black text-white">۰ تومان</div>
-                    <div id="dailyAllowanceDisplay" class="text-[10px] text-slate-400 mt-1">سهمیه روز: ۰ تومان</div>
+                    <div id="dailyAllowanceDisplay" class="text-[10px] text-zinc-400 mt-2 font-medium">سهمیه روز: ۰ تومان</div>
                 </div>
 
-                <div class="bg-slate-800/60 border border-slate-700/50 p-3.5 rounded-2xl relative overflow-hidden">
-                    <div class="flex items-center justify-between text-slate-400 mb-1">
-                        <span class="text-xs">مجموع ورودی ماه</span>
-                        <i class="fa-solid fa-arrow-down-long text-emerald-400 text-xs"></i>
+                <div class="ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-zinc-400 mb-1.5">
+                            <span class="text-[11px] font-medium">مجموع ورودی ماه</span>
+                            <div class="w-6 h-6 rounded-full bg-[#30d158]/15 flex items-center justify-center">
+                                <i class="fa-solid fa-arrow-down text-[#30d158] text-[10px]"></i>
+                            </div>
+                        </div>
+                        <div id="totalIncomeDisplay" class="text-xl font-bold tracking-tight text-[#30d158]">۰ تومان</div>
                     </div>
-                    <div id="totalIncomeDisplay" class="text-lg font-black text-emerald-400">۰ تومان</div>
-                    <div id="incomeBreakdownDisplay" class="text-[10px] text-slate-400 mt-1">پاداش/مازاد: ۰ تومان</div>
+                    <div id="incomeBreakdownDisplay" class="text-[10px] text-zinc-400 mt-2 font-medium">پاداش/مازاد: ۰ تومان</div>
                 </div>
             </div>
 
-            <div class="flex gap-2">
-                <button onclick="openModal('expenseModal')" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-95 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 active:scale-[0.98] transition">
-                    <i class="fa-solid fa-minus-circle"></i>
+            <!-- Apple Action Buttons -->
+            <div class="flex gap-2.5 pt-0.5">
+                <button onclick="openModal('expenseModal')" class="flex-1 bg-[#ff453a] hover:bg-[#ff3b30] active:scale-[0.98] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-red-500/15 transition text-xs">
+                    <i class="fa-solid fa-minus text-xs"></i>
                     <span>ثبت هزینه</span>
                 </button>
-                <button onclick="openModal('incomeModal')" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition">
-                    <i class="fa-solid fa-plus-circle"></i>
+                <button onclick="openModal('incomeModal')" class="flex-1 bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15 transition text-xs">
+                    <i class="fa-solid fa-plus text-xs"></i>
                     <span>ثبت ورودی پول</span>
                 </button>
             </div>
 
-            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-xs text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt text-slate-400"></i> تراکنش‌های این ماه
+            <!-- Transactions iOS List -->
+            <div class="ios-blur rounded-3xl p-4">
+                <div class="flex items-center justify-between mb-3.5 px-1">
+                    <h3 class="font-bold text-xs text-zinc-300 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ul text-zinc-500"></i> تراکنش‌های ماه
                     </h3>
-                    <span id="txCount" class="text-[10px] bg-slate-700/50 px-2 py-0.5 rounded-md text-slate-400">۰ مورد</span>
+                    <span id="txCount" class="text-[10px] bg-white/[0.06] px-2 py-0.5 rounded-full text-zinc-400 font-mono">۰ مورد</span>
                 </div>
-                <div id="txList" class="space-y-2.5"></div>
+                <div id="txList" class="space-y-2"></div>
             </div>
         </section>
 
         <!-- TAB 2: REMINDERS & DUE DATES -->
-        <section id="tab-reminders" class="tab-content hidden space-y-4">
-            <div class="flex items-center justify-between bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+        <section id="tab-reminders" class="tab-content hidden space-y-3.5">
+            <div class="flex items-center justify-between ios-blur p-4 rounded-3xl">
                 <div>
-                    <h2 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                        <i class="fa-solid fa-bell text-amber-400"></i> چک‌لیست و یادآور پرداخت‌ها
+                    <h2 class="font-bold text-[13px] text-white flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-[#ffd60a]"></i> یادآور و اقساط
                     </h2>
-                    <p class="text-[11px] text-slate-400">اقساط، چک‌ها و هزینه‌های دوره‌ای ثابت</p>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">مدیریت چک‌ها، وام‌ها و هزینه‌های ثابت</p>
                 </div>
-                <button onclick="openModal('reminderModal')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-lg shadow-amber-500/20 transition">
-                    <i class="fa-solid fa-plus"></i> یادآور جدید
+                <button onclick="openModal('reminderModal')" class="bg-[#ffd60a] hover:bg-yellow-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                    <i class="fa-solid fa-plus text-xs"></i> جدید
                 </button>
             </div>
 
-            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
-                <h3 class="font-bold text-xs text-amber-400 flex items-center gap-1.5">
-                    <i class="fa-regular fa-clock"></i> در انتظار پرداخت / سررسیدهای پیش‌رو
+            <div class="ios-blur rounded-3xl p-4 space-y-3">
+                <h3 class="font-bold text-[11px] text-[#ffd60a] flex items-center gap-1.5 px-1">
+                    <i class="fa-regular fa-clock"></i> در انتظار پرداخت
                 </h3>
-                <div id="pendingReminderList" class="space-y-2.5"></div>
+                <div id="pendingReminderList" class="space-y-2"></div>
             </div>
 
-            <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
-                <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">
+            <div class="ios-blur rounded-3xl p-4 space-y-3">
+                <h3 class="font-bold text-[11px] text-[#30d158] flex items-center gap-1.5 px-1">
                     <i class="fa-regular fa-circle-check"></i> تسویه‌شده‌های این ماه
                 </h3>
-                <div id="paidReminderList" class="space-y-2.5"></div>
+                <div id="paidReminderList" class="space-y-2"></div>
             </div>
         </section>
 
         <!-- TAB 3: BUDGET PLANNING -->
-        <section id="tab-budget" class="tab-content hidden space-y-4">
-            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <section id="tab-budget" class="tab-content hidden space-y-3.5">
+            <div class="ios-blur p-4 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
                     <div>
-                        <h2 class="font-bold text-sm text-slate-100">بودجه‌ریزی اول ماه</h2>
-                        <p class="text-[11px] text-slate-400">در هر زمان می‌توانید مقادیر را ویرایش کنید.</p>
+                        <h2 class="font-bold text-xs text-white">بودجه‌ریزی اول ماه</h2>
+                        <p class="text-[11px] text-zinc-400">برنامه‌ریزی مالی ابتدای دوره</p>
                     </div>
-                    <span id="budgetMonthBadge" class="text-[11px] bg-sky-500/20 text-sky-400 px-2.5 py-1 rounded-lg"></span>
+                    <span id="budgetMonthBadge" class="text-[11px] bg-[#0a84ff]/15 text-[#0a84ff] font-semibold px-2.5 py-1 rounded-full"></span>
                 </div>
 
-                <form id="budgetForm" onsubmit="saveMonthlyBudget(event)" class="space-y-3.5">
+                <form id="budgetForm" onsubmit="saveMonthlyBudget(event)" class="space-y-3">
                     <div>
-                        <label class="text-xs text-slate-300 mb-1 block">درآمد کل تخمینی این ماه (تومان)</label>
-                        <input type="text" id="planIncome" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500" placeholder="۰" required>
+                        <label class="text-[11px] text-zinc-300 mb-1 block font-medium">درآمد کل تخمینی این ماه (تومان)</label>
+                        <input type="text" id="planIncome" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="۰" required>
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-300 mb-1 block">هدف پس‌انداز ماه (تومان)</label>
-                        <input type="text" id="planSavings" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="۰" required>
+                        <label class="text-[11px] text-zinc-300 mb-1 block font-medium">هدف پس‌انداز ماه (تومان)</label>
+                        <input type="text" id="planSavings" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-[#30d158] font-bold" placeholder="۰" required>
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-300 mb-1 block">مجموع هزینه‌های ثابت ماه (اقساط، اجاره...)</label>
-                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-indigo-400 focus:outline-none focus:border-indigo-500" placeholder="۰" required>
+                        <label class="text-[11px] text-zinc-300 mb-1 block font-medium">مجموع هزینه‌های ثابت (اقساط، اجاره...)</label>
+                        <input type="text" id="planFixed" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-[#5e5ce6] font-bold" placeholder="۰" required>
                     </div>
 
-                    <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+                    <div class="bg-[#2c2c2e]/60 p-3.5 rounded-2xl border border-white/[0.04] space-y-2 text-xs">
                         <div class="flex items-center justify-between">
-                            <span class="text-slate-400">سقف مجاز برای خرج‌های متغیر روزمره:</span>
-                            <span id="calcDisposable" class="font-bold text-sky-400">۰ تومان</span>
+                            <span class="text-zinc-400 text-[11px]">سقف مجاز خرج روزمره:</span>
+                            <span id="calcDisposable" class="font-bold text-[#0a84ff]">۰ تومان</span>
                         </div>
-                        <div class="flex items-center justify-between border-t border-slate-800 pt-2 text-[11px]">
-                            <span class="text-slate-400">هزینه‌های ثابت تسویه شده:</span>
-                            <span id="planFixedPaidStatus" class="text-indigo-300 font-bold">۰ از ۰ تومان</span>
+                        <div class="flex items-center justify-between border-t border-white/[0.06] pt-2 text-[11px]">
+                            <span class="text-zinc-400">هزینه‌های ثابت پرداخت‌شده:</span>
+                            <span id="planFixedPaidStatus" class="text-[#5e5ce6] font-bold">۰ از ۰ تومان</span>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-sm">
+                    <button type="submit" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] active:scale-[0.98] text-white font-semibold py-3 rounded-2xl shadow-lg shadow-blue-500/20 transition text-xs">
                         ذخیره تغییرات بودجه
                     </button>
                 </form>
@@ -203,276 +258,305 @@
         </section>
 
         <!-- TAB 4: REFLECTION -->
-        <section id="tab-reflection" class="tab-content hidden space-y-4">
-            <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                    <h2 class="font-bold text-sm text-slate-100">کارنامه و بازتاب ماهانه</h2>
-                    <select id="reflectionMonthSelect" onchange="renderReflection(this.value)" class="bg-slate-900 text-xs border border-slate-700 text-sky-400 rounded-lg px-2 py-1">
-                    </select>
+        <section id="tab-reflection" class="tab-content hidden space-y-3.5">
+            <div class="ios-blur p-4 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                    <h2 class="font-bold text-xs text-white">کارنامه و بازتاب ماهانه</h2>
+                    <span class="text-[11px] text-zinc-400 font-mono" id="reflectionPeriodBadge"></span>
                 </div>
 
-                <div class="space-y-2.5">
-                    <h3 class="text-xs font-semibold text-slate-300">تفکیک مخارج متغیر کاکیبو:</h3>
-                    <div class="space-y-2">
+                <div class="space-y-3">
+                    <h3 class="text-[11px] font-semibold text-zinc-400">تفکیک مخارج ۴ گانه کاکیبو:</h3>
+                    
+                    <div class="space-y-2.5">
                         <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span class="text-slate-300">🍜 نیازها (ضروریات)</span>
-                                <span id="refNeeds" class="font-bold text-slate-200">۰ تومان</span>
+                            <div class="flex justify-between text-[11px] mb-1 font-medium">
+                                <span class="text-zinc-300">🍜 نیازها (ضروری)</span>
+                                <span id="refNeeds" class="text-white font-mono font-bold">۰ تومان</span>
                             </div>
-                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barNeeds" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+                            <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                                <div id="barNeeds" class="bg-[#30d158] h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
 
                         <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span class="text-slate-300">🛍️ خواسته‌ها (لذت و تنوع)</span>
-                                <span id="refWants" class="font-bold text-slate-200">۰ تومان</span>
+                            <div class="flex justify-between text-[11px] mb-1 font-medium">
+                                <span class="text-zinc-300">🛍️ خواسته‌ها (لذت و تنوع)</span>
+                                <span id="refWants" class="text-white font-mono font-bold">۰ تومان</span>
                             </div>
-                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barWants" class="bg-amber-400 h-full w-0 transition-all duration-300"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span class="text-slate-300">📚 رشد و آموزش</span>
-                                <span id="refCulture" class="font-bold text-slate-200">۰ تومان</span>
-                            </div>
-                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barCulture" class="bg-sky-400 h-full w-0 transition-all duration-300"></div>
+                            <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                                <div id="barWants" class="bg-[#ffd60a] h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
 
                         <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span class="text-slate-300">⚡ غیرمنتظره و متفرقه</span>
-                                <span id="refUnexpected" class="font-bold text-slate-200">۰ تومان</span>
+                            <div class="flex justify-between text-[11px] mb-1 font-medium">
+                                <span class="text-zinc-300">📚 رشد و آموزش</span>
+                                <span id="refCulture" class="text-white font-mono font-bold">۰ تومان</span>
                             </div>
-                            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
-                                <div id="barUnexpected" class="bg-rose-400 h-full w-0 transition-all duration-300"></div>
+                            <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                                <div id="barCulture" class="bg-[#0a84ff] h-full w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1 font-medium">
+                                <span class="text-zinc-300">⚡ غیرمنتظره و متفرقه</span>
+                                <span id="refUnexpected" class="text-white font-mono font-bold">۰ تومان</span>
+                            </div>
+                            <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                                <div id="barUnexpected" class="bg-[#ff453a] h-full w-0 transition-all duration-300"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-2">
-                    <div class="flex justify-between text-slate-400">
+                <div class="bg-[#2c2c2e]/60 rounded-2xl p-3.5 border border-white/[0.04] text-xs space-y-2">
+                    <div class="flex justify-between text-zinc-400 text-[11px]">
                         <span>درآمد کل ماه (پیش‌بینی + مازاد):</span>
-                        <span id="refPlanIncome" class="font-bold text-slate-200">۰ تومان</span>
+                        <span id="refPlanIncome" class="font-bold text-white font-mono">۰ تومان</span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-zinc-400 text-[11px]">
                         <span>هدف پس‌انداز:</span>
-                        <span id="refPlanSavings" class="font-bold text-emerald-400">۰ تومان</span>
+                        <span id="refPlanSavings" class="font-bold text-[#30d158] font-mono">۰ تومان</span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-zinc-400 text-[11px]">
                         <span>هزینه‌های ثابت (پرداخت‌شده):</span>
-                        <span id="refPlanFixed" class="font-bold text-indigo-300">۰ تومان</span>
+                        <span id="refPlanFixed" class="font-bold text-[#5e5ce6] font-mono">۰ تومان</span>
                     </div>
-                    <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-300 font-bold">
+                    <div class="flex justify-between border-t border-white/[0.06] pt-2 text-zinc-300 font-bold text-[11px]">
                         <span>کل مخارج روزمره (متغیر):</span>
-                        <span id="refTotalSpent" class="text-rose-400">۰ تومان</span>
+                        <span id="refTotalSpent" class="text-[#ff453a] font-mono">۰ تومان</span>
                     </div>
-                    <div class="flex justify-between border-t border-slate-800 pt-2 text-slate-100 font-bold text-sm">
+                    <div class="flex justify-between border-t border-white/[0.06] pt-2 text-white font-bold text-xs">
                         <span>پس‌انداز نهایی تحقق‌یافته:</span>
-                        <span id="refActualSavings" class="text-sky-400">۰ تومان</span>
+                        <span id="refActualSavings" class="text-[#0a84ff] font-mono font-black">۰ تومان</span>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- NEW REMINDER MODAL -->
-    <div id="reminderModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-bell text-amber-400"></i> ثبت یادآور / قسط جدید
+    <!-- iOS MODAL: NEW REMINDER -->
+    <div id="reminderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید
                 </h3>
-                <button onclick="closeModal('reminderModal')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeModal('reminderModal')" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
 
             <form onsubmit="submitReminder(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">عنوان یادآور / هزینه</label>
-                    <input type="text" id="remTitle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500" placeholder="مثلاً: قسط وام مسکن، اجاره خانه، بیمه" required autofocus>
+                    <label class="text-[11px] text-zinc-400 block mb-1">عنوان یادآور / هزینه</label>
+                    <input type="text" id="remTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: قسط وام بانک، اجاره، شهریه" required autofocus>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">مبلغ پرداختی (تومان)</label>
-                    <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-amber-400 focus:outline-none focus:border-amber-500" placeholder="۰" required>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ پرداختی (تومان)</label>
+                    <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ffd60a]" placeholder="۰" required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="text-xs text-slate-400 block mb-1">تاریخ سررسید (شمسی)</label>
-                        <input type="text" id="remDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500" placeholder="۱۴۰۵/۰۶/۲۵" required>
+                        <label class="text-[11px] text-zinc-400 block mb-1">تاریخ اولین سررسید</label>
+                        <input type="text" id="remDate" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white" placeholder="۱۴۰۵/۰۶/۲۵" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 block mb-1">دوره تکرار</label>
-                        <select id="remCycle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <label class="text-[11px] text-zinc-400 block mb-1">دوره تکرار</label>
+                        <select id="remCycle" onchange="toggleCustomCycleInput(this.value)" class="w-full ios-input rounded-2xl px-2.5 py-2 text-xs text-white">
                             <option value="once">یک‌بار پرداخت</option>
                             <option value="monthly" selected>ماهانه (هر ماه)</option>
                             <option value="bimonthly">دو ماه یک‌بار</option>
                             <option value="quarterly">سه ماه یک‌بار (فصلی)</option>
+                            <option value="yearly">سالانه</option>
+                            <option value="custom">دوره دلخواه (سفارشی)...</option>
                         </select>
                     </div>
                 </div>
 
+                <!-- Custom Cycle Fields (Hidden by default) -->
+                <div id="customCycleBox" class="hidden grid grid-cols-2 gap-2 p-3 bg-white/[0.03] rounded-2xl border border-white/[0.06]">
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">هر چند وقت یک‌بار؟</label>
+                        <input type="number" id="remCustomIntervalVal" min="1" value="45" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">واحد زمان</label>
+                        <select id="remCustomIntervalUnit" class="w-full ios-input rounded-xl px-2 py-1.5 text-xs text-white">
+                            <option value="days">روز یک‌بار</option>
+                            <option value="months">ماه یک‌بار</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- End Condition / Total Installments -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط (اختیاری)</label>
+                        <input type="number" id="remTotalCount" min="1" placeholder="مثلاً: 12" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">تاریخ سررسید نهایی (اختیاری)</label>
+                        <input type="text" id="remEndDate" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">زمان یادآوری / هشدار</label>
-                    <select id="remNotifyDays" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="0">دقیقاً در همان روز سررسید</option>
+                    <label class="text-[11px] text-zinc-400 block mb-1">زمان هشدار</label>
+                    <select id="remNotifyDays" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
+                        <option value="0">دقیقاً در روز سررسید</option>
                         <option value="1">۱ روز قبل</option>
                         <option value="3" selected>۳ روز قبل</option>
                         <option value="5">۵ روز قبل</option>
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm transition">
+                <button type="submit" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
                     ذخیره یادآور
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- EXPENSE MODAL -->
-    <div id="expenseModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-receipt text-rose-400"></i> ثبت هزینه جدید
+    <!-- iOS MODAL: EXPENSE -->
+    <div id="expenseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-[#ff453a]"></i> ثبت هزینه جدید
                 </h3>
-                <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeModal('expenseModal')" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
 
             <form onsubmit="submitExpense(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">مبلغ هزینه (تومان)</label>
-                    <input type="text" id="expAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-white focus:outline-none focus:border-rose-500" placeholder="۰" required autofocus>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ هزینه (تومان)</label>
+                    <input type="text" id="expAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ff453a]" placeholder="۰" required autofocus>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">دسته‌بندی کاکیبو</label>
+                    <label class="text-[11px] text-zinc-400 block mb-1">دسته‌بندی کاکیبو</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="expCat" value="needs" checked class="accent-emerald-400">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="expCat" value="needs" checked class="accent-[#30d158]">
                             <span>🍜 نیازها</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="expCat" value="wants" class="accent-amber-400">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="expCat" value="wants" class="accent-[#ffd60a]">
                             <span>🛍️ خواسته‌ها</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="expCat" value="culture" class="accent-sky-400">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="expCat" value="culture" class="accent-[#0a84ff]">
                             <span>📚 رشد و آموزش</span>
                         </label>
-                        <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="expCat" value="unexpected" class="accent-rose-400">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="expCat" value="unexpected" class="accent-[#ff453a]">
                             <span>⚡ غیرمنتظره</span>
                         </label>
-                        <label class="col-span-2 flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-500/40 text-xs cursor-pointer hover:border-indigo-400 text-indigo-300 font-medium">
-                            <input type="radio" name="expCat" value="fixed" class="accent-indigo-400">
+                        <label class="col-span-2 flex items-center gap-2 p-2.5 rounded-2xl bg-[#5e5ce6]/15 border border-[#5e5ce6]/30 text-xs cursor-pointer hover:border-[#5e5ce6]/60 text-[#a5a4f3] font-medium">
+                            <input type="radio" name="expCat" value="fixed" class="accent-[#5e5ce6]">
                             <span>🔒 هزینه ثابت (قسط، اجاره...) — از بودجه روزمره کم نمی‌شود</span>
                         </label>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="expDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" required>
+                    <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
+                    <input type="text" id="expDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" required>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">عنوان یا توضیح (اختیاری)</label>
-                    <input type="text" id="expDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: خرید سوپرمارکت">
+                    <label class="text-[11px] text-zinc-400 block mb-1">عنوان یا توضیح (اختیاری)</label>
+                    <input type="text" id="expDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: خرید سوپرمارکت">
                 </div>
 
-                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-rose-500/20 text-sm transition">
+                <button type="submit" class="w-full bg-[#ff453a] hover:bg-[#ff3b30] active:scale-[0.98] text-white font-semibold py-3 rounded-2xl shadow-lg shadow-red-500/20 text-xs transition">
                     ثبت نهایی هزینه
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- INCOME MODAL -->
-    <div id="incomeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-hand-holding-dollar text-emerald-400"></i> ثبت ورودی پول یا درآمد
+    <!-- iOS MODAL: INCOME -->
+    <div id="incomeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <h3 class="font-bold text-xs text-white flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-down text-[#30d158]"></i> ثبت ورودی پول یا درآمد
                 </h3>
-                <button onclick="closeModal('incomeModal')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeModal('incomeModal')" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
 
             <form onsubmit="submitIncome(event)" class="space-y-3">
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">نوع واریزی درآمد</label>
+                    <label class="text-[11px] text-zinc-400 block mb-1">نوع واریزی درآمد</label>
                     <div class="space-y-2">
-                        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="incType" value="planned" checked class="accent-emerald-400 mt-0.5">
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="incType" value="planned" checked class="accent-[#30d158] mt-0.5">
                             <div>
-                                <span class="font-bold text-slate-200 block">💼 واریز درآمد پیش‌بینی‌شده (حقوق اصلی)</span>
-                                <span class="text-[10px] text-slate-400">فقط وصول حقوق ثبت می‌شود؛ سقف خرج ماه دوبار اضافه نمی‌شود.</span>
+                                <span class="font-bold text-white block">💼 واریز درآمد پیش‌بینی‌شده (حقوق اصلی)</span>
+                                <span class="text-[10px] text-zinc-400">فقط وصول حقوق ثبت می‌شود؛ سقف خرج ماه دوبار اضافه نمی‌شود.</span>
                             </div>
                         </label>
-                        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-700 text-xs cursor-pointer hover:border-slate-500">
-                            <input type="radio" name="incType" value="extra" class="accent-sky-400 mt-0.5">
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer hover:border-white/20">
+                            <input type="radio" name="incType" value="extra" class="accent-[#0a84ff] mt-0.5">
                             <div>
-                                <span class="font-bold text-slate-200 block">✨ درآمد یا پاداش جدید (مازاد)</span>
-                                <span class="text-[10px] text-sky-400">مستقیماً به مانده بودجه خرج روزمره و مجموع درآمد ماه افزوده می‌شود.</span>
+                                <span class="font-bold text-white block">✨ درآمد یا پاداش جدید (مازاد)</span>
+                                <span class="text-[10px] text-[#0a84ff]">مستقیماً به مانده بودجه خرج روزمره و مجموع درآمد ماه افزوده می‌شود.</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">مبلغ ورودی (تومان)</label>
-                    <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-base font-bold text-emerald-400 focus:outline-none focus:border-emerald-500" placeholder="۰" required autofocus>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ ورودی (تومان)</label>
+                    <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#30d158]" placeholder="۰" required autofocus>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="incDate" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" required>
+                    <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
+                    <input type="text" id="incDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" required>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 block mb-1">منبع یا توضیح (اختیاری)</label>
-                    <input type="text" id="incDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500" placeholder="مثلاً: حقوق شرکت، پاداش">
+                    <label class="text-[11px] text-zinc-400 block mb-1">منبع یا توضیح (اختیاری)</label>
+                    <input type="text" id="incDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: حقوق ماه، پاداش پروژه">
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg shadow-emerald-500/20 text-sm transition">
+                <button type="submit" class="w-full bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-500/20 text-xs transition">
                     ثبت ورودی پول
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/90 backdrop-blur border-t border-slate-700/60 z-30">
-        <div class="max-w-md mx-auto flex justify-around items-center py-2 text-xs text-slate-400">
+    <!-- Apple iOS Bottom Tab Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
+        <div class="max-w-md mx-auto flex justify-around items-center py-2 text-xs text-zinc-400">
             <button onclick="switchTab('daily')" class="tab-btn active flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
-                <i class="fa-solid fa-house-chimney text-base"></i>
-                <span class="text-[11px]">روزمره</span>
+                <i class="fa-solid fa-house text-base"></i>
+                <span class="text-[10px] font-medium">روزمره</span>
             </button>
             <button onclick="switchTab('reminders')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
                 <i class="fa-solid fa-bell text-base"></i>
-                <span class="text-[11px]">یادآورها</span>
-                <span id="navRemBadge" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-[10px] font-medium">یادآورها</span>
+                <span id="navRemBadge" class="hidden absolute top-1 right-6 w-2 h-2 rounded-full bg-[#ffd60a]"></span>
             </button>
             <button onclick="switchTab('budget')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
                 <i class="fa-solid fa-pen-ruler text-base"></i>
-                <span class="text-[11px]">بودجه ماه</span>
+                <span class="text-[10px] font-medium">بودجه ماه</span>
             </button>
             <button onclick="switchTab('reflection')" class="tab-btn flex-1 flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
                 <i class="fa-solid fa-chart-pie text-base"></i>
-                <span class="text-[11px]">بازتاب ماه</span>
+                <span class="text-[10px] font-medium">بازتاب ماه</span>
             </button>
         </div>
     </nav>
@@ -537,48 +621,52 @@
             }
         }
 
-        function requestNotificationPermission() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-        }
-
         window.addEventListener('load', () => {
             loadLocalState();
-            populateMonthDropdowns();
+            populateYearAndMonthDropdowns();
             initGoogleClient();
-            requestNotificationPermission();
             document.getElementById('expDate').value = getTodayJalali();
             document.getElementById('incDate').value = getTodayJalali();
             document.getElementById('remDate').value = getTodayJalali();
             renderAll();
         });
 
-        function populateMonthDropdowns() {
-            const currentYear = 1405;
-            const globalSel = document.getElementById('globalMonthSelect');
-            const refSel = document.getElementById('reflectionMonthSelect');
-            globalSel.innerHTML = '';
-            refSel.innerHTML = '';
+        // Generate 10 years forward (1404 to 1415)
+        function populateYearAndMonthDropdowns() {
+            const yearSel = document.getElementById('globalYearSelect');
+            const monthSel = document.getElementById('globalMonthSelect');
+            yearSel.innerHTML = '';
+            monthSel.innerHTML = '';
+
+            const startYear = 1404;
+            const totalYears = 12; // 1404 to 1415
+
+            for (let i = 0; i < totalYears; i++) {
+                const y = startYear + i;
+                yearSel.add(new Option(y.toString(), y.toString()));
+            }
 
             MONTH_NAMES.forEach((name, idx) => {
-                const monthNum = String(idx + 1).padStart(2, '0');
-                const key = `${currentYear}-${monthNum}`;
-                const opt1 = new Option(`${name} ${currentYear}`, key);
-                const opt2 = new Option(`${name} ${currentYear}`, key);
-                globalSel.add(opt1);
-                refSel.add(opt2);
+                const mNum = String(idx + 1).padStart(2, '0');
+                monthSel.add(new Option(name, mNum));
             });
 
-            globalSel.value = state.activeMonth;
-            refSel.value = state.activeMonth;
+            // Set default selected date from state
+            const [curYear, curMonth] = state.activeMonth.split('-');
+            yearSel.value = curYear || '1405';
+            monthSel.value = curMonth || '06';
+        }
+
+        function onDateSelectorChange() {
+            const y = document.getElementById('globalYearSelect').value;
+            const m = document.getElementById('globalMonthSelect').value;
+            const mKey = `${y}-${m}`;
+            changeActiveMonth(mKey);
         }
 
         function changeActiveMonth(mKey) {
             state.activeMonth = mKey;
-            document.getElementById('reflectionMonthSelect').value = mKey;
             ensureMonthExists(mKey);
-            checkOverdueRemindersForMonth(mKey);
             saveState();
             renderAll();
         }
@@ -596,6 +684,15 @@
             }
             if (!state.reminders) {
                 state.reminders = [];
+            }
+        }
+
+        function toggleCustomCycleInput(val) {
+            const customBox = document.getElementById('customCycleBox');
+            if (val === 'custom') {
+                customBox.classList.remove('hidden');
+            } else {
+                customBox.classList.add('hidden');
             }
         }
 
@@ -629,7 +726,11 @@
             document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalExtraIncome)} تومان`;
             document.getElementById('incomeBreakdownDisplay').innerText = `پاداش/مازاد: ${formatNumber(totalExtraIncome)} تومان`;
 
-            document.getElementById('budgetMonthBadge').innerText = document.getElementById('globalMonthSelect').selectedOptions[0]?.text || '';
+            const [y, m] = state.activeMonth.split('-');
+            const monthName = MONTH_NAMES[parseInt(m, 10) - 1];
+            document.getElementById('budgetMonthBadge').innerText = `${monthName} ${y}`;
+            document.getElementById('reflectionPeriodBadge').innerText = `${monthName} ${y}`;
+
             document.getElementById('planIncome').value = curr.budget.income ? Number(curr.budget.income).toLocaleString('en-US') : '';
             document.getElementById('planSavings').value = curr.budget.savings ? Number(curr.budget.savings).toLocaleString('en-US') : '';
             document.getElementById('planFixed').value = curr.budget.fixed ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
@@ -647,16 +748,16 @@
             container.innerHTML = '';
 
             if (list.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">تراکنشی در این ماه ثبت نشده است.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-xs font-medium">تراکنشی در این ماه ثبت نشده است.</div>`;
                 return;
             }
 
             const catMap = {
-                needs: { label: 'نیازها', icon: '🍜', color: 'text-rose-400' },
-                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-rose-400' },
-                culture: { label: 'رشد و آموزش', icon: '📚', color: 'text-rose-400' },
-                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-rose-400' },
-                fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-indigo-400' }
+                needs: { label: 'نیازها', icon: '🍜', color: 'text-[#ff453a]' },
+                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-[#ffd60a]' },
+                culture: { label: 'رشد و آموزش', icon: '📚', color: 'text-[#0a84ff]' },
+                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-[#ff453a]' },
+                fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-[#5e5ce6]' }
             };
 
             [...list].reverse().forEach(t => {
@@ -665,11 +766,11 @@
                 
                 let titleText = t.desc;
                 let subLabel = t.date;
-                let amountColor = 'text-emerald-400';
+                let amountColor = 'text-[#30d158]';
                 let iconChar = '💰';
 
                 if (isExp) {
-                    amountColor = catInfo.color || 'text-rose-400';
+                    amountColor = catInfo.color || 'text-[#ff453a]';
                     iconChar = catInfo.icon || '💸';
                     if (!titleText) titleText = catInfo.label;
                     if (t.category === 'fixed') subLabel += ' • (هزینه ثابت)';
@@ -686,25 +787,25 @@
                 }
 
                 const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs';
+                item.className = 'flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.04] text-xs hover:bg-white/[0.05] transition';
                 item.innerHTML = `
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-3">
                         <span class="text-base">${iconChar}</span>
                         <div>
-                            <div class="font-bold text-slate-200">${titleText}</div>
-                            <div class="text-[10px] text-slate-500">${subLabel}</div>
+                            <div class="font-bold text-white">${titleText}</div>
+                            <div class="text-[10px] text-zinc-400 font-mono mt-0.5">${subLabel}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold ${amountColor}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
-                        <button onclick="deleteTx('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        <span class="font-bold font-mono ${amountColor}">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
+                        <button onclick="deleteTx('${t.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // REMINDER SYSTEM
+        // REMINDER & INSTALLMENTS SYSTEM
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -718,8 +819,10 @@
             const cycleLabels = {
                 once: 'یک‌بار',
                 monthly: 'ماهانه',
-                bimonthly: '۲ ماه یک‌بار',
-                quarterly: 'فصلی'
+                bimonthly: '۲ ماهه',
+                quarterly: 'فصلی',
+                yearly: 'سالانه',
+                custom: 'دوره دلخواه'
             };
 
             state.reminders.forEach(r => {
@@ -727,42 +830,53 @@
 
                 if (isPaid) {
                     const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-emerald-900/30 text-xs opacity-80';
+                    item.className = 'flex items-center justify-between p-3 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/20 text-xs opacity-75';
                     item.innerHTML = `
                         <div class="flex items-center gap-2.5">
-                            <span class="text-emerald-400 text-base"><i class="fa-solid fa-circle-check"></i></span>
+                            <span class="text-[#30d158] text-base"><i class="fa-solid fa-circle-check"></i></span>
                             <div>
-                                <div class="font-bold text-slate-300 line-through">${r.title}</div>
-                                <div class="text-[10px] text-slate-500">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
+                                <div class="font-bold text-zinc-300 line-through">${r.title}</div>
+                                <div class="text-[10px] text-zinc-500 font-mono">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
                             </div>
                         </div>
-                        <button onclick="unmarkReminderPaid('${r.id}')" class="text-slate-500 hover:text-amber-400 text-[11px] px-2 py-1 bg-slate-800 rounded-lg">
+                        <button onclick="unmarkReminderPaid('${r.id}')" class="text-zinc-400 hover:text-amber-300 text-[11px] px-2.5 py-1 bg-white/[0.06] rounded-xl">
                             لغو پرداخت
                         </button>
                     `;
                     paidContainer.appendChild(item);
                 } else {
                     urgentCount++;
+                    
+                    let cycleText = cycleLabels[r.cycle] || 'دوره‌ای';
+                    if (r.cycle === 'custom') {
+                        cycleText = `هر ${r.customVal} ${r.customUnit === 'days' ? 'روز' : 'ماه'}`;
+                    }
+
+                    let installmentBadge = '';
+                    if (r.totalCount) {
+                        installmentBadge = ` • قسط ${r.paidCount || 0} از ${r.totalCount}`;
+                    }
+
                     const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 text-xs';
+                    item.className = 'flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs';
                     item.innerHTML = `
                         <div class="flex items-center gap-3">
-                            <button onclick="markReminderPaid('${r.id}')" class="w-5 h-5 rounded-lg border-2 border-amber-400 hover:bg-amber-400/20 flex items-center justify-center text-transparent hover:text-amber-400 transition" title="ثبت پرداخت">
-                                <i class="fa-solid fa-check text-xs"></i>
+                            <button onclick="markReminderPaid('${r.id}')" class="w-5 h-5 rounded-full border-2 border-[#ffd60a] hover:bg-[#ffd60a]/20 flex items-center justify-center text-transparent hover:text-[#ffd60a] transition" title="ثبت پرداخت">
+                                <i class="fa-solid fa-check text-[10px]"></i>
                             </button>
                             <div>
-                                <div class="font-bold text-slate-100 flex items-center gap-1.5">
+                                <div class="font-bold text-white flex items-center gap-1.5">
                                     <span>${r.title}</span>
-                                    <span class="text-[9px] bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded">${cycleLabels[r.cycle] || 'دوره‌ای'}</span>
+                                    <span class="text-[9px] bg-[#ffd60a]/15 text-[#ffd60a] font-medium px-1.5 py-0.5 rounded-full">${cycleText}</span>
                                 </div>
-                                <div class="text-[10px] text-slate-400 mt-0.5">
-                                    سررسید: <span class="text-amber-300 font-medium">${r.dueDate}</span>
+                                <div class="text-[10px] text-zinc-400 font-mono mt-0.5">
+                                    سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span> ${installmentBadge}
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-indigo-300">${formatNumber(r.amount)} تومان</span>
-                            <button onclick="deleteReminder('${r.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            <span class="font-bold font-mono text-[#a5a4f3]">${formatNumber(r.amount)} تومان</span>
+                            <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                         </div>
                     `;
                     pendingContainer.appendChild(item);
@@ -770,13 +884,13 @@
             });
 
             if (pendingContainer.children.length === 0) {
-                pendingContainer.innerHTML = `<div class="text-center py-4 text-slate-500 text-xs">یادآور فعالی برای پرداخت وجود ندارد.</div>`;
+                pendingContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">یادآور فعالی برای پرداخت وجود ندارد.</div>`;
             }
             if (paidContainer.children.length === 0) {
-                paidContainer.innerHTML = `<div class="text-center py-3 text-slate-600 text-[11px]">موردی در این ماه تسویه نشده است.</div>`;
+                paidContainer.innerHTML = `<div class="text-center py-3 text-zinc-600 text-[11px]">موردی در این ماه تسویه نشده است.</div>`;
             }
 
-            // Quick Top Banner Alert
+            // Top Banner Alert
             const alertBox = document.getElementById('dueAlertBox');
             const navBadge = document.getElementById('navRemBadge');
             if (urgentCount > 0) {
@@ -796,6 +910,11 @@
             const dueDate = document.getElementById('remDate').value.trim();
             const cycle = document.getElementById('remCycle').value;
             const notifyDays = parseInt(document.getElementById('remNotifyDays').value, 10);
+            
+            const customVal = cleanNumber(document.getElementById('remCustomIntervalVal')?.value);
+            const customUnit = document.getElementById('remCustomIntervalUnit')?.value;
+            const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value);
+            const endDate = document.getElementById('remEndDate')?.value.trim();
 
             if (!title || !amount) return;
 
@@ -805,6 +924,11 @@
                 amount,
                 dueDate,
                 cycle,
+                customVal,
+                customUnit,
+                totalCount,
+                paidCount: 0,
+                endDate,
                 notifyDays
             };
 
@@ -823,11 +947,14 @@
             const confirmPay = confirm(`آیا پرداخت «${rem.title}» به مبلغ ${formatNumber(rem.amount)} تومان تأیید شود و به عنوان هزینه ثابت ثبت گردد؟`);
             if (!confirmPay) return;
 
-            // 1. Mark as paid in active month
             if (!state.months[state.activeMonth].paidReminders) state.months[state.activeMonth].paidReminders = [];
             state.months[state.activeMonth].paidReminders.push(remId);
 
-            // 2. Automatically record as Fixed Expense transaction
+            if (rem.totalCount) {
+                rem.paidCount = (rem.paidCount || 0) + 1;
+            }
+
+            // Record as Fixed Expense transaction
             const tx = {
                 id: Date.now().toString(),
                 type: 'expense',
@@ -855,14 +982,6 @@
             state.reminders = state.reminders.filter(r => r.id !== remId);
             saveState();
             renderAll();
-        }
-
-        function checkOverdueRemindersForMonth(newMonthKey) {
-            const prevMonthPaid = state.months[state.activeMonth]?.paidReminders || [];
-            const unpaid = state.reminders.filter(r => !prevMonthPaid.includes(r.id));
-            if (unpaid.length > 0) {
-                // Carry over handled dynamically
-            }
         }
 
         function renderReflection(mKey) {
@@ -1026,8 +1145,8 @@
                     document.getElementById('loginBtn').classList.add('hidden');
                     document.getElementById('userProfile').classList.remove('hidden');
                     document.getElementById('userEmailText').innerText = info.email;
-                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
-                    document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> درایو متصل';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium';
                     
                     loadLocalState();
                     renderAll();
@@ -1052,8 +1171,8 @@
 
             document.getElementById('loginBtn').classList.remove('hidden');
             document.getElementById('userProfile').classList.add('hidden');
-            document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> حالت مهمان (آفلاین)';
-            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1';
+            document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین';
+            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1 font-medium';
 
             loadLocalState();
             renderAll();
@@ -1075,7 +1194,7 @@
                         state = cloudData;
                         if (!state.reminders) state.reminders = [];
                         localStorage.setItem(getStorageKey(), JSON.stringify(state));
-                        populateMonthDropdowns();
+                        populateYearAndMonthDropdowns();
                         renderAll();
                     }
                 } else {
