@@ -41,7 +41,7 @@
                 <div>
                     <h1 class="font-bold text-sm leading-tight text-slate-100">کاکیبو ژاپنی</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> آفلاین (محلی)
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> ذخیره محلی فعال
                     </span>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                 </select>
                 <button id="authBtn" onclick="handleAuthClick()" class="bg-slate-700/80 hover:bg-slate-700 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-600/60 flex items-center gap-1.5 transition">
                     <i class="fa-brands fa-google text-slate-300"></i>
-                    <span id="authBtnText">ورود</span>
+                    <span id="authBtnText">ورود به گوگل</span>
                 </button>
             </div>
         </div>
@@ -385,7 +385,6 @@
         }
 
         window.addEventListener('load', () => {
-            migrateOldData();
             loadLocalState();
             populateMonthDropdowns();
             initGoogleClient();
@@ -393,29 +392,6 @@
             document.getElementById('incDate').value = getTodayJalali();
             renderAll();
         });
-
-        // Migration logic for previous single-month data
-        function migrateOldData() {
-            const legacyKeys = ['kakeibo_data', 'kakeibo_app_data', 'kakeibo_state'];
-            legacyKeys.forEach(k => {
-                const old = localStorage.getItem(k);
-                if (old) {
-                    try {
-                        const parsed = JSON.parse(old);
-                        ensureMonthExists('1405-06');
-                        if (parsed.budget) state.months['1405-06'].budget = parsed.budget;
-                        if (parsed.expenses && parsed.expenses.length > 0) {
-                            parsed.expenses.forEach(e => {
-                                if (!e.type) e.type = 'expense';
-                                state.months['1405-06'].transactions.push(e);
-                            });
-                        }
-                        saveState();
-                        localStorage.removeItem(k);
-                    } catch (e) {}
-                }
-            });
-        }
 
         function populateMonthDropdowns() {
             const currentYear = 1405;
@@ -575,7 +551,7 @@
             };
             saveState();
             renderAll();
-            alert('بودجه ذخیره شد.');
+            alert('بودجه این ماه با موفقیت ذخیره شد.');
         }
 
         function submitExpense(e) {
@@ -641,7 +617,9 @@
         function loadLocalState() {
             const saved = localStorage.getItem('kakeibo_multi_data');
             if (saved) {
-                try { state = JSON.parse(saved); } catch (e) {}
+                try { 
+                    state = JSON.parse(saved); 
+                } catch (e) {}
             }
         }
 
@@ -653,7 +631,7 @@
                 callback: async (resp) => {
                     if (resp.error) return;
                     accessToken = resp.access_token;
-                    document.getElementById('authBtnText').innerText = 'متصل';
+                    document.getElementById('authBtnText').innerText = 'متصل به گوگل';
                     document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> همگام با درایو';
                     document.getElementById('syncStatus').className = 'text-[10px] text-emerald-400 flex items-center gap-1';
                     await fetchFromDrive();
@@ -678,14 +656,8 @@
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
                     const cloudData = await fileRes.json();
-                    if (cloudData) {
-                        if (cloudData.months) {
-                            state = cloudData;
-                        } else if (cloudData.budget || cloudData.expenses) {
-                            ensureMonthExists('1405-06');
-                            if (cloudData.budget) state.months['1405-06'].budget = cloudData.budget;
-                            if (cloudData.expenses) state.months['1405-06'].transactions = cloudData.expenses;
-                        }
+                    if (cloudData && cloudData.months) {
+                        state = cloudData;
                         localStorage.setItem('kakeibo_multi_data', JSON.stringify(state));
                         populateMonthDropdowns();
                         renderAll();
