@@ -6,9 +6,9 @@
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=8">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=8">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=8">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=9">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=9">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=9">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -75,7 +75,7 @@
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-3.5 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 shrink-0">
-                <img src="./logo.jpg?v=8" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
+                <img src="./logo.jpg?v=9" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
                 <div class="flex flex-col">
                     <h1 class="font-bold text-[13px] tracking-tight whitespace-nowrap text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap">
@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <!-- Header Controls: CSV & Auth -->
+            <!-- Header Controls -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <button onclick="exportToCSV()" title="دریافت فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs transition active:scale-95">
                     <i class="fa-solid fa-file-excel text-[#30d158]"></i>
@@ -100,7 +100,7 @@
                 <select id="globalMonthSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-[#0a84ff] rounded-xl px-2 py-1.5 focus:outline-none">
                 </select>
                 
-                <!-- Google Login/Profile -->
+                <!-- Google Login -->
                 <div id="authContainer" class="flex items-center">
                     <button id="loginBtn" onclick="handleAuthClick()" class="bg-[#2c2c2e] hover:bg-[#3a3a3c] text-[11px] px-2 py-1.5 rounded-xl border border-white/10 flex items-center gap-1 font-medium transition active:scale-95">
                         <i class="fa-brands fa-google text-slate-300"></i>
@@ -387,29 +387,6 @@
         </section>
     </main>
 
-    <!-- JALALI CALENDAR PICKER MODAL (z-[99] to appear in front of everything) -->
-    <div id="calendarModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99] hidden flex items-center justify-center p-4">
-        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-xs rounded-3xl p-4 space-y-3 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
-                <div class="flex items-center gap-1.5">
-                    <select id="calYearSelect" onchange="renderCalendarGrid()" class="bg-[#2c2c2e] text-xs text-white rounded-xl px-2 py-1 focus:outline-none"></select>
-                    <select id="calMonthSelect" onchange="renderCalendarGrid()" class="bg-[#2c2c2e] text-xs text-[#0a84ff] rounded-xl px-2 py-1 focus:outline-none"></select>
-                </div>
-                <button onclick="closeModal('calendarModal')" class="text-zinc-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
-            </div>
-            <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-zinc-400 font-bold pb-1">
-                <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
-            </div>
-            <div id="calDaysGrid" class="grid grid-cols-7 gap-1.5 text-center text-xs"></div>
-            <div class="flex justify-between pt-2 border-t border-white/[0.08]">
-                <button onclick="selectCalendarToday()" class="text-[#0a84ff] text-xs font-semibold py-1 px-2 hover:opacity-80">امروز</button>
-                <button onclick="closeModal('calendarModal')" class="text-zinc-400 text-xs py-1 px-2 hover:text-white">بستن</button>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL: PAY CONFIRMATION WITH EDITABLE AMOUNT -->
     <div id="payConfirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
@@ -435,12 +412,15 @@
                     <input type="text" id="payTargetAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#30d158]" required>
                 </div>
 
-                <div>
+                <div class="relative">
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ پرداخت</label>
-                    <div class="relative">
-                        <input type="text" id="payTargetDate" readonly onclick="openCalendarPicker('payTargetDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
-                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    <div class="relative flex items-center">
+                        <input type="text" id="payTargetDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white pr-3 pl-9" required>
+                        <button type="button" onclick="toggleInlineCalendar('payTargetDate', 'payTargetDateCal')" class="absolute left-2.5 text-zinc-400 hover:text-sky-400 p-1">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </button>
                     </div>
+                    <div id="payTargetDateCal" class="hidden mt-2 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
                 </div>
 
                 <div class="flex gap-2 pt-2">
@@ -515,12 +495,15 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
+                    <div class="relative">
                         <label class="text-[11px] text-zinc-400 block mb-1">تاریخ اولین سررسید</label>
-                        <div class="relative">
-                            <input type="text" id="remDate" readonly onclick="openCalendarPicker('remDate')" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white cursor-pointer" placeholder="۱۴۰۵/۰۶/۲۵" required>
-                            <i class="fa-regular fa-calendar text-zinc-400 absolute left-2.5 top-2.5 pointer-events-none text-xs"></i>
+                        <div class="relative flex items-center">
+                            <input type="text" id="remDate" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white pr-2.5 pl-8" placeholder="۱۴۰۵/۰۶/۲۵" required>
+                            <button type="button" onclick="toggleInlineCalendar('remDate', 'remDateCal')" class="absolute left-2 text-zinc-400 hover:text-sky-400 p-1">
+                                <i class="fa-regular fa-calendar text-xs"></i>
+                            </button>
                         </div>
+                        <div id="remDateCal" class="hidden absolute top-full left-0 right-0 z-50 mt-1 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
                     </div>
                     <div id="remCycleWrap">
                         <label class="text-[11px] text-zinc-400 block mb-1">دوره تکرار</label>
@@ -570,12 +553,15 @@
                         <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط (اختیاری)</label>
                         <input type="number" id="remTotalCount" min="1" placeholder="مثلاً: 12" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
                     </div>
-                    <div>
+                    <div class="relative">
                         <label class="text-[10px] text-zinc-400 block mb-1">تاریخ پایان (اختیاری)</label>
-                        <div class="relative">
-                            <input type="text" id="remEndDate" readonly onclick="openCalendarPicker('remEndDate')" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white cursor-pointer">
-                            <i class="fa-regular fa-calendar text-zinc-400 absolute left-2.5 top-2.5 pointer-events-none text-xs"></i>
+                        <div class="relative flex items-center">
+                            <input type="text" id="remEndDate" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white pr-2.5 pl-8">
+                            <button type="button" onclick="toggleInlineCalendar('remEndDate', 'remEndDateCal')" class="absolute left-2 text-zinc-400 hover:text-sky-400 p-1">
+                                <i class="fa-regular fa-calendar text-xs"></i>
+                            </button>
                         </div>
+                        <div id="remEndDateCal" class="hidden absolute top-full left-0 right-0 z-50 mt-1 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
                     </div>
                 </div>
 
@@ -631,12 +617,15 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="relative">
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
-                    <div class="relative">
-                        <input type="text" id="expDate" readonly onclick="openCalendarPicker('expDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
-                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    <div class="relative flex items-center">
+                        <input type="text" id="expDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white pr-3 pl-9" required>
+                        <button type="button" onclick="toggleInlineCalendar('expDate', 'expDateCal')" class="absolute left-2.5 text-zinc-400 hover:text-sky-400 p-1">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </button>
                     </div>
+                    <div id="expDateCal" class="hidden mt-2 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
                 </div>
 
                 <div>
@@ -690,12 +679,15 @@
                     <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#30d158]" placeholder="۰" required autofocus>
                 </div>
 
-                <div>
+                <div class="relative">
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
-                    <div class="relative">
-                        <input type="text" id="incDate" readonly onclick="openCalendarPicker('incDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
-                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    <div class="relative flex items-center">
+                        <input type="text" id="incDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white pr-3 pl-9" required>
+                        <button type="button" onclick="toggleInlineCalendar('incDate', 'incDateCal')" class="absolute left-2.5 text-zinc-400 hover:text-sky-400 p-1">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </button>
                     </div>
+                    <div id="incDateCal" class="hidden mt-2 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
                 </div>
 
                 <div>
@@ -764,7 +756,6 @@
         let tokenClient;
         let accessToken = localStorage.getItem('kakeibo_cached_token') || null;
         let driveFileId = null;
-        let activePickerTargetInputId = null;
 
         function getStorageKey() {
             return currentUserEmail ? `kakeibo_user_${currentUserEmail}` : 'kakeibo_guest_data';
@@ -837,10 +828,82 @@
             }
         }
 
+        // --- INLINE CALENDAR PICKER ---
+        function toggleInlineCalendar(inputId, calContainerId) {
+            const container = document.getElementById(calContainerId);
+            if (!container.classList.contains('hidden')) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            const curVal = normalizeJalaliDate(document.getElementById(inputId).value) || getTodayJalali();
+            let [curY, curM, curD] = curVal.split('/');
+            curY = parseInt(curY, 10);
+            curM = parseInt(curM, 10);
+            curD = parseInt(curD, 10);
+
+            renderInlineCalendarUI(inputId, calContainerId, curY, curM, curD);
+            container.classList.remove('hidden');
+        }
+
+        function renderInlineCalendarUI(inputId, calContainerId, y, m, selectedD) {
+            const container = document.getElementById(calContainerId);
+            const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
+
+            let yearOptions = '';
+            for (let yr = 1404; yr <= 1415; yr++) {
+                yearOptions += `<option value="${yr}" ${yr === y ? 'selected' : ''}>${yr}</option>`;
+            }
+
+            let monthOptions = '';
+            MONTH_NAMES.forEach((name, idx) => {
+                const mNum = idx + 1;
+                monthOptions += `<option value="${mNum}" ${mNum === m ? 'selected' : ''}>${name}</option>`;
+            });
+
+            let daysHtml = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isSel = d === selectedD;
+                daysHtml += `
+                    <button type="button" onclick="selectInlineDate('${inputId}', '${calContainerId}', ${y}, ${m}, ${d})" class="py-1.5 rounded-lg text-[11px] font-semibold transition ${isSel ? 'bg-[#0a84ff] text-white font-bold' : 'bg-white/[0.04] text-zinc-300 hover:bg-white/10'}">
+                        ${d}
+                    </button>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+                    <div class="flex items-center gap-1">
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', parseInt(this.value, 10), ${m}, ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none">
+                            ${yearOptions}
+                        </select>
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', ${y}, parseInt(this.value, 10), ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-[#0a84ff] rounded-lg px-2 py-1 focus:outline-none">
+                            ${monthOptions}
+                        </select>
+                    </div>
+                    <button type="button" onclick="document.getElementById('${calContainerId}').classList.add('hidden')" class="text-zinc-400 hover:text-white text-xs p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-zinc-400 font-bold">
+                    <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center">
+                    ${daysHtml}
+                </div>
+            `;
+        }
+
+        function selectInlineDate(inputId, calContainerId, y, m, d) {
+            const mStr = String(m).padStart(2, '0');
+            const dStr = String(d).padStart(2, '0');
+            document.getElementById(inputId).value = `${y}/${mStr}/${dStr}`;
+            document.getElementById(calContainerId).classList.add('hidden');
+        }
+
         window.addEventListener('load', () => {
             loadLocalState();
             populateYearAndMonthDropdowns();
-            initCalendarDropdowns();
             initGoogleClient();
             resetModalDates();
 
@@ -1146,71 +1209,6 @@
             }
         }
 
-        // --- JALALI CALENDAR PICKER LOGIC ---
-        function initCalendarDropdowns() {
-            const ySel = document.getElementById('calYearSelect');
-            const mSel = document.getElementById('calMonthSelect');
-            ySel.innerHTML = '';
-            mSel.innerHTML = '';
-
-            for (let i = 1404; i <= 1415; i++) {
-                ySel.add(new Option(i.toString(), i.toString()));
-            }
-            MONTH_NAMES.forEach((name, idx) => {
-                mSel.add(new Option(name, (idx + 1).toString()));
-            });
-        }
-
-        function openCalendarPicker(targetInputId) {
-            activePickerTargetInputId = targetInputId;
-            const curVal = document.getElementById(targetInputId).value.trim();
-            const norm = normalizeJalaliDate(curVal) || getTodayJalali();
-            const [y, m] = norm.split('/');
-
-            document.getElementById('calYearSelect').value = y;
-            document.getElementById('calMonthSelect').value = parseInt(m, 10).toString();
-            renderCalendarGrid(norm);
-            openModal('calendarModal');
-        }
-
-        function renderCalendarGrid(selectedFullDate) {
-            const y = parseInt(document.getElementById('calYearSelect').value, 10);
-            const m = parseInt(document.getElementById('calMonthSelect').value, 10);
-            const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
-
-            const grid = document.getElementById('calDaysGrid');
-            grid.innerHTML = '';
-
-            const currentSelected = selectedFullDate || document.getElementById(activePickerTargetInputId)?.value || '';
-
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dStr = String(d).padStart(2, '0');
-                const mStr = String(m).padStart(2, '0');
-                const thisDate = `${y}/${mStr}/${dStr}`;
-                const isSelected = currentSelected === thisDate;
-
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = `py-2 rounded-xl text-xs font-semibold transition ${isSelected ? 'bg-[#0a84ff] text-white font-bold' : 'bg-white/[0.04] text-zinc-300 hover:bg-white/10'}`;
-                btn.innerText = d;
-                btn.onclick = () => {
-                    if (activePickerTargetInputId) {
-                        document.getElementById(activePickerTargetInputId).value = thisDate;
-                    }
-                    closeModal('calendarModal');
-                };
-                grid.appendChild(btn);
-            }
-        }
-
-        function selectCalendarToday() {
-            const today = getTodayJalali();
-            if (activePickerTargetInputId) {
-                document.getElementById(activePickerTargetInputId).value = today;
-            }
-            closeModal('calendarModal');
-        }
-
         // --- CSV EXPORT & IMPORT ---
         function exportToCSV() {
             let csvRows = [];
@@ -1298,7 +1296,7 @@
                         return;
                     }
 
-                    if (!confirm('آیا از بارگذاری و بازگردانی این فایل اطمینان دارید؟ اطلاعات جاری با فایل ادغام می‌شوند.')) return;
+                    if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟')) return;
 
                     for (let i = 1; i < lines.length; i++) {
                         const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
@@ -1344,7 +1342,7 @@
 
                     saveState();
                     renderAll();
-                    alert('داده‌های فایل اکسل با موفقیت وارد و ذخیره شدند.');
+                    alert('اطلاعات با موفقیت بارگذاری شد.');
                 } catch (err) {
                     alert('خطا در خواندن فایل CSV.');
                 }
@@ -1361,6 +1359,7 @@
             document.getElementById('payTargetTitle').value = rem.title;
             document.getElementById('payTargetAmount').value = Number(rem.amount).toLocaleString('en-US');
             document.getElementById('payTargetDate').value = getTodayJalali();
+            document.getElementById('payTargetDateCal').classList.add('hidden');
             openModal('payConfirmModal');
         }
 
@@ -1408,6 +1407,8 @@
             document.getElementById('remDate').value = getTodayJalali();
             document.getElementById('remCycleWrap').classList.remove('hidden');
             document.getElementById('remInstallmentsWrap').classList.remove('hidden');
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
             openModal('reminderModal');
         }
 
@@ -1424,6 +1425,8 @@
             document.getElementById('remCycleWrap').classList.add('hidden');
             document.getElementById('remInstallmentsWrap').classList.add('hidden');
             document.getElementById('customCycleBox').classList.add('hidden');
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
             openModal('reminderModal');
         }
 
@@ -1598,6 +1601,7 @@
                 document.getElementById('expAmount').value = Number(tx.amount).toLocaleString('en-US');
                 document.getElementById('expDate').value = tx.date;
                 document.getElementById('expDesc').value = tx.desc || '';
+                document.getElementById('expDateCal').classList.add('hidden');
                 
                 const catRadio = document.querySelector(`input[name="expCat"][value="${tx.category}"]`);
                 if (catRadio) catRadio.checked = true;
@@ -1610,6 +1614,7 @@
                 document.getElementById('incAmount').value = Number(tx.amount).toLocaleString('en-US');
                 document.getElementById('incDate').value = tx.date;
                 document.getElementById('incDesc').value = tx.desc || '';
+                document.getElementById('incDateCal').classList.add('hidden');
                 
                 const typeRadio = document.querySelector(`input[name="incType"][value="${tx.incomeType || 'planned'}"]`);
                 if (typeRadio) typeRadio.checked = true;
