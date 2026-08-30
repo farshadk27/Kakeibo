@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=10">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=10">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=10">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=11">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=11">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=11">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -76,7 +76,7 @@
         <div class="max-w-md mx-auto flex items-center justify-between gap-1.5">
             
             <div class="flex items-center gap-2 shrink-0">
-                <img src="./logo.jpg?v=10" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
+                <img src="./logo.jpg?v=11" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
                 <div class="flex flex-col">
                     <h1 class="font-bold text-[13px] tracking-tight whitespace-nowrap text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap">
@@ -132,6 +132,7 @@
             </button>
         </div>
 
+        <!-- TAB: DAILY -->
         <section id="tab-daily" class="tab-content space-y-3.5">
             <div class="grid grid-cols-2 gap-3">
                 <div id="remBudgetCard" class="ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300">
@@ -172,6 +173,34 @@
                 </button>
             </div>
 
+            <!-- SEARCH & FILTERS -->
+            <div class="ios-blur rounded-3xl p-3.5 space-y-2.5">
+                <div class="relative">
+                    <input type="text" id="dailySearchInput" oninput="applyTxFilters()" placeholder="جست‌وجو در عنوان یا مبلغ تراکنش..." class="w-full ios-input rounded-2xl pr-8 pl-3 py-2 text-xs text-white placeholder-zinc-500">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-zinc-500 text-xs"></i>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="dailyCatFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200">
+                        <option value="all">همه دسته‌بندی‌ها</option>
+                        <option value="needs">🍜 نیازها</option>
+                        <option value="wants">🛍️ خواسته‌ها</option>
+                        <option value="culture">📚 آموزش و رشد</option>
+                        <option value="unexpected">⚡ غیرمنتظره</option>
+                        <option value="fixed">🔒 هزینه ثابت</option>
+                        <option value="income">💰 درآمدها / ورودی</option>
+                    </select>
+
+                    <div class="relative flex items-center">
+                        <input type="text" id="dailyDateFilter" placeholder="فیلتر بر اساس روز" readonly onclick="toggleInlineCalendar('dailyDateFilter', 'dailyDateFilterCal')" class="w-full ios-input rounded-xl pr-2.5 pl-7 py-1.5 text-[11px] text-zinc-200 cursor-pointer">
+                        <button type="button" onclick="clearDailyDateFilter(event)" id="clearDateFilterBtn" class="hidden absolute left-2 text-zinc-400 hover:text-red-400 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div id="dailyDateFilterCal" class="hidden absolute top-full left-0 right-0 z-50 mt-1 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="ios-blur rounded-3xl p-4">
                 <div class="flex items-center justify-between mb-3.5 px-1">
                     <h3 class="font-bold text-xs text-zinc-300 flex items-center gap-2">
@@ -183,6 +212,44 @@
             </div>
         </section>
 
+        <!-- TAB: CHECKLIST -->
+        <section id="tab-checklist" class="tab-content hidden space-y-3.5">
+            <div class="flex items-center justify-between ios-blur p-4 rounded-3xl">
+                <div>
+                    <h2 class="font-bold text-[13px] text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-[#30d158]"></i> چک‌لیست خرید
+                    </h2>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">مدیریت اقلام و خریدهای برنامه‌ریزی‌شده</p>
+                </div>
+                <button onclick="openChecklistModal()" class="bg-[#30d158] hover:bg-emerald-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                    <i class="fa-solid fa-plus text-xs"></i> آیتم جدید
+                </button>
+            </div>
+
+            <!-- SECTION 1: TIME-BOUND -->
+            <div class="ios-blur rounded-3xl p-4 space-y-3">
+                <div class="flex items-center justify-between px-1 border-b border-white/[0.06] pb-2">
+                    <h3 class="font-bold text-[11px] text-[#0a84ff] flex items-center gap-1.5">
+                        <i class="fa-regular fa-calendar-check"></i> وابسته به زمان و تاریخ (این ماه)
+                    </h3>
+                    <span id="timeboundBadge" class="text-[10px] text-zinc-400"></span>
+                </div>
+                <div id="timeboundChecklist" class="space-y-2"></div>
+            </div>
+
+            <!-- SECTION 2: TIMELESS -->
+            <div class="ios-blur rounded-3xl p-4 space-y-3">
+                <div class="flex items-center justify-between px-1 border-b border-white/[0.06] pb-2">
+                    <h3 class="font-bold text-[11px] text-[#ffd60a] flex items-center gap-1.5">
+                        <i class="fa-solid fa-infinity text-xs"></i> همیشگی و جاری (بدون وابستگی زمانی)
+                    </h3>
+                    <span class="text-[10px] text-zinc-500">تا زمان خرید در لیست می‌ماند</span>
+                </div>
+                <div id="timelessChecklist" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- TAB: REMINDERS -->
         <section id="tab-reminders" class="tab-content hidden space-y-3.5">
             <div class="flex items-center justify-between ios-blur p-4 rounded-3xl">
                 <div>
@@ -211,6 +278,7 @@
             </div>
         </section>
 
+        <!-- TAB: WISHLIST -->
         <section id="tab-wishlist" class="tab-content hidden space-y-3.5">
             <div class="flex items-center justify-between ios-blur p-4 rounded-3xl">
                 <div>
@@ -232,6 +300,7 @@
             </div>
         </section>
 
+        <!-- TAB: NOTES -->
         <section id="tab-notes" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-3">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -253,6 +322,7 @@
             </div>
         </section>
 
+        <!-- TAB: BUDGET -->
         <section id="tab-budget" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-4">
                 <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
@@ -299,6 +369,7 @@
             </div>
         </section>
 
+        <!-- TAB: REFLECTION -->
         <section id="tab-reflection" class="tab-content hidden space-y-3.5">
             <div class="ios-blur p-4 rounded-3xl space-y-4">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -380,6 +451,63 @@
         </section>
     </main>
 
+    <!-- MODAL: CHECKLIST ITEM -->
+    <div id="checklistModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <h3 id="checklistModalTitle" class="font-bold text-xs text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-[#30d158]"></i> افزودن آیتم به چک‌لیست
+                </h3>
+                <button onclick="closeModal('checklistModal')" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitChecklistItem(event)" class="space-y-3">
+                <input type="hidden" id="editChecklistId" value="">
+                <div>
+                    <label class="text-[11px] text-zinc-400 block mb-1">عنوان کالا یا خرید</label>
+                    <input type="text" id="checkTitle" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-xs text-white" placeholder="مثلاً: خرید قهوه، تعویض روغن" required autofocus>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ تخمینی (اختیاری - تومان)</label>
+                    <input type="text" id="checkAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-[#30d158] font-bold" placeholder="۰">
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-zinc-400 block mb-1.5">نوع وابستگی زمانی</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
+                            <input type="radio" name="checkTimeType" value="timeless" checked onchange="toggleChecklistDateMode(this.value)" class="accent-[#ffd60a]">
+                            <span>همیشگی (بدون تاریخ)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
+                            <input type="radio" name="checkTimeType" value="dated" onchange="toggleChecklistDateMode(this.value)" class="accent-[#0a84ff]">
+                            <span>تاریخ‌دار / این ماه</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="checkDateWrapper" class="hidden relative">
+                    <label class="text-[11px] text-zinc-400 block mb-1">تاریخ مدنظر</label>
+                    <div class="relative flex items-center">
+                        <input type="text" id="checkDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white pr-3 pl-9">
+                        <button type="button" onclick="toggleInlineCalendar('checkDate', 'checkDateCal')" class="absolute left-2.5 text-zinc-400 hover:text-sky-400 p-1">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </button>
+                    </div>
+                    <div id="checkDateCal" class="hidden mt-2 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
+                </div>
+
+                <button type="submit" id="checkSubmitBtn" class="w-full bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-emerald-500/20 text-xs transition mt-2">
+                    افزودن به چک‌لیست
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PAY CONFIRM -->
     <div id="payConfirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -427,6 +555,7 @@
         </div>
     </div>
 
+    <!-- MODAL: WISHLIST -->
     <div id="wishlistModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -461,6 +590,7 @@
         </div>
     </div>
 
+    <!-- MODAL: REMINDER (FIXED LAYOUT & EXTENDED CONTROLS) -->
     <div id="reminderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -484,9 +614,9 @@
                     <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ffd60a]" placeholder="۰" required>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div class="relative">
-                        <label class="text-[11px] text-zinc-400 block mb-1">تاریخ اولین سررسید</label>
+                        <label class="text-[11px] text-zinc-400 block mb-1">تاریخ سررسید</label>
                         <div class="relative flex items-center">
                             <input type="text" id="remDate" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white pr-2.5 pl-8" placeholder="۱۴۰۵/۰۶/۲۵" required>
                             <button type="button" onclick="toggleInlineCalendar('remDate', 'remDateCal')" class="absolute left-2 text-zinc-400 hover:text-sky-400 p-1">
@@ -508,20 +638,29 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <!-- ALERTS CONFIG: CLEAN RESPONSIVE GRID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">ساعت هشدار</label>
                         <input type="time" id="remNotifyTime" value="09:00" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
                     </div>
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">زمان هشدار</label>
-                        <select id="remNotifyDays" class="w-full ios-input rounded-2xl px-2.5 py-2 text-xs text-white">
+                        <select id="remNotifyDays" onchange="toggleCustomNotifyDays(this.value)" class="w-full ios-input rounded-2xl px-2.5 py-2 text-xs text-white">
                             <option value="0">دقیقاً در روز سررسید</option>
                             <option value="1">۱ روز قبل</option>
+                            <option value="2">۲ روز قبل</option>
                             <option value="3" selected>۳ روز قبل</option>
                             <option value="5">۵ روز قبل</option>
+                            <option value="7">۱ هفته قبل</option>
+                            <option value="custom">روز دلخواه (سفارشی)...</option>
                         </select>
                     </div>
+                </div>
+
+                <div id="customNotifyDaysBox" class="hidden p-2.5 bg-white/[0.03] rounded-2xl border border-white/[0.06]">
+                    <label class="text-[10px] text-zinc-400 block mb-1">چند روز قبل از سررسید یادآوری شود؟</label>
+                    <input type="number" id="remCustomNotifyDaysVal" min="0" max="60" value="4" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-xs text-white">
                 </div>
 
                 <div id="customCycleBox" class="hidden grid grid-cols-2 gap-2 p-3 bg-white/[0.03] rounded-2xl border border-white/[0.06]">
@@ -538,7 +677,7 @@
                     </div>
                 </div>
 
-                <div id="remInstallmentsWrap" class="grid grid-cols-2 gap-2 pt-1">
+                <div id="remInstallmentsWrap" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط (اختیاری)</label>
                         <input type="number" id="remTotalCount" min="1" placeholder="مثلاً: 12" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
@@ -555,6 +694,14 @@
                     </div>
                 </div>
 
+                <!-- UPDATE ALL FUTURE RECURRING CHECKBOX -->
+                <div id="remSeriesUpdateWrap" class="hidden p-2.5 bg-amber-500/[0.08] border border-amber-500/20 rounded-2xl">
+                    <label class="flex items-center gap-2 text-xs text-amber-300 cursor-pointer">
+                        <input type="checkbox" id="remUpdateAllInSeries" class="accent-[#ffd60a] rounded">
+                        <span>ساعت و زمان هشدار روی تمام اقساط باقی‌مانده این قسط در ماه‌های آینده نیز اعمال شود.</span>
+                    </label>
+                </div>
+
                 <button type="submit" id="remSubmitBtn" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
                     ذخیره یادآور
                 </button>
@@ -562,6 +709,7 @@
         </div>
     </div>
 
+    <!-- MODAL: EXPENSE -->
     <div id="expenseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -629,6 +777,7 @@
         </div>
     </div>
 
+    <!-- MODAL: INCOME -->
     <div id="incomeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -690,32 +839,37 @@
         </div>
     </div>
 
+    <!-- BOTTOM TAB NAVIGATION (7 TABS) -->
     <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
-        <div class="max-w-md mx-auto flex justify-between items-center py-2 px-2 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('daily')" class="tab-btn active min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
-                <i class="fa-solid fa-house text-sm"></i>
-                <span class="text-[9px] font-medium">روزمره</span>
+        <div class="max-w-md mx-auto flex justify-between items-center py-2 px-1.5 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('daily')" class="tab-btn active min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
+                <i class="fa-solid fa-house text-xs"></i>
+                <span class="text-[8.5px] font-medium">روزمره</span>
             </button>
-            <button onclick="switchTab('reminders')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
-                <i class="fa-solid fa-bell text-sm"></i>
-                <span class="text-[9px] font-medium">یادآورها</span>
-                <span id="navRemBadge" class="hidden absolute top-0.5 right-3 w-1.5 h-1.5 rounded-full bg-[#ffd60a]"></span>
+            <button onclick="switchTab('checklist')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="checklist">
+                <i class="fa-solid fa-list-check text-xs"></i>
+                <span class="text-[8.5px] font-medium">چک‌لیست</span>
             </button>
-            <button onclick="switchTab('wishlist')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
-                <i class="fa-solid fa-hourglass-half text-sm"></i>
-                <span class="text-[9px] font-medium">۳۰ روز انتظار</span>
+            <button onclick="switchTab('reminders')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
+                <i class="fa-solid fa-bell text-xs"></i>
+                <span class="text-[8.5px] font-medium">یادآورها</span>
+                <span id="navRemBadge" class="hidden absolute top-0.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[#ffd60a]"></span>
             </button>
-            <button onclick="switchTab('notes')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
-                <i class="fa-solid fa-note-sticky text-sm"></i>
-                <span class="text-[9px] font-medium">یادداشت</span>
+            <button onclick="switchTab('wishlist')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
+                <i class="fa-solid fa-hourglass-half text-xs"></i>
+                <span class="text-[8.5px] font-medium">۳۰ روز</span>
             </button>
-            <button onclick="switchTab('budget')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
-                <i class="fa-solid fa-pen-ruler text-sm"></i>
-                <span class="text-[9px] font-medium">بودجه</span>
+            <button onclick="switchTab('notes')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
+                <i class="fa-solid fa-note-sticky text-xs"></i>
+                <span class="text-[8.5px] font-medium">یادداشت</span>
             </button>
-            <button onclick="switchTab('reflection')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
-                <i class="fa-solid fa-chart-pie text-sm"></i>
-                <span class="text-[9px] font-medium">بازتاب</span>
+            <button onclick="switchTab('budget')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
+                <i class="fa-solid fa-pen-ruler text-xs"></i>
+                <span class="text-[8.5px] font-medium">بودجه</span>
+            </button>
+            <button onclick="switchTab('reflection')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
+                <i class="fa-solid fa-chart-pie text-xs"></i>
+                <span class="text-[8.5px] font-medium">بازتاب</span>
             </button>
         </div>
     </nav>
@@ -734,7 +888,8 @@
                 activeMonth: '1405-06',
                 months: {},
                 reminders: [],
-                wishlist: []
+                wishlist: [],
+                checklist: []
             };
         }
 
@@ -825,9 +980,9 @@
 
             const curVal = normalizeJalaliDate(document.getElementById(inputId).value) || getTodayJalali();
             let [curY, curM, curD] = curVal.split('/');
-            curY = parseInt(curY, 10);
-            curM = parseInt(curM, 10);
-            curD = parseInt(curD, 10);
+            curY = parseInt(curY, 10) || 1405;
+            curM = parseInt(curM, 10) || 6;
+            curD = parseInt(curD, 10) || 1;
 
             renderInlineCalendarUI(inputId, calContainerId, curY, curM, curD);
             container.classList.remove('hidden');
@@ -886,6 +1041,19 @@
             const dStr = String(d).padStart(2, '0');
             document.getElementById(inputId).value = `${y}/${mStr}/${dStr}`;
             document.getElementById(calContainerId).classList.add('hidden');
+            
+            if (inputId === 'dailyDateFilter') {
+                document.getElementById('clearDateFilterBtn').classList.remove('hidden');
+                applyTxFilters();
+            }
+        }
+
+        function clearDailyDateFilter(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('dailyDateFilter').value = '';
+            document.getElementById('clearDateFilterBtn').classList.add('hidden');
+            document.getElementById('dailyDateFilterCal').classList.add('hidden');
+            applyTxFilters();
         }
 
         window.addEventListener('load', () => {
@@ -914,6 +1082,7 @@
             document.getElementById('incDate').value = today;
             document.getElementById('remDate').value = today;
             document.getElementById('payTargetDate').value = today;
+            document.getElementById('checkDate').value = today;
         }
 
         function populateYearAndMonthDropdowns() {
@@ -967,10 +1136,20 @@
             if (state.months[mKey].notes === undefined) state.months[mKey].notes = '';
             if (!state.reminders) state.reminders = [];
             if (!state.wishlist) state.wishlist = [];
+            if (!state.checklist) state.checklist = [];
         }
 
         function toggleCustomCycleInput(val) {
             const customBox = document.getElementById('customCycleBox');
+            if (val === 'custom') {
+                customBox.classList.remove('hidden');
+            } else {
+                customBox.classList.add('hidden');
+            }
+        }
+
+        function toggleCustomNotifyDays(val) {
+            const customBox = document.getElementById('customNotifyDaysBox');
             if (val === 'custom') {
                 customBox.classList.remove('hidden');
             } else {
@@ -1024,6 +1203,7 @@
             document.getElementById('budgetMonthBadge').innerText = `${monthName} ${y}`;
             document.getElementById('notesMonthBadge').innerText = `${monthName} ${y}`;
             document.getElementById('reflectionPeriodBadge').innerText = `${monthName} ${y}`;
+            document.getElementById('timeboundBadge').innerText = `${monthName} ${y}`;
 
             document.getElementById('planIncome').value = (curr.budget.income !== undefined) ? Number(curr.budget.income).toLocaleString('en-US') : '';
             document.getElementById('planSavings').value = (curr.budget.savings !== undefined) ? Number(curr.budget.savings).toLocaleString('en-US') : '';
@@ -1032,10 +1212,43 @@
             document.getElementById('monthlyNotesArea').value = curr.notes || '';
             updateLiveDisposable();
 
-            renderTxList(curr.transactions);
+            applyTxFilters();
+            renderChecklist();
             renderReminders();
             renderWishlist();
             renderReflection(state.activeMonth);
+        }
+
+        // --- FILTER & SEARCH IN DAILY TRANSACTIONS ---
+        function applyTxFilters() {
+            ensureMonthExists(state.activeMonth);
+            const list = state.months[state.activeMonth].transactions || [];
+            
+            const searchVal = (document.getElementById('dailySearchInput').value || '').trim().toLowerCase();
+            const catVal = document.getElementById('dailyCatFilter').value;
+            const dateVal = normalizeJalaliDate(document.getElementById('dailyDateFilter').value);
+
+            const filtered = list.filter(t => {
+                if (catVal !== 'all') {
+                    if (catVal === 'income') {
+                        if (t.type !== 'income') return false;
+                    } else {
+                        if (t.type !== 'expense' || t.category !== catVal) return false;
+                    }
+                }
+
+                if (dateVal && t.date !== dateVal) return false;
+
+                if (searchVal) {
+                    const descMatch = (t.desc || '').toLowerCase().includes(searchVal);
+                    const amtMatch = t.amount.toString().includes(cleanNumber(searchVal).toString()) || formatNumber(t.amount).includes(searchVal);
+                    if (!descMatch && !amtMatch) return false;
+                }
+
+                return true;
+            });
+
+            renderTxList(filtered);
         }
 
         function renderTxList(list) {
@@ -1044,7 +1257,7 @@
             container.innerHTML = '';
 
             if (list.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-xs font-medium">تراکنشی در این ماه ثبت نشده است.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-xs font-medium">هیچ تراکنشی مطابق فیلتر یافت نشد.</div>`;
                 return;
             }
 
@@ -1104,6 +1317,163 @@
             });
         }
 
+        // --- TAB: CHECKLIST LOGIC ---
+        function openChecklistModal() {
+            document.getElementById('editChecklistId').value = '';
+            document.getElementById('checklistModalTitle').innerHTML = '<i class="fa-solid fa-list-check text-[#30d158]"></i> افزودن آیتم به چک‌لیست';
+            document.getElementById('checkSubmitBtn').innerText = 'افزودن به چک‌لیست';
+            document.getElementById('checkTitle').value = '';
+            document.getElementById('checkAmount').value = '';
+            document.getElementById('checkDate').value = getTodayJalali();
+            document.querySelector('input[name="checkTimeType"][value="timeless"]').checked = true;
+            toggleChecklistDateMode('timeless');
+            document.getElementById('checkDateCal').classList.add('hidden');
+            openModal('checklistModal');
+        }
+
+        function toggleChecklistDateMode(mode) {
+            const wrap = document.getElementById('checkDateWrapper');
+            if (mode === 'dated') {
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+
+        function submitChecklistItem(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editChecklistId').value;
+            const title = document.getElementById('checkTitle').value.trim();
+            const amount = cleanNumber(document.getElementById('checkAmount').value);
+            const timeType = document.querySelector('input[name="checkTimeType"]:checked').value;
+            const date = timeType === 'dated' ? normalizeJalaliDate(document.getElementById('checkDate').value.trim()) : null;
+
+            if (!title) return;
+
+            if (!state.checklist) state.checklist = [];
+
+            if (editId) {
+                const target = state.checklist.find(c => c.id === editId);
+                if (target) {
+                    target.title = title;
+                    target.amount = amount;
+                    target.date = date;
+                }
+            } else {
+                const item = {
+                    id: Date.now().toString(),
+                    title,
+                    amount,
+                    date,
+                    completed: false,
+                    createdAt: getTodayJalali()
+                };
+                state.checklist.push(item);
+            }
+
+            saveState();
+            renderChecklist();
+            closeModal('checklistModal');
+        }
+
+        function toggleChecklistItem(id) {
+            const item = state.checklist.find(c => c.id === id);
+            if (!item) return;
+            item.completed = !item.completed;
+            saveState();
+            renderChecklist();
+        }
+
+        function convertChecklistToExpense(id) {
+            const item = state.checklist.find(c => c.id === id);
+            if (!item) return;
+
+            openModal('expenseModal');
+            document.getElementById('editExpId').value = '';
+            document.getElementById('expModalTitle').innerHTML = '<i class="fa-solid fa-receipt text-[#ff453a]"></i> تبدیل چک‌لیست به هزینه';
+            document.getElementById('expSubmitBtn').innerText = 'ثبت هزینه';
+            document.getElementById('expAmount').value = item.amount ? Number(item.amount).toLocaleString('en-US') : '';
+            document.getElementById('expDate').value = item.date || getTodayJalali();
+            document.getElementById('expDesc').value = item.title;
+            
+            item.completed = true;
+            saveState();
+            renderChecklist();
+        }
+
+        function deleteChecklistItem(id) {
+            if (!confirm('آیا این آیتم چک‌لیست حذف شود؟')) return;
+            state.checklist = state.checklist.filter(c => c.id !== id);
+            saveState();
+            renderChecklist();
+        }
+
+        function renderChecklist() {
+            const timeboundContainer = document.getElementById('timeboundChecklist');
+            const timelessContainer = document.getElementById('timelessChecklist');
+            
+            timeboundContainer.innerHTML = '';
+            timelessContainer.innerHTML = '';
+
+            const [activeY, activeM] = state.activeMonth.split('-');
+            const items = state.checklist || [];
+
+            let timeboundCount = 0;
+            let timelessCount = 0;
+
+            items.forEach(c => {
+                const isCompleted = !!c.completed;
+                const amtText = c.amount ? `${formatNumber(c.amount)} تومان` : '';
+
+                const itemHtml = `
+                    <div class="flex items-center justify-between p-3 rounded-2xl ${isCompleted ? 'bg-white/[0.02] opacity-60' : 'bg-white/[0.04]'} border border-white/[0.05] text-xs gap-2 transition">
+                        <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                            <button onclick="toggleChecklistItem('${c.id}')" class="mt-0.5 w-5 h-5 rounded-lg border ${isCompleted ? 'bg-[#30d158] border-[#30d158] text-black' : 'border-white/30 text-transparent hover:border-emerald-400'} flex items-center justify-center transition shrink-0">
+                                <i class="fa-solid fa-check text-[10px]"></i>
+                            </button>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-bold ${isCompleted ? 'line-through text-zinc-400' : 'text-white'} text-[13px] truncate">${c.title}</div>
+                                <div class="text-[10px] text-zinc-400 mt-0.5 flex items-center gap-2">
+                                    ${c.date ? `<span><i class="fa-regular fa-calendar text-[9px]"></i> ${c.date}</span>` : '<span>همیشگی</span>'}
+                                    ${amtText ? `<span class="text-[#30d158] font-semibold">${amtText}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            ${!isCompleted ? `
+                                <button onclick="convertChecklistToExpense('${c.id}')" title="ثبت به عنوان هزینه" class="px-2 py-1 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-[#ff453a] text-[10px] font-bold">
+                                    ثبت خرج
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteChecklistItem('${c.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف">
+                                <i class="fa-solid fa-trash-can text-[11px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (c.date) {
+                    const norm = normalizeJalaliDate(c.date);
+                    const [cY, cM] = norm.split('/');
+                    if (cY === activeY && cM === activeM) {
+                        timeboundCount++;
+                        timeboundContainer.insertAdjacentHTML('beforeend', itemHtml);
+                    }
+                } else {
+                    timelessCount++;
+                    timelessContainer.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            });
+
+            if (timeboundCount === 0) {
+                timeboundContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">هیچ خرید زمان‌داری برای این ماه ثبت نشده است.</div>`;
+            }
+            if (timelessCount === 0) {
+                timelessContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">هیچ آیتم جاری یا بدون تاریخی در چک‌لیست وجود ندارد.</div>`;
+            }
+        }
+
+        // --- REMINDERS & NOTIFICATIONS LOGIC ---
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -1128,6 +1498,11 @@
                 let installmentBadge = '';
                 if (r.installmentIndex && r.totalCount) {
                     installmentBadge = `<span class="text-[10px] bg-amber-400/15 text-amber-300 font-medium px-2 py-0.5 rounded-full inline-block mt-1">قسط ${formatNumber(r.installmentIndex)} از ${formatNumber(r.totalCount)}</span>`;
+                }
+
+                let notifyLabel = '';
+                if (r.notifyDays !== undefined) {
+                    notifyLabel = r.notifyDays === '0' ? 'همان روز' : `${r.notifyDays} روز قبل`;
                 }
 
                 if (isPaid) {
@@ -1162,8 +1537,9 @@
                             <div class="min-w-0 flex-1">
                                 <div class="font-bold text-white text-[13px] leading-tight truncate">${r.title}</div>
                                 ${installmentBadge}
-                                <div class="text-[10px] text-zinc-400 mt-1">
-                                    سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span> ${r.notifyTime ? `(${r.notifyTime})` : ''}
+                                <div class="text-[10px] text-zinc-400 mt-1 flex flex-wrap items-center gap-x-2">
+                                    <span>سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span></span>
+                                    ${r.notifyTime ? `<span><i class="fa-regular fa-bell text-[9px]"></i> ${r.notifyTime} ${notifyLabel ? `(${notifyLabel})` : ''}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1196,6 +1572,140 @@
                 alertBox.classList.add('hidden');
                 navBadge.classList.add('hidden');
             }
+        }
+
+        function openReminderCreateModal() {
+            document.getElementById('editRemId').value = '';
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره یادآور';
+            document.getElementById('remTitle').value = '';
+            document.getElementById('remAmount').value = '';
+            document.getElementById('remDate').value = getTodayJalali();
+            document.getElementById('remNotifyTime').value = '09:00';
+            document.getElementById('remNotifyDays').value = '3';
+            document.getElementById('remCycleWrap').classList.remove('hidden');
+            document.getElementById('remInstallmentsWrap').classList.remove('hidden');
+            document.getElementById('remSeriesUpdateWrap').classList.add('hidden');
+            document.getElementById('customCycleBox').classList.add('hidden');
+            document.getElementById('customNotifyDaysBox').classList.add('hidden');
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
+            openModal('reminderModal');
+        }
+
+        function editReminder(remId) {
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem) return;
+
+            document.getElementById('editRemId').value = rem.id;
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ffd60a]"></i> ویرایش یادآور';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره تغییرات';
+            document.getElementById('remTitle').value = rem.title;
+            document.getElementById('remAmount').value = Number(rem.amount).toLocaleString('en-US');
+            document.getElementById('remDate').value = rem.dueDate;
+            document.getElementById('remNotifyTime').value = rem.notifyTime || '09:00';
+            
+            const nDays = rem.notifyDays !== undefined ? rem.notifyDays.toString() : '3';
+            const selectDays = document.getElementById('remNotifyDays');
+            if (['0', '1', '2', '3', '5', '7'].includes(nDays)) {
+                selectDays.value = nDays;
+                document.getElementById('customNotifyDaysBox').classList.add('hidden');
+            } else {
+                selectDays.value = 'custom';
+                document.getElementById('customNotifyDaysBox').classList.remove('hidden');
+                document.getElementById('remCustomNotifyDaysVal').value = nDays;
+            }
+
+            document.getElementById('remCycleWrap').classList.add('hidden');
+            document.getElementById('remInstallmentsWrap').classList.add('hidden');
+            document.getElementById('customCycleBox').classList.add('hidden');
+
+            if (rem.seriesId) {
+                document.getElementById('remSeriesUpdateWrap').classList.remove('hidden');
+                document.getElementById('remUpdateAllInSeries').checked = false;
+            } else {
+                document.getElementById('remSeriesUpdateWrap').classList.add('hidden');
+            }
+
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
+            openModal('reminderModal');
+        }
+
+        function submitReminder(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editRemId').value;
+            const title = document.getElementById('remTitle').value.trim();
+            const amount = cleanNumber(document.getElementById('remAmount').value);
+            const dueDate = normalizeJalaliDate(document.getElementById('remDate').value.trim());
+            const notifyTime = document.getElementById('remNotifyTime').value;
+
+            let notifyDays = document.getElementById('remNotifyDays').value;
+            if (notifyDays === 'custom') {
+                notifyDays = document.getElementById('remCustomNotifyDaysVal').value || '0';
+            }
+
+            if (!title || !amount || !dueDate) return;
+
+            if (editId) {
+                const target = state.reminders.find(r => r.id === editId);
+                if (target) {
+                    target.title = title;
+                    target.amount = amount;
+                    target.dueDate = dueDate;
+                    target.notifyTime = notifyTime;
+                    target.notifyDays = notifyDays;
+
+                    const updateAll = document.getElementById('remUpdateAllInSeries').checked;
+                    if (updateAll && target.seriesId) {
+                        state.reminders.forEach(r => {
+                            if (r.seriesId === target.seriesId && r.dueDate >= target.dueDate) {
+                                r.notifyTime = notifyTime;
+                                r.notifyDays = notifyDays;
+                            }
+                        });
+                    }
+                }
+            } else {
+                const cycle = document.getElementById('remCycle').value;
+                const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
+                const seriesId = 'series_' + Date.now();
+                
+                let stepMonths = 1;
+                if (cycle === 'bimonthly') stepMonths = 2;
+                if (cycle === 'quarterly') stepMonths = 3;
+                if (cycle === 'yearly') stepMonths = 12;
+
+                const countToGenerate = cycle === 'once' ? 1 : Math.max(1, totalCount);
+
+                for (let i = 0; i < countToGenerate; i++) {
+                    const instDate = addJalaliMonths(dueDate, i * stepMonths);
+                    const remInstance = {
+                        id: (Date.now() + i).toString(),
+                        seriesId: countToGenerate > 1 ? seriesId : null,
+                        title: title,
+                        amount,
+                        dueDate: instDate,
+                        cycle,
+                        notifyTime,
+                        notifyDays,
+                        installmentIndex: countToGenerate > 1 ? (i + 1) : null,
+                        totalCount: countToGenerate > 1 ? countToGenerate : null
+                    };
+                    state.reminders.push(remInstance);
+                }
+            }
+
+            saveState();
+            renderAll();
+            closeModal('reminderModal');
+        }
+
+        function deleteReminder(remId) {
+            if (!confirm('آیا این یادآور حذف شود؟')) return;
+            state.reminders = state.reminders.filter(r => r.id !== remId);
+            saveState();
+            renderAll();
         }
 
         // --- CSV EXPORT & IMPORT ---
@@ -1245,19 +1755,20 @@
                 ].join(','));
             });
 
-            Object.keys(state.months).forEach(mKey => {
-                const m = state.months[mKey];
-                csvRows.push([
-                    'بودجه و یادداشت',
-                    mKey,
-                    mKey,
-                    '',
-                    `درآمد: ${m.budget.income} | پس‌انداز: ${m.budget.savings} | ثابت: ${m.budget.fixed}`,
-                    `"${(m.notes || '').replace(/"/g, '""')}"`,
-                    '',
-                    ''
-                ].join(','));
-            });
+            if (state.checklist) {
+                state.checklist.forEach(c => {
+                    csvRows.push([
+                        'چک‌لیست',
+                        c.id,
+                        '',
+                        c.date || '',
+                        c.completed ? 'انجام‌شده' : 'در انتظار',
+                        `"${(c.title || '').replace(/"/g, '""')}"`,
+                        c.amount || '',
+                        ''
+                    ].join(','));
+                });
+            }
 
             const csvContent = '\uFEFF' + csvRows.join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1326,6 +1837,18 @@
                                     date: date || getTodayJalali()
                                 });
                             }
+                        } else if (type === 'چک‌لیست') {
+                            if (!state.checklist) state.checklist = [];
+                            if (!state.checklist.some(c => c.id === id)) {
+                                state.checklist.push({
+                                    id: id || Date.now().toString() + i,
+                                    title: title,
+                                    amount: amt,
+                                    date: date || null,
+                                    completed: cat === 'انجام‌شده',
+                                    createdAt: getTodayJalali()
+                                });
+                            }
                         }
                     }
 
@@ -1383,95 +1906,6 @@
             if (!confirm('آیا وضعیت پرداخت این مورد لغو شود؟')) return;
             const list = state.months[state.activeMonth].paidReminders || [];
             state.months[state.activeMonth].paidReminders = list.filter(id => id !== remId);
-            saveState();
-            renderAll();
-        }
-
-        function openReminderCreateModal() {
-            document.getElementById('editRemId').value = '';
-            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید';
-            document.getElementById('remSubmitBtn').innerText = 'ذخیره یادآور';
-            document.getElementById('remTitle').value = '';
-            document.getElementById('remAmount').value = '';
-            document.getElementById('remDate').value = getTodayJalali();
-            document.getElementById('remCycleWrap').classList.remove('hidden');
-            document.getElementById('remInstallmentsWrap').classList.remove('hidden');
-            document.getElementById('remDateCal').classList.add('hidden');
-            document.getElementById('remEndDateCal').classList.add('hidden');
-            openModal('reminderModal');
-        }
-
-        function editReminder(remId) {
-            const rem = state.reminders.find(r => r.id === remId);
-            if (!rem) return;
-
-            document.getElementById('editRemId').value = rem.id;
-            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ffd60a]"></i> ویرایش یادآور';
-            document.getElementById('remSubmitBtn').innerText = 'ذخیره تغییرات';
-            document.getElementById('remTitle').value = rem.title;
-            document.getElementById('remAmount').value = Number(rem.amount).toLocaleString('en-US');
-            document.getElementById('remDate').value = rem.dueDate;
-            document.getElementById('remCycleWrap').classList.add('hidden');
-            document.getElementById('remInstallmentsWrap').classList.add('hidden');
-            document.getElementById('customCycleBox').classList.add('hidden');
-            document.getElementById('remDateCal').classList.add('hidden');
-            document.getElementById('remEndDateCal').classList.add('hidden');
-            openModal('reminderModal');
-        }
-
-        function submitReminder(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editRemId').value;
-            const title = document.getElementById('remTitle').value.trim();
-            const amount = cleanNumber(document.getElementById('remAmount').value);
-            const dueDate = normalizeJalaliDate(document.getElementById('remDate').value.trim());
-            const notifyTime = document.getElementById('remNotifyTime').value;
-
-            if (!title || !amount || !dueDate) return;
-
-            if (editId) {
-                const target = state.reminders.find(r => r.id === editId);
-                if (target) {
-                    target.title = title;
-                    target.amount = amount;
-                    target.dueDate = dueDate;
-                    target.notifyTime = notifyTime;
-                }
-            } else {
-                const cycle = document.getElementById('remCycle').value;
-                const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
-                
-                let stepMonths = 1;
-                if (cycle === 'bimonthly') stepMonths = 2;
-                if (cycle === 'quarterly') stepMonths = 3;
-                if (cycle === 'yearly') stepMonths = 12;
-
-                const countToGenerate = cycle === 'once' ? 1 : Math.max(1, totalCount);
-
-                for (let i = 0; i < countToGenerate; i++) {
-                    const instDate = addJalaliMonths(dueDate, i * stepMonths);
-                    const remInstance = {
-                        id: (Date.now() + i).toString(),
-                        title: title,
-                        amount,
-                        dueDate: instDate,
-                        cycle,
-                        notifyTime,
-                        installmentIndex: countToGenerate > 1 ? (i + 1) : null,
-                        totalCount: countToGenerate > 1 ? countToGenerate : null
-                    };
-                    state.reminders.push(remInstance);
-                }
-            }
-
-            saveState();
-            renderAll();
-            closeModal('reminderModal');
-        }
-
-        function deleteReminder(remId) {
-            if (!confirm('آیا این یادآور حذف شود؟')) return;
-            state.reminders = state.reminders.filter(r => r.id !== remId);
             saveState();
             renderAll();
         }
@@ -1771,6 +2205,7 @@
                     state = JSON.parse(saved); 
                     if (!state.reminders) state.reminders = [];
                     if (!state.wishlist) state.wishlist = [];
+                    if (!state.checklist) state.checklist = [];
                 } catch (e) {
                     state = getEmptyState();
                 }
@@ -1861,6 +2296,7 @@
                         state = cloudData;
                         if (!state.reminders) state.reminders = [];
                         if (!state.wishlist) state.wishlist = [];
+                        if (!state.checklist) state.checklist = [];
                         localStorage.setItem(getStorageKey(), JSON.stringify(state));
                         populateYearAndMonthDropdowns();
                         renderAll();
