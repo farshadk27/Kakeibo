@@ -61,6 +61,19 @@
             color: var(--ios-blue);
         }
 
+        .tab-btn[data-tab="daily"] i {
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .compact-time-input {
+            width: 120px !important;
+            min-width: 120px;
+            max-width: 120px;
+            direction: ltr;
+            text-align: center;
+        }
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -176,7 +189,7 @@
             <!-- SEARCH & FILTERS -->
             <div class="ios-blur rounded-3xl p-3.5 space-y-2.5">
                 <div class="relative">
-                    <input type="text" id="dailySearchInput" oninput="applyTxFilters()" placeholder="جست‌وجو در عنوان یا مبلغ تراکنش..." class="w-full ios-input rounded-2xl pr-8 pl-3 py-2 text-xs text-white placeholder-zinc-500">
+                    <input type="text" id="dailySearchInput" oninput="applyTxFilters()" placeholder="جست‌وجو در عنوان، توضیح یا مبلغ..." class="w-full ios-input rounded-2xl pr-8 pl-3 py-2 text-xs text-white placeholder-zinc-500">
                     <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-zinc-500 text-xs"></i>
                 </div>
                 
@@ -614,7 +627,7 @@
                     <input type="text" id="remAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#ffd60a]" placeholder="۰" required>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div class="grid grid-cols-[120px_minmax(0,1fr)] gap-2.5 items-end">
                     <div class="relative">
                         <label class="text-[11px] text-zinc-400 block mb-1">تاریخ سررسید</label>
                         <div class="relative flex items-center">
@@ -642,7 +655,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">ساعت هشدار</label>
-                        <input type="time" id="remNotifyTime" value="09:00" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
+                        <input type="time" id="remNotifyTime" value="09:00" class="compact-time-input ios-input rounded-2xl px-2 py-2 text-xs text-white">
                     </div>
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">زمان هشدار</label>
@@ -679,11 +692,11 @@
 
                 <div id="remInstallmentsWrap" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط (اختیاری)</label>
+                        <label class="text-[10px] text-zinc-400 block mb-1">تعداد کل اقساط</label>
                         <input type="number" id="remTotalCount" min="1" placeholder="مثلاً: 12" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
                     </div>
                     <div class="relative">
-                        <label class="text-[10px] text-zinc-400 block mb-1">تاریخ پایان (اختیاری)</label>
+                        <label class="text-[10px] text-zinc-400 block mb-1">تاریخ پایان</label>
                         <div class="relative flex items-center">
                             <input type="text" id="remEndDate" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white pr-2.5 pl-8">
                             <button type="button" onclick="toggleInlineCalendar('remEndDate', 'remEndDateCal')" class="absolute left-2 text-zinc-400 hover:text-sky-400 p-1">
@@ -842,10 +855,6 @@
     <!-- BOTTOM TAB NAVIGATION (7 TABS) -->
     <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
         <div class="max-w-md mx-auto flex justify-between items-center py-2 px-1.5 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('daily')" class="tab-btn active min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
-                <i class="fa-solid fa-house text-xs"></i>
-                <span class="text-[8.5px] font-medium">روزمره</span>
-            </button>
             <button onclick="switchTab('checklist')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="checklist">
                 <i class="fa-solid fa-list-check text-xs"></i>
                 <span class="text-[8.5px] font-medium">چک‌لیست</span>
@@ -858,6 +867,10 @@
             <button onclick="switchTab('wishlist')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
                 <i class="fa-solid fa-hourglass-half text-xs"></i>
                 <span class="text-[8.5px] font-medium">۳۰ روز</span>
+            </button>
+            <button onclick="switchTab('daily')" class="tab-btn active min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
+                <i class="fa-solid fa-house"></i>
+                <span class="text-[9px] font-bold">روزمره</span>
             </button>
             <button onclick="switchTab('notes')" class="tab-btn min-w-[46px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
                 <i class="fa-solid fa-note-sticky text-xs"></i>
@@ -955,19 +968,148 @@
             }
         }
 
+        function div(a, b) { return ~~(a / b); }
+        function mod(a, b) { return a - ~~(a / b) * b; }
+
+        function jalCal(jy) {
+            const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+            const bl = breaks.length;
+            const gy = jy + 621;
+            let leapJ = -14, jp = breaks[0], jm, jump = 0;
+            if (jy < jp || jy >= breaks[bl - 1]) throw new Error('Invalid Jalaali year');
+            for (let i = 1; i < bl; i += 1) {
+                jm = breaks[i];
+                jump = jm - jp;
+                if (jy < jm) break;
+                leapJ += div(jump, 33) * 8 + div(mod(jump, 33), 4);
+                jp = jm;
+            }
+            let n = jy - jp;
+            leapJ += div(n, 33) * 8 + div(mod(n, 33) + 3, 4);
+            if (mod(jump, 33) === 4 && jump - n === 4) leapJ += 1;
+            const leapG = div(gy, 4) - div((div(gy, 100) + 1) * 3, 4) - 150;
+            const march = 20 + leapJ - leapG;
+            if (jump - n < 6) n = n - jump + div(jump + 4, 33) * 33;
+            let leap = mod(mod(n + 1, 33) - 1, 4);
+            if (leap === -1) leap = 4;
+            return { leap, gy, march };
+        }
+
+        function g2d(gy, gm, gd) {
+            let d = div((gy + div(gm - 8, 6) + 100100) * 1461, 4)
+                + div(153 * mod(gm + 9, 12) + 2, 5) + gd - 34840408;
+            d = d - div(div(gy + 100100 + div(gm - 8, 6), 100) * 3, 4) + 752;
+            return d;
+        }
+
+        function d2g(jdn) {
+            let j = 4 * jdn + 139361631;
+            j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
+            const i = div(mod(j, 1461), 4) * 5 + 308;
+            const gd = div(mod(i, 153), 5) + 1;
+            const gm = mod(div(i, 153), 12) + 1;
+            const gy = div(j, 1461) - 100100 + div(8 - gm, 6);
+            return { gy, gm, gd };
+        }
+
+        function j2d(jy, jm, jd) {
+            const r = jalCal(jy);
+            return g2d(r.gy, 3, r.march) + (jm - 1) * 31 - div(jm, 7) * (jm - 7) + jd - 1;
+        }
+
+        function d2j(jdn) {
+            const g = d2g(jdn);
+            let jy = g.gy - 621;
+            const r = jalCal(jy);
+            const jdn1f = g2d(g.gy, 3, r.march);
+            let k = jdn - jdn1f;
+            let jd, jm;
+            if (k >= 0) {
+                if (k <= 185) {
+                    jm = 1 + div(k, 31);
+                    jd = mod(k, 31) + 1;
+                    return { jy, jm, jd };
+                }
+                k -= 186;
+            } else {
+                jy -= 1;
+                k += 179;
+                if (r.leap === 1) k += 1;
+            }
+            jm = 7 + div(k, 30);
+            jd = mod(k, 30) + 1;
+            return { jy, jm, jd };
+        }
+
+        function isLeapJalaliYear(jy) {
+            try { return jalCal(jy).leap === 0; } catch { return false; }
+        }
+
+        function getJalaliMonthLength(y, m) {
+            if (m <= 6) return 31;
+            if (m <= 11) return 30;
+            return isLeapJalaliYear(y) ? 30 : 29;
+        }
+
         function addJalaliMonths(jalaliDateStr, monthsToAdd) {
             try {
                 const norm = normalizeJalaliDate(jalaliDateStr);
                 let [y, m, d] = norm.split('/').map(v => parseInt(v, 10));
                 let totalMonths = (y * 12 + (m - 1)) + monthsToAdd;
                 let newY = Math.floor(totalMonths / 12);
-                let newM = (totalMonths % 12) + 1;
-                let mStr = String(newM).padStart(2, '0');
-                let dStr = String(Math.min(d, newM > 6 ? 30 : 31)).padStart(2, '0');
-                return `${newY}/${mStr}/${dStr}`;
+                let newM = mod(totalMonths, 12) + 1;
+                const maxDay = getJalaliMonthLength(newY, newM);
+                return `${newY}/${String(newM).padStart(2, '0')}/${String(Math.min(d, maxDay)).padStart(2, '0')}`;
             } catch (e) {
                 return jalaliDateStr;
             }
+        }
+
+        function addJalaliDays(jalaliDateStr, daysToAdd) {
+            try {
+                const [y, m, d] = normalizeJalaliDate(jalaliDateStr).split('/').map(Number);
+                const next = d2j(j2d(y, m, d) + Number(daysToAdd || 0));
+                return `${next.jy}/${String(next.jm).padStart(2, '0')}/${String(next.jd).padStart(2, '0')}`;
+            } catch (e) {
+                return jalaliDateStr;
+            }
+        }
+
+        function compareJalaliDates(a, b) {
+            const na = normalizeJalaliDate(a);
+            const nb = normalizeJalaliDate(b);
+            return na === nb ? 0 : (na < nb ? -1 : 1);
+        }
+
+        function monthKeyFromDate(dateStr) {
+            const norm = normalizeJalaliDate(dateStr);
+            const parts = norm.split('/');
+            return parts.length >= 2 ? `${parts[0]}-${parts[1]}` : state.activeMonth;
+        }
+
+        function formatShortJalaliDate(dateStr) {
+            const norm = normalizeJalaliDate(dateStr);
+            const [y, m, d] = norm.split('/').map(Number);
+            if (!y || !m || !d || !MONTH_NAMES[m - 1]) return dateStr || '';
+            return `${formatNumber(d)} ${MONTH_NAMES[m - 1]}`;
+        }
+
+        function normalizeSearchText(value) {
+            return (value ?? '').toString().trim().toLowerCase()
+                .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+                .replace(/[ۀة]/g, 'ه')
+                .replace(/[أإ]/g, 'ا')
+                .replace(/\u200c/g, ' ')
+                .replace(/\s+/g, ' ');
+        }
+
+        function escapeHTML(value) {
+            return (value ?? '').toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         // --- INLINE CALENDAR PICKER ---
@@ -978,19 +1120,29 @@
                 return;
             }
 
-            const curVal = normalizeJalaliDate(document.getElementById(inputId).value) || getTodayJalali();
-            let [curY, curM, curD] = curVal.split('/');
-            curY = parseInt(curY, 10) || 1405;
-            curM = parseInt(curM, 10) || 6;
-            curD = parseInt(curD, 10) || 1;
+            let curVal;
+            if (inputId === 'dailyDateFilter') {
+                const [ay, am] = state.activeMonth.split('-').map(Number);
+                const selectedFull = document.getElementById(inputId).dataset.selectedDate || '';
+                const selectedDay = selectedFull ? Number(selectedFull.split('/')[2]) : 1;
+                renderInlineCalendarUI(inputId, calContainerId, ay, am, selectedDay);
+                container.classList.remove('hidden');
+                return;
+            }
 
-            renderInlineCalendarUI(inputId, calContainerId, curY, curM, curD);
+            curVal = normalizeJalaliDate(document.getElementById(inputId).value) || getTodayJalali();
+            let [curY, curM, curD] = curVal.split('/').map(Number);
+            renderInlineCalendarUI(inputId, calContainerId, curY || 1405, curM || 1, curD || 1);
             container.classList.remove('hidden');
         }
 
         function renderInlineCalendarUI(inputId, calContainerId, y, m, selectedD) {
             const container = document.getElementById(calContainerId);
-            const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
+            const daysInMonth = getJalaliMonthLength(y, m);
+            const firstDayJdn = j2d(y, m, 1);
+            // JDN % 7: Monday=0 ... Sunday=6. Persian grid starts Saturday.
+            const firstWeekdayOffset = mod(firstDayJdn + 2, 7);
+            const lockToActiveMonth = inputId === 'dailyDateFilter';
 
             let yearOptions = '';
             for (let yr = 1404; yr <= 1415; yr++) {
@@ -1003,45 +1155,48 @@
                 monthOptions += `<option value="${mNum}" ${mNum === m ? 'selected' : ''}>${name}</option>`;
             });
 
-            let daysHtml = '';
+            let daysHtml = '<span></span>'.repeat(firstWeekdayOffset);
             for (let d = 1; d <= daysInMonth; d++) {
                 const isSel = d === selectedD;
                 daysHtml += `
                     <button type="button" onclick="selectInlineDate('${inputId}', '${calContainerId}', ${y}, ${m}, ${d})" class="py-1.5 rounded-lg text-[11px] font-semibold transition ${isSel ? 'bg-[#0a84ff] text-white font-bold' : 'bg-white/[0.04] text-zinc-300 hover:bg-white/10'}">
-                        ${d}
+                        ${formatNumber(d)}
                     </button>
                 `;
             }
 
+            const headerControls = lockToActiveMonth
+                ? `<div class="text-[11px] font-bold text-[#0a84ff]">${MONTH_NAMES[m - 1]} ${formatNumber(y)}</div>`
+                : `<div class="flex items-center gap-1">
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', parseInt(this.value, 10), ${m}, ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none">${yearOptions}</select>
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', ${y}, parseInt(this.value, 10), ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-[#0a84ff] rounded-lg px-2 py-1 focus:outline-none">${monthOptions}</select>
+                   </div>`;
+
             container.innerHTML = `
                 <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
-                    <div class="flex items-center gap-1">
-                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', parseInt(this.value, 10), ${m}, ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none">
-                            ${yearOptions}
-                        </select>
-                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', ${y}, parseInt(this.value, 10), ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-[#0a84ff] rounded-lg px-2 py-1 focus:outline-none">
-                            ${monthOptions}
-                        </select>
-                    </div>
-                    <button type="button" onclick="document.getElementById('${calContainerId}').classList.add('hidden')" class="text-zinc-400 hover:text-white text-xs p-1">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    ${headerControls}
+                    <button type="button" onclick="document.getElementById('${calContainerId}').classList.add('hidden')" class="text-zinc-400 hover:text-white text-xs p-1"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-zinc-400 font-bold">
                     <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
                 </div>
-                <div class="grid grid-cols-7 gap-1 text-center">
-                    ${daysHtml}
-                </div>
+                <div class="grid grid-cols-7 gap-1 text-center">${daysHtml}</div>
             `;
         }
 
         function selectInlineDate(inputId, calContainerId, y, m, d) {
             const mStr = String(m).padStart(2, '0');
             const dStr = String(d).padStart(2, '0');
-            document.getElementById(inputId).value = `${y}/${mStr}/${dStr}`;
+            const fullDate = `${y}/${mStr}/${dStr}`;
+            const input = document.getElementById(inputId);
+            if (inputId === 'dailyDateFilter') {
+                input.dataset.selectedDate = fullDate;
+                input.value = `${formatNumber(d)} ${MONTH_NAMES[m - 1]}`;
+            } else {
+                input.value = fullDate;
+            }
             document.getElementById(calContainerId).classList.add('hidden');
-            
+
             if (inputId === 'dailyDateFilter') {
                 document.getElementById('clearDateFilterBtn').classList.remove('hidden');
                 applyTxFilters();
@@ -1050,7 +1205,9 @@
 
         function clearDailyDateFilter(e) {
             if (e) e.stopPropagation();
-            document.getElementById('dailyDateFilter').value = '';
+            const input = document.getElementById('dailyDateFilter');
+            input.value = '';
+            delete input.dataset.selectedDate;
             document.getElementById('clearDateFilterBtn').classList.add('hidden');
             document.getElementById('dailyDateFilterCal').classList.add('hidden');
             applyTxFilters();
@@ -1119,6 +1276,13 @@
         function changeActiveMonth(mKey) {
             state.activeMonth = mKey;
             ensureMonthExists(mKey);
+            const dayFilter = document.getElementById('dailyDateFilter');
+            if (dayFilter) {
+                dayFilter.value = '';
+                delete dayFilter.dataset.selectedDate;
+                document.getElementById('clearDateFilterBtn')?.classList.add('hidden');
+                document.getElementById('dailyDateFilterCal')?.classList.add('hidden');
+            }
             saveState();
             renderAll();
         }
@@ -1141,11 +1305,12 @@
 
         function toggleCustomCycleInput(val) {
             const customBox = document.getElementById('customCycleBox');
-            if (val === 'custom') {
-                customBox.classList.remove('hidden');
-            } else {
-                customBox.classList.add('hidden');
-            }
+            const installmentsBox = document.getElementById('remInstallmentsWrap');
+            if (val === 'custom') customBox.classList.remove('hidden');
+            else customBox.classList.add('hidden');
+
+            if (val === 'once') installmentsBox.classList.add('hidden');
+            else installmentsBox.classList.remove('hidden');
         }
 
         function toggleCustomNotifyDays(val) {
@@ -1223,28 +1388,41 @@
         function applyTxFilters() {
             ensureMonthExists(state.activeMonth);
             const list = state.months[state.activeMonth].transactions || [];
-            
-            const searchVal = (document.getElementById('dailySearchInput').value || '').trim().toLowerCase();
+
+            const rawSearch = document.getElementById('dailySearchInput').value || '';
+            const searchVal = normalizeSearchText(rawSearch);
             const catVal = document.getElementById('dailyCatFilter').value;
-            const dateVal = normalizeJalaliDate(document.getElementById('dailyDateFilter').value);
+            const dateInput = document.getElementById('dailyDateFilter');
+            const dateVal = dateInput.dataset.selectedDate || '';
+            const numericSearch = cleanNumber(rawSearch);
+
+            const catLabels = {
+                needs: 'نیازها ضروری غذا', wants: 'خواسته ها خرید', culture: 'رشد آموزش فرهنگ',
+                unexpected: 'غیرمنتظره متفرقه', fixed: 'هزینه ثابت قسط', income: 'درآمد ورودی'
+            };
 
             const filtered = list.filter(t => {
                 if (catVal !== 'all') {
                     if (catVal === 'income') {
                         if (t.type !== 'income') return false;
-                    } else {
-                        if (t.type !== 'expense' || t.category !== catVal) return false;
-                    }
+                    } else if (t.type !== 'expense' || t.category !== catVal) return false;
                 }
 
-                if (dateVal && t.date !== dateVal) return false;
+                if (dateVal && normalizeJalaliDate(t.date) !== dateVal) return false;
 
                 if (searchVal) {
-                    const descMatch = (t.desc || '').toLowerCase().includes(searchVal);
-                    const amtMatch = t.amount.toString().includes(cleanNumber(searchVal).toString()) || formatNumber(t.amount).includes(searchVal);
-                    if (!descMatch && !amtMatch) return false;
+                    const searchableText = normalizeSearchText([
+                        t.title || '', t.desc || '', catLabels[t.category] || '',
+                        t.type === 'income' ? 'درآمد ورودی پول' : 'هزینه پرداخت',
+                        t.incomeType || ''
+                    ].join(' '));
+                    const textMatch = searchableText.includes(searchVal);
+                    const amountMatch = numericSearch > 0 && (
+                        String(t.amount || '').includes(String(numericSearch)) ||
+                        normalizeSearchText(formatNumber(t.amount || 0)).includes(searchVal)
+                    );
+                    if (!textMatch && !amountMatch) return false;
                 }
-
                 return true;
             });
 
@@ -1272,47 +1450,46 @@
             [...list].reverse().forEach(t => {
                 const isExp = t.type === 'expense';
                 const catInfo = catMap[t.category] || {};
-                
-                let titleText = t.desc;
-                let subLabel = t.date;
+                let titleText = t.title || t.desc || '';
+                let subLabel = formatShortJalaliDate(t.date);
                 let amountColor = 'text-[#30d158]';
                 let iconChar = '💰';
 
                 if (isExp) {
                     amountColor = catInfo.color || 'text-[#ff453a]';
                     iconChar = catInfo.icon || '💸';
-                    if (!titleText) titleText = catInfo.label;
-                    if (t.category === 'fixed') subLabel += ' • (هزینه ثابت)';
+                    if (!titleText) titleText = catInfo.label || 'هزینه';
+                    if (t.category === 'fixed') subLabel += ' • هزینه ثابت';
+                } else if (t.incomeType === 'planned') {
+                    iconChar = '💼';
+                    if (!titleText) titleText = 'واریز حقوق/درآمد اصلی';
+                    subLabel += ' • درآمد پیش‌بینی';
                 } else {
-                    if (t.incomeType === 'planned') {
-                        iconChar = '💼';
-                        if (!titleText) titleText = 'واریز حقوق/درآمد اصلی';
-                        subLabel += ' • (درآمد پیش‌بینی)';
-                    } else {
-                        iconChar = '✨';
-                        if (!titleText) titleText = 'درآمد/پاداش مازاد';
-                        subLabel += ' • (افزوده‌شده به بودجه)';
-                    }
+                    iconChar = '✨';
+                    if (!titleText) titleText = 'درآمد/پاداش مازاد';
+                    subLabel += ' • افزوده‌شده به بودجه';
                 }
 
+                const safeTitle = escapeHTML(titleText);
+                const safeSubLabel = escapeHTML(subLabel);
+                const safeId = escapeHTML(t.id);
                 const item = document.createElement('div');
                 item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.04] text-xs hover:bg-white/[0.05] transition gap-2';
                 item.innerHTML = `
                     <div class="flex items-center gap-3 min-w-0 flex-1">
                         <span class="text-base shrink-0">${iconChar}</span>
                         <div class="min-w-0 flex-1">
-                            <div class="font-bold text-white truncate text-[13px]">${titleText}</div>
-                            <div class="text-[10px] text-zinc-400 mt-0.5">${subLabel}</div>
+                            <div class="font-bold text-white truncate text-[13px]">${safeTitle}</div>
+                            <div class="text-[10px] text-zinc-400 mt-0.5">${safeSubLabel}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         <span class="font-bold ${amountColor} text-[13px] whitespace-nowrap">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
                         <div class="flex items-center gap-0.5">
-                            <button onclick="editTransaction('${t.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
-                            <button onclick="deleteTx('${t.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            <button onclick="editTransaction('${safeId}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                            <button onclick="deleteTx('${safeId}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(item);
             });
         }
@@ -1583,6 +1760,10 @@
             document.getElementById('remDate').value = getTodayJalali();
             document.getElementById('remNotifyTime').value = '09:00';
             document.getElementById('remNotifyDays').value = '3';
+            document.getElementById('remCycle').value = 'monthly';
+            document.getElementById('remTotalCount').value = '';
+            document.getElementById('remEndDate').value = '';
+            toggleCustomCycleInput('monthly');
             document.getElementById('remCycleWrap').classList.remove('hidden');
             document.getElementById('remInstallmentsWrap').classList.remove('hidden');
             document.getElementById('remSeriesUpdateWrap').classList.add('hidden');
@@ -1641,10 +1822,7 @@
             const notifyTime = document.getElementById('remNotifyTime').value;
 
             let notifyDays = document.getElementById('remNotifyDays').value;
-            if (notifyDays === 'custom') {
-                notifyDays = document.getElementById('remCustomNotifyDaysVal').value || '0';
-            }
-
+            if (notifyDays === 'custom') notifyDays = document.getElementById('remCustomNotifyDaysVal').value || '0';
             if (!title || !amount || !dueDate) return;
 
             if (editId) {
@@ -1655,11 +1833,10 @@
                     target.dueDate = dueDate;
                     target.notifyTime = notifyTime;
                     target.notifyDays = notifyDays;
-
                     const updateAll = document.getElementById('remUpdateAllInSeries').checked;
                     if (updateAll && target.seriesId) {
                         state.reminders.forEach(r => {
-                            if (r.seriesId === target.seriesId && r.dueDate >= target.dueDate) {
+                            if (r.seriesId === target.seriesId && compareJalaliDates(r.dueDate, target.dueDate) >= 0) {
                                 r.notifyTime = notifyTime;
                                 r.notifyDays = notifyDays;
                             }
@@ -1668,32 +1845,59 @@
                 }
             } else {
                 const cycle = document.getElementById('remCycle').value;
-                const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
+                const rawCount = cleanNumber(document.getElementById('remTotalCount')?.value);
+                const endDate = normalizeJalaliDate(document.getElementById('remEndDate')?.value.trim());
                 const seriesId = 'series_' + Date.now();
-                
-                let stepMonths = 1;
-                if (cycle === 'bimonthly') stepMonths = 2;
-                if (cycle === 'quarterly') stepMonths = 3;
-                if (cycle === 'yearly') stepMonths = 12;
+                const customInterval = Math.max(1, cleanNumber(document.getElementById('remCustomIntervalVal')?.value) || 1);
+                const customUnit = document.getElementById('remCustomIntervalUnit')?.value || 'days';
 
-                const countToGenerate = cycle === 'once' ? 1 : Math.max(1, totalCount);
+                if (cycle !== 'once' && !rawCount && !endDate) {
+                    alert('برای یادآور تکرارشونده، حداقل یکی از «تعداد کل اقساط» یا «تاریخ پایان» را وارد کنید.');
+                    return;
+                }
+                if (endDate && compareJalaliDates(endDate, dueDate) < 0) {
+                    alert('تاریخ پایان نمی‌تواند قبل از تاریخ اولین سررسید باشد.');
+                    return;
+                }
 
-                for (let i = 0; i < countToGenerate; i++) {
-                    const instDate = addJalaliMonths(dueDate, i * stepMonths);
-                    const remInstance = {
+                const dates = [];
+                const maxItems = rawCount || 600;
+                for (let i = 0; i < maxItems; i++) {
+                    let instDate = dueDate;
+                    if (i > 0) {
+                        if (cycle === 'monthly') instDate = addJalaliMonths(dueDate, i);
+                        else if (cycle === 'bimonthly') instDate = addJalaliMonths(dueDate, i * 2);
+                        else if (cycle === 'quarterly') instDate = addJalaliMonths(dueDate, i * 3);
+                        else if (cycle === 'yearly') instDate = addJalaliMonths(dueDate, i * 12);
+                        else if (cycle === 'custom') instDate = customUnit === 'months'
+                            ? addJalaliMonths(dueDate, i * customInterval)
+                            : addJalaliDays(dueDate, i * customInterval);
+                    }
+                    if (cycle === 'once' && i > 0) break;
+                    if (endDate && compareJalaliDates(instDate, endDate) > 0) break;
+                    dates.push(instDate);
+                    if (cycle === 'once') break;
+                }
+
+                if (!dates.length) dates.push(dueDate);
+                const totalGenerated = dates.length;
+                dates.forEach((instDate, i) => {
+                    state.reminders.push({
                         id: (Date.now() + i).toString(),
-                        seriesId: countToGenerate > 1 ? seriesId : null,
-                        title: title,
+                        seriesId: totalGenerated > 1 ? seriesId : null,
+                        title,
                         amount,
                         dueDate: instDate,
                         cycle,
                         notifyTime,
                         notifyDays,
-                        installmentIndex: countToGenerate > 1 ? (i + 1) : null,
-                        totalCount: countToGenerate > 1 ? countToGenerate : null
-                    };
-                    state.reminders.push(remInstance);
-                }
+                        installmentIndex: totalGenerated > 1 ? i + 1 : null,
+                        totalCount: totalGenerated > 1 ? totalGenerated : null,
+                        endDate: endDate || null,
+                        customInterval: cycle === 'custom' ? customInterval : null,
+                        customUnit: cycle === 'custom' ? customUnit : null
+                    });
+                });
             }
 
             saveState();
@@ -1702,165 +1906,123 @@
         }
 
         function deleteReminder(remId) {
-            if (!confirm('آیا این یادآور حذف شود؟')) return;
+            if (!confirm('آیا این یادآور حذف شود؟ اگر قبلاً پرداخت شده باشد، هزینه ثابت مرتبط نیز حذف می‌شود.')) return;
             state.reminders = state.reminders.filter(r => r.id !== remId);
+            Object.values(state.months).forEach(m => {
+                m.paidReminders = (m.paidReminders || []).filter(id => id !== remId);
+                m.transactions = (m.transactions || []).filter(t => t.reminderId !== remId);
+            });
             saveState();
             renderAll();
         }
 
         // --- CSV EXPORT & IMPORT ---
+        function csvEscape(value) {
+            const str = value === null || value === undefined ? '' : String(value);
+            return `"${str.replace(/"/g, '""')}"`;
+        }
+
+        function safeJsonParse(value, fallback = {}) {
+            try { return value ? JSON.parse(value) : fallback; } catch { return fallback; }
+        }
+
         function exportToCSV() {
-            let csvRows = [];
-            csvRows.push(['نوع رکورد', 'شناسه', 'ماه/سال', 'تاریخ', 'دسته‌بندی/نوع', 'عنوان/توضیح', 'مبلغ (تومان)', 'جزئیات تکمیلی'].join(','));
+            const rows = [];
+            rows.push(['نوع رکورد','شناسه','ماه/سال','تاریخ','دسته‌بندی/نوع','عنوان/توضیح','مبلغ (تومان)','جزئیات JSON']);
 
-            Object.keys(state.months).forEach(mKey => {
+            Object.keys(state.months).sort().forEach(mKey => {
                 const m = state.months[mKey];
-                m.transactions.forEach(t => {
-                    csvRows.push([
-                        'تراکنش',
-                        t.id,
-                        mKey,
-                        t.date,
-                        t.type === 'expense' ? `هزینه (${t.category})` : `درآمد (${t.incomeType})`,
-                        `"${(t.desc || '').replace(/"/g, '""')}"`,
-                        t.amount,
-                        ''
-                    ].join(','));
-                });
+                rows.push(['بودجه', `budget_${mKey}`, mKey, '', '', '', '', JSON.stringify(m.budget || {})]);
+                rows.push(['یادداشت', `notes_${mKey}`, mKey, '', '', m.notes || '', '', '']);
+                (m.paidReminders || []).forEach(remId => rows.push(['پرداخت یادآور', remId, mKey, '', '', '', '', '']));
+                (m.transactions || []).forEach(t => rows.push([
+                    'تراکنش', t.id, mKey, t.date || '', t.type === 'expense' ? `هزینه (${t.category || ''})` : `درآمد (${t.incomeType || ''})`,
+                    t.title || t.desc || '', t.amount || 0, JSON.stringify(t)
+                ]));
             });
 
-            state.reminders.forEach(r => {
-                csvRows.push([
-                    'یادآور',
-                    r.id,
-                    r.dueDate ? r.dueDate.substring(0, 7).replace('/', '-') : '',
-                    r.dueDate,
-                    `دوره: ${r.cycle}`,
-                    `"${(r.title || '').replace(/"/g, '""')}"`,
-                    r.amount,
-                    r.totalCount ? `قسط ${r.installmentIndex || 1} از ${r.totalCount}` : ''
-                ].join(','));
-            });
+            (state.reminders || []).forEach(r => rows.push(['یادآور', r.id, monthKeyFromDate(r.dueDate), r.dueDate || '', r.cycle || '', r.title || '', r.amount || 0, JSON.stringify(r)]));
+            (state.wishlist || []).forEach(w => rows.push(['۳۰ روز انتظار', w.id, '', w.date || '', 'خواسته', w.title || '', w.amount || 0, JSON.stringify(w)]));
+            (state.checklist || []).forEach(c => rows.push(['چک‌لیست', c.id, c.date ? monthKeyFromDate(c.date) : '', c.date || '', c.completed ? 'انجام‌شده' : 'در انتظار', c.title || '', c.amount || 0, JSON.stringify(c)]));
+            rows.push(['تنظیمات', 'app_state_meta', state.activeMonth || '', '', '', '', '', JSON.stringify({ activeMonth: state.activeMonth })]);
 
-            state.wishlist.forEach(w => {
-                csvRows.push([
-                    '۳۰ روز انتظار',
-                    w.id,
-                    '',
-                    w.date,
-                    'خواسته',
-                    `"${(w.title || '').replace(/"/g, '""')}"`,
-                    w.amount,
-                    `"${(w.reason || '').replace(/"/g, '""')}"`
-                ].join(','));
-            });
-
-            if (state.checklist) {
-                state.checklist.forEach(c => {
-                    csvRows.push([
-                        'چک‌لیست',
-                        c.id,
-                        '',
-                        c.date || '',
-                        c.completed ? 'انجام‌شده' : 'در انتظار',
-                        `"${(c.title || '').replace(/"/g, '""')}"`,
-                        c.amount || '',
-                        ''
-                    ].join(','));
-                });
-            }
-
-            const csvContent = '\uFEFF' + csvRows.join('\n');
+            const csvContent = '\uFEFF' + rows.map(row => row.map(csvEscape).join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `kakeibo_backup_${getTodayJalali().replace(/\//g, '-')}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.download = `kakeibo_full_backup_${getTodayJalali().replace(/\//g, '-')}.csv`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function parseCSVLine(line) {
+            const out = []; let cur = ''; let quoted = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (quoted && line[i + 1] === '"') { cur += '"'; i++; }
+                    else quoted = !quoted;
+                } else if (ch === ',' && !quoted) { out.push(cur); cur = ''; }
+                else cur += ch;
+            }
+            out.push(cur); return out;
         }
 
         function importFromCSV(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const text = evt.target.result;
-                    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-                    if (lines.length < 2) {
-                        alert('فایل CSV معتبر نیست.');
-                        return;
-                    }
-
-                    if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟')) return;
+                    const lines = evt.target.result.replace(/^\uFEFF/, '').split(/\r?\n/).filter(line => line.trim());
+                    if (lines.length < 2) return alert('فایل CSV معتبر نیست.');
+                    if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟ داده‌های هم‌نام با شناسه یکسان به‌روزرسانی می‌شوند.')) return;
 
                     for (let i = 1; i < lines.length; i++) {
-                        const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-                        const [type, id, mKey, date, cat, title, amountStr] = cols;
+                        const cols = parseCSVLine(lines[i]);
+                        const [type,id,mKey,date,cat,title,amountStr,detailsStr] = cols;
+                        const details = safeJsonParse(detailsStr, {});
                         const amt = cleanNumber(amountStr);
 
-                        if (type === 'تراکنش' && mKey) {
+                        if (type === 'بودجه' && mKey) {
+                            ensureMonthExists(mKey); state.months[mKey].budget = { ...state.months[mKey].budget, ...details };
+                        } else if (type === 'یادداشت' && mKey) {
+                            ensureMonthExists(mKey); state.months[mKey].notes = title || '';
+                        } else if (type === 'پرداخت یادآور' && mKey) {
+                            ensureMonthExists(mKey); if (!state.months[mKey].paidReminders.includes(id)) state.months[mKey].paidReminders.push(id);
+                        } else if (type === 'تراکنش' && mKey) {
                             ensureMonthExists(mKey);
-                            const isExpense = cat.includes('هزینه');
-                            const rawCat = cat.match(/\((.*?)\)/)?.[1] || 'needs';
-                            if (!state.months[mKey].transactions.some(x => x.id === id)) {
-                                state.months[mKey].transactions.push({
-                                    id: id || Date.now().toString() + i,
-                                    type: isExpense ? 'expense' : 'income',
-                                    category: isExpense ? rawCat : 'needs',
-                                    incomeType: isExpense ? undefined : rawCat,
-                                    amount: amt,
-                                    date: date || getTodayJalali(),
-                                    desc: title
-                                });
-                            }
+                            const fallbackExpense = (cat || '').includes('هزینه');
+                            const rawCat = (cat || '').match(/\((.*?)\)/)?.[1] || 'needs';
+                            const tx = Object.keys(details).length ? details : { id, type: fallbackExpense ? 'expense' : 'income', category: fallbackExpense ? rawCat : undefined, incomeType: fallbackExpense ? undefined : rawCat, amount: amt, date: date || getTodayJalali(), desc: title };
+                            tx.id = tx.id || id || `${Date.now()}_${i}`;
+                            const idx = state.months[mKey].transactions.findIndex(x => x.id === tx.id);
+                            if (idx >= 0) state.months[mKey].transactions[idx] = tx; else state.months[mKey].transactions.push(tx);
                         } else if (type === 'یادآور') {
-                            if (!state.reminders.some(r => r.id === id)) {
-                                state.reminders.push({
-                                    id: id || Date.now().toString() + i,
-                                    title: title,
-                                    amount: amt,
-                                    dueDate: date || getTodayJalali(),
-                                    cycle: 'monthly'
-                                });
-                            }
+                            const r = Object.keys(details).length ? details : { id, title, amount: amt, dueDate: date || getTodayJalali(), cycle: cat || 'once' };
+                            r.id = r.id || id || `${Date.now()}_${i}`;
+                            const idx = state.reminders.findIndex(x => x.id === r.id);
+                            if (idx >= 0) state.reminders[idx] = r; else state.reminders.push(r);
                         } else if (type === '۳۰ روز انتظار') {
-                            if (!state.wishlist.some(w => w.id === id)) {
-                                state.wishlist.push({
-                                    id: id || Date.now().toString() + i,
-                                    title: title,
-                                    amount: amt,
-                                    date: date || getTodayJalali()
-                                });
-                            }
+                            const w = Object.keys(details).length ? details : { id, title, amount: amt, date: date || getTodayJalali() };
+                            w.id = w.id || id || `${Date.now()}_${i}`;
+                            const idx = state.wishlist.findIndex(x => x.id === w.id);
+                            if (idx >= 0) state.wishlist[idx] = w; else state.wishlist.push(w);
                         } else if (type === 'چک‌لیست') {
-                            if (!state.checklist) state.checklist = [];
-                            if (!state.checklist.some(c => c.id === id)) {
-                                state.checklist.push({
-                                    id: id || Date.now().toString() + i,
-                                    title: title,
-                                    amount: amt,
-                                    date: date || null,
-                                    completed: cat === 'انجام‌شده',
-                                    createdAt: getTodayJalali()
-                                });
-                            }
+                            const c = Object.keys(details).length ? details : { id, title, amount: amt, date: date || null, completed: cat === 'انجام‌شده', createdAt: getTodayJalali() };
+                            c.id = c.id || id || `${Date.now()}_${i}`;
+                            const idx = state.checklist.findIndex(x => x.id === c.id);
+                            if (idx >= 0) state.checklist[idx] = c; else state.checklist.push(c);
+                        } else if (type === 'تنظیمات' && details.activeMonth) {
+                            state.activeMonth = details.activeMonth;
                         }
                     }
-
-                    saveState();
-                    renderAll();
-                    alert('اطلاعات با موفقیت بارگذاری شد.');
+                    populateYearAndMonthDropdowns(); saveState(); renderAll(); alert('نسخه پشتیبان کامل با موفقیت بارگذاری شد.');
                 } catch (err) {
-                    alert('خطا در خواندن فایل CSV.');
-                }
+                    console.error(err); alert('خطا در خواندن فایل CSV.');
+                } finally { e.target.value = ''; }
             };
             reader.readAsText(file, 'UTF-8');
-            e.target.value = '';
         }
 
         function openPayConfirmModal(remId) {
@@ -1879,35 +2041,35 @@
             e.preventDefault();
             const remId = document.getElementById('payTargetRemId').value;
             const finalAmount = cleanNumber(document.getElementById('payTargetAmount').value);
-            const payDate = document.getElementById('payTargetDate').value.trim();
-
+            const payDate = normalizeJalaliDate(document.getElementById('payTargetDate').value.trim()) || getTodayJalali();
             const rem = state.reminders.find(r => r.id === remId);
             if (!rem || !finalAmount) return;
 
-            if (!state.months[state.activeMonth].paidReminders) state.months[state.activeMonth].paidReminders = [];
-            state.months[state.activeMonth].paidReminders.push(remId);
+            ensureMonthExists(state.activeMonth);
+            if (!state.months[state.activeMonth].paidReminders.includes(remId)) state.months[state.activeMonth].paidReminders.push(remId);
 
-            const tx = {
-                id: Date.now().toString(),
-                type: 'expense',
-                category: 'fixed',
-                amount: finalAmount,
-                date: normalizeJalaliDate(payDate) || getTodayJalali(),
-                desc: `پرداخت قسط/یادآور: ${rem.title}`
-            };
-            state.months[state.activeMonth].transactions.push(tx);
+            const txMonth = monthKeyFromDate(payDate);
+            ensureMonthExists(txMonth);
+            // Prevent duplicate fixed-expense rows for the same reminder.
+            Object.values(state.months).forEach(m => {
+                m.transactions = (m.transactions || []).filter(t => t.reminderId !== remId);
+            });
+            state.months[txMonth].transactions.push({
+                id: Date.now().toString(), type: 'expense', category: 'fixed', amount: finalAmount,
+                date: payDate, desc: `پرداخت قسط/یادآور: ${rem.title}`, reminderId: remId
+            });
 
-            saveState();
-            renderAll();
-            closeModal('payConfirmModal');
+            saveState(); renderAll(); closeModal('payConfirmModal');
         }
 
         function unmarkReminderPaid(remId) {
-            if (!confirm('آیا وضعیت پرداخت این مورد لغو شود؟')) return;
+            if (!confirm('آیا وضعیت پرداخت این مورد لغو شود؟ هزینه ثابت مرتبط نیز از تراکنش‌ها حذف می‌شود.')) return;
             const list = state.months[state.activeMonth].paidReminders || [];
             state.months[state.activeMonth].paidReminders = list.filter(id => id !== remId);
-            saveState();
-            renderAll();
+            Object.values(state.months).forEach(m => {
+                m.transactions = (m.transactions || []).filter(t => t.reminderId !== remId);
+            });
+            saveState(); renderAll();
         }
 
         function renderWishlist() {
@@ -1983,7 +2145,9 @@
                 date: getTodayJalali(),
                 desc: `خرید بعد از دوره انتظار: ${w.title}`
             };
-            state.months[state.activeMonth].transactions.push(tx);
+            const txMonth = monthKeyFromDate(tx.date);
+            ensureMonthExists(txMonth);
+            state.months[txMonth].transactions.push(tx);
             state.wishlist = state.wishlist.filter(x => x.id !== id);
 
             saveState();
@@ -2013,8 +2177,11 @@
         }
 
         function editTransaction(txId) {
-            const curr = state.months[state.activeMonth];
-            const tx = curr.transactions.find(t => t.id === txId);
+            let tx = null;
+            for (const m of Object.values(state.months)) {
+                tx = (m.transactions || []).find(t => t.id === txId);
+                if (tx) break;
+            }
             if (!tx) return;
 
             if (tx.type === 'expense') {
@@ -2051,29 +2218,25 @@
             const editId = document.getElementById('editExpId').value;
             const amount = cleanNumber(document.getElementById('expAmount').value);
             if (!amount) return;
-
             const category = document.querySelector('input[name="expCat"]:checked').value;
-            const date = normalizeJalaliDate(document.getElementById('expDate').value.trim());
+            const date = normalizeJalaliDate(document.getElementById('expDate').value.trim()) || getTodayJalali();
             const desc = document.getElementById('expDesc').value.trim();
-
-            const curr = state.months[state.activeMonth];
+            const targetMonth = monthKeyFromDate(date);
+            ensureMonthExists(targetMonth);
 
             if (editId) {
-                const target = curr.transactions.find(t => t.id === editId);
-                if (target) {
-                    target.amount = amount;
-                    target.category = category;
-                    target.date = date;
-                    target.desc = desc;
+                let existing = null;
+                for (const [mKey, m] of Object.entries(state.months)) {
+                    const idx = (m.transactions || []).findIndex(t => t.id === editId);
+                    if (idx >= 0) { existing = m.transactions.splice(idx, 1)[0]; break; }
                 }
+                const tx = { ...(existing || {}), id: editId, type: 'expense', amount, category, date, desc };
+                state.months[targetMonth].transactions.push(tx);
             } else {
-                const tx = { id: Date.now().toString(), type: 'expense', amount, category, date, desc };
-                curr.transactions.push(tx);
+                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'expense', amount, category, date, desc });
             }
 
-            saveState();
-            renderAll();
-            closeModal('expenseModal');
+            saveState(); renderAll(); closeModal('expenseModal');
             document.getElementById('editExpId').value = '';
             document.getElementById('expAmount').value = '';
             document.getElementById('expDesc').value = '';
@@ -2085,29 +2248,26 @@
             const editId = document.getElementById('editIncId').value;
             const amount = cleanNumber(document.getElementById('incAmount').value);
             if (!amount) return;
-
             const incomeType = document.querySelector('input[name="incType"]:checked').value;
-            const date = normalizeJalaliDate(document.getElementById('incDate').value.trim());
+            const date = normalizeJalaliDate(document.getElementById('incDate').value.trim()) || getTodayJalali();
             const desc = document.getElementById('incDesc').value.trim();
-
-            const curr = state.months[state.activeMonth];
+            const targetMonth = monthKeyFromDate(date);
+            ensureMonthExists(targetMonth);
 
             if (editId) {
-                const target = curr.transactions.find(t => t.id === editId);
-                if (target) {
-                    target.amount = amount;
-                    target.incomeType = incomeType;
-                    target.date = date;
-                    target.desc = desc;
+                let existing = null;
+                for (const [mKey, m] of Object.entries(state.months)) {
+                    const idx = (m.transactions || []).findIndex(t => t.id === editId);
+                    if (idx >= 0) { existing = m.transactions.splice(idx, 1)[0]; break; }
                 }
+                const tx = { ...(existing || {}), id: editId, type: 'income', incomeType, amount, date, desc };
+                delete tx.category;
+                state.months[targetMonth].transactions.push(tx);
             } else {
-                const tx = { id: Date.now().toString(), type: 'income', incomeType, amount, date, desc };
-                curr.transactions.push(tx);
+                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'income', incomeType, amount, date, desc });
             }
 
-            saveState();
-            renderAll();
-            closeModal('incomeModal');
+            saveState(); renderAll(); closeModal('incomeModal');
             document.getElementById('editIncId').value = '';
             document.getElementById('incAmount').value = '';
             document.getElementById('incDesc').value = '';
@@ -2116,8 +2276,14 @@
 
         function deleteTx(id) {
             if (!confirm('آیا این تراکنش حذف شود؟')) return;
-            const list = state.months[state.activeMonth].transactions;
+            const list = state.months[state.activeMonth].transactions || [];
+            const target = list.find(item => item.id === id);
             state.months[state.activeMonth].transactions = list.filter(item => item.id !== id);
+            if (target?.reminderId) {
+                Object.values(state.months).forEach(m => {
+                    m.paidReminders = (m.paidReminders || []).filter(remId => remId !== target.reminderId);
+                });
+            }
             saveState();
             renderAll();
         }
