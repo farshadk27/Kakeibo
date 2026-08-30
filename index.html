@@ -6,9 +6,9 @@
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=7">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=7">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=7">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=8">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=8">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=8">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -75,7 +75,7 @@
     <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-3.5 pt-3 pb-3">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 shrink-0">
-                <img src="./logo.jpg?v=7" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
+                <img src="./logo.jpg?v=8" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
                 <div class="flex flex-col">
                     <h1 class="font-bold text-[13px] tracking-tight whitespace-nowrap text-white">دفترچه کاکیبو</h1>
                     <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap">
@@ -86,7 +86,6 @@
 
             <!-- Header Controls: CSV & Auth -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <!-- CSV Backup Actions -->
                 <button onclick="exportToCSV()" title="دریافت فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs transition active:scale-95">
                     <i class="fa-solid fa-file-excel text-[#30d158]"></i>
                 </button>
@@ -388,9 +387,9 @@
         </section>
     </main>
 
-    <!-- JALALI CALENDAR PICKER MODAL -->
-    <div id="calendarModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-xs rounded-3xl p-4 space-y-3">
+    <!-- JALALI CALENDAR PICKER MODAL (z-[99] to appear in front of everything) -->
+    <div id="calendarModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99] hidden flex items-center justify-center p-4">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-xs rounded-3xl p-4 space-y-3 shadow-2xl">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
                 <div class="flex items-center gap-1.5">
                     <select id="calYearSelect" onchange="renderCalendarGrid()" class="bg-[#2c2c2e] text-xs text-white rounded-xl px-2 py-1 focus:outline-none"></select>
@@ -952,7 +951,6 @@
             const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
             const daily = Math.round(Math.max(0, remBudget) / 30);
 
-            // Responsive Card Styling (Green if positive, Red if negative)
             const remBudgetCard = document.getElementById('remBudgetCard');
             const remBudgetDisplay = document.getElementById('remBudgetDisplay');
             if (remBudget < 0) {
@@ -1218,7 +1216,6 @@
             let csvRows = [];
             csvRows.push(['نوع رکورد', 'شناسه', 'ماه/سال', 'تاریخ', 'دسته‌بندی/نوع', 'عنوان/توضیح', 'مبلغ (تومان)', 'جزئیات تکمیلی'].join(','));
 
-            // 1. Transactions
             Object.keys(state.months).forEach(mKey => {
                 const m = state.months[mKey];
                 m.transactions.forEach(t => {
@@ -1235,7 +1232,6 @@
                 });
             });
 
-            // 2. Reminders
             state.reminders.forEach(r => {
                 csvRows.push([
                     'یادآور',
@@ -1249,7 +1245,6 @@
                 ].join(','));
             });
 
-            // 3. Wishlist
             state.wishlist.forEach(w => {
                 csvRows.push([
                     '۳۰ روز انتظار',
@@ -1263,7 +1258,6 @@
                 ].join(','));
             });
 
-            // 4. Monthly Budgets & Notes
             Object.keys(state.months).forEach(mKey => {
                 const m = state.months[mKey];
                 csvRows.push([
@@ -1359,7 +1353,6 @@
             e.target.value = '';
         }
 
-        // Confirmation Modal for Reminders
         function openPayConfirmModal(remId) {
             const rem = state.reminders.find(r => r.id === remId);
             if (!rem) return;
