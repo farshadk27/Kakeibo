@@ -6,9 +6,9 @@
     <title>دفترچه مالی کاکیبو | Kakeibo</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=6">
-    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=6">
-    <link rel="apple-touch-icon" href="./logo.jpg?v=6">
+    <link rel="icon" type="image/jpeg" href="./logo.jpg?v=7">
+    <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=7">
+    <link rel="apple-touch-icon" href="./logo.jpg?v=7">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -72,32 +72,43 @@
 <body class="bg-black text-white min-h-screen flex flex-col justify-between select-none">
 
     <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-4 pt-3 pb-3">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <img src="./logo.jpg?v=6" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm">
-                <div>
-                    <h1 class="font-bold text-[13px] tracking-tight leading-none text-white">دفترچه کاکیبو</h1>
-                    <span id="syncStatus" class="text-[10px] text-amber-400/90 flex items-center gap-1 mt-1 font-medium">
+    <header class="sticky top-0 z-30 ios-blur border-b border-white/[0.08] px-3.5 pt-3 pb-3">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 shrink-0">
+                <img src="./logo.jpg?v=7" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
+                <div class="flex flex-col">
+                    <h1 class="font-bold text-[13px] tracking-tight whitespace-nowrap text-white">دفترچه کاکیبو</h1>
+                    <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین
                     </span>
                 </div>
             </div>
 
-            <!-- Date Selectors -->
-            <div class="flex items-center gap-1.5">
-                <select id="globalYearSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-white rounded-xl px-2 py-1.5 focus:outline-none">
+            <!-- Header Controls: CSV & Auth -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- CSV Backup Actions -->
+                <button onclick="exportToCSV()" title="دریافت فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs transition active:scale-95">
+                    <i class="fa-solid fa-file-excel text-[#30d158]"></i>
+                </button>
+                <label title="بارگذاری فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs cursor-pointer transition active:scale-95">
+                    <i class="fa-solid fa-file-import text-[#0a84ff]"></i>
+                    <input type="file" accept=".csv" onchange="importFromCSV(event)" class="hidden">
+                </label>
+
+                <!-- Date Selectors -->
+                <select id="globalYearSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-white rounded-xl px-1.5 py-1.5 focus:outline-none">
                 </select>
-                <select id="globalMonthSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-[#0a84ff] rounded-xl px-2.5 py-1.5 focus:outline-none">
+                <select id="globalMonthSelect" onchange="onDateSelectorChange()" class="bg-[#1c1c1e] text-[11px] font-semibold border border-white/10 text-[#0a84ff] rounded-xl px-2 py-1.5 focus:outline-none">
                 </select>
                 
+                <!-- Google Login/Profile -->
                 <div id="authContainer" class="flex items-center">
-                    <button id="loginBtn" onclick="handleAuthClick()" class="bg-[#2c2c2e] hover:bg-[#3a3a3c] text-[11px] px-2.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1 font-medium transition active:scale-95">
+                    <button id="loginBtn" onclick="handleAuthClick()" class="bg-[#2c2c2e] hover:bg-[#3a3a3c] text-[11px] px-2 py-1.5 rounded-xl border border-white/10 flex items-center gap-1 font-medium transition active:scale-95">
                         <i class="fa-brands fa-google text-slate-300"></i>
                         <span>ورود</span>
                     </button>
-                    <div id="userProfile" class="hidden flex items-center gap-1.5 bg-[#1c1c1e] border border-white/10 px-2 py-1 rounded-xl">
-                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[80px] truncate"></span>
+                    <div id="userProfile" class="hidden flex items-center gap-1 bg-[#1c1c1e] border border-white/10 px-1.5 py-1 rounded-xl">
+                        <span id="userEmailText" class="text-[10px] text-slate-300 max-w-[65px] truncate"></span>
                         <button onclick="handleLogout()" title="خروج از حساب" class="text-[#ff453a] hover:opacity-80 p-0.5">
                             <i class="fa-solid fa-right-from-bracket text-xs"></i>
                         </button>
@@ -377,7 +388,30 @@
         </section>
     </main>
 
-    <!-- MODAL: PAY CONFIRMATION WITH EDITABLE AMOUNT (عکس ۳) -->
+    <!-- JALALI CALENDAR PICKER MODAL -->
+    <div id="calendarModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-xs rounded-3xl p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
+                <div class="flex items-center gap-1.5">
+                    <select id="calYearSelect" onchange="renderCalendarGrid()" class="bg-[#2c2c2e] text-xs text-white rounded-xl px-2 py-1 focus:outline-none"></select>
+                    <select id="calMonthSelect" onchange="renderCalendarGrid()" class="bg-[#2c2c2e] text-xs text-[#0a84ff] rounded-xl px-2 py-1 focus:outline-none"></select>
+                </div>
+                <button onclick="closeModal('calendarModal')" class="text-zinc-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-zinc-400 font-bold pb-1">
+                <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+            </div>
+            <div id="calDaysGrid" class="grid grid-cols-7 gap-1.5 text-center text-xs"></div>
+            <div class="flex justify-between pt-2 border-t border-white/[0.08]">
+                <button onclick="selectCalendarToday()" class="text-[#0a84ff] text-xs font-semibold py-1 px-2 hover:opacity-80">امروز</button>
+                <button onclick="closeModal('calendarModal')" class="text-zinc-400 text-xs py-1 px-2 hover:text-white">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PAY CONFIRMATION WITH EDITABLE AMOUNT -->
     <div id="payConfirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -404,7 +438,10 @@
 
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ پرداخت</label>
-                    <input type="text" id="payTargetDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" required>
+                    <div class="relative">
+                        <input type="text" id="payTargetDate" readonly onclick="openCalendarPicker('payTargetDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
+                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    </div>
                 </div>
 
                 <div class="flex gap-2 pt-2">
@@ -481,7 +518,10 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">تاریخ اولین سررسید</label>
-                        <input type="text" id="remDate" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white" placeholder="۱۴۰۵/۰۶/۲۵" required>
+                        <div class="relative">
+                            <input type="text" id="remDate" readonly onclick="openCalendarPicker('remDate')" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white cursor-pointer" placeholder="۱۴۰۵/۰۶/۲۵" required>
+                            <i class="fa-regular fa-calendar text-zinc-400 absolute left-2.5 top-2.5 pointer-events-none text-xs"></i>
+                        </div>
                     </div>
                     <div id="remCycleWrap">
                         <label class="text-[11px] text-zinc-400 block mb-1">دوره تکرار</label>
@@ -533,7 +573,10 @@
                     </div>
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1">تاریخ پایان (اختیاری)</label>
-                        <input type="text" id="remEndDate" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white">
+                        <div class="relative">
+                            <input type="text" id="remEndDate" readonly onclick="openCalendarPicker('remEndDate')" placeholder="۱۴۰۶/۰۵/۰۱" class="w-full ios-input rounded-2xl px-3 py-2 text-xs text-white cursor-pointer">
+                            <i class="fa-regular fa-calendar text-zinc-400 absolute left-2.5 top-2.5 pointer-events-none text-xs"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -591,7 +634,10 @@
 
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="expDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" required>
+                    <div class="relative">
+                        <input type="text" id="expDate" readonly onclick="openCalendarPicker('expDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
+                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    </div>
                 </div>
 
                 <div>
@@ -647,7 +693,10 @@
 
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
-                    <input type="text" id="incDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" required>
+                    <div class="relative">
+                        <input type="text" id="incDate" readonly onclick="openCalendarPicker('incDate')" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white cursor-pointer" required>
+                        <i class="fa-regular fa-calendar text-zinc-400 absolute left-3 top-2.5 pointer-events-none text-xs"></i>
+                    </div>
                 </div>
 
                 <div>
@@ -662,7 +711,7 @@
         </div>
     </div>
 
-    <!-- Apple iOS Bottom Tab Bar with High-Contrast Icons -->
+    <!-- Apple iOS Bottom Tab Bar -->
     <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
         <div class="max-w-md mx-auto flex justify-between items-center py-2 px-2 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
             <button onclick="switchTab('daily')" class="tab-btn active min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
@@ -712,10 +761,11 @@
         }
 
         let state = getEmptyState();
-        let currentUserEmail = null;
+        let currentUserEmail = localStorage.getItem('kakeibo_cached_email') || null;
         let tokenClient;
-        let accessToken = null;
+        let accessToken = localStorage.getItem('kakeibo_cached_token') || null;
         let driveFileId = null;
+        let activePickerTargetInputId = null;
 
         function getStorageKey() {
             return currentUserEmail ? `kakeibo_user_${currentUserEmail}` : 'kakeibo_guest_data';
@@ -727,10 +777,10 @@
         }
 
         function cleanNumber(str) {
-            if (!str) return 0;
-            const p2e = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-            const cleaned = p2e(str.toString()).replace(/,/g, '').replace(/[^0-9]/g, '');
-            return parseInt(cleaned, 10) || 0;
+            if (str === '' || str === null || str === undefined) return 0;
+            const p2e = s => s.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            const cleaned = p2e(str).replace(/,/g, '').replace(/[^0-9]/g, '');
+            return cleaned === '' ? 0 : (parseInt(cleaned, 10) || 0);
         }
 
         function normalizeJalaliDate(dStr) {
@@ -748,8 +798,13 @@
         }
 
         function formatInputNumber(input) {
+            if (input.value === '0' || input.value === '۰') {
+                input.value = '0';
+                if (input.id.startsWith('plan')) updateLiveDisposable();
+                return;
+            }
             const raw = cleanNumber(input.value);
-            input.value = raw ? raw.toLocaleString('en-US') : '';
+            input.value = raw ? raw.toLocaleString('en-US') : (input.value.trim() === '' ? '' : '0');
             if (input.id.startsWith('plan')) updateLiveDisposable();
         }
 
@@ -786,16 +841,28 @@
         window.addEventListener('load', () => {
             loadLocalState();
             populateYearAndMonthDropdowns();
+            initCalendarDropdowns();
             initGoogleClient();
             resetModalDates();
+
+            if (currentUserEmail) {
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('userProfile').classList.remove('hidden');
+                document.getElementById('userEmailText').innerText = currentUserEmail;
+                document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                if (accessToken) fetchFromDrive();
+            }
+
             renderAll();
         });
 
         function resetModalDates() {
-            document.getElementById('expDate').value = getTodayJalali();
-            document.getElementById('incDate').value = getTodayJalali();
-            document.getElementById('remDate').value = getTodayJalali();
-            document.getElementById('payTargetDate').value = getTodayJalali();
+            const today = getTodayJalali();
+            document.getElementById('expDate').value = today;
+            document.getElementById('incDate').value = today;
+            document.getElementById('remDate').value = today;
+            document.getElementById('payTargetDate').value = today;
         }
 
         function populateYearAndMonthDropdowns() {
@@ -885,7 +952,7 @@
             const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
             const daily = Math.round(Math.max(0, remBudget) / 30);
 
-            // Highlight Red when budget is negative
+            // Responsive Card Styling (Green if positive, Red if negative)
             const remBudgetCard = document.getElementById('remBudgetCard');
             const remBudgetDisplay = document.getElementById('remBudgetDisplay');
             if (remBudget < 0) {
@@ -893,8 +960,8 @@
                 remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a]';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             } else {
-                remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300';
-                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-white';
+                remBudgetCard.className = 'p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-emerald-950/50 border border-[#30d158]/40 shadow-lg shadow-emerald-900/20';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#30d158]';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             }
 
@@ -908,9 +975,9 @@
             document.getElementById('notesMonthBadge').innerText = `${monthName} ${y}`;
             document.getElementById('reflectionPeriodBadge').innerText = `${monthName} ${y}`;
 
-            document.getElementById('planIncome').value = curr.budget.income ? Number(curr.budget.income).toLocaleString('en-US') : '';
-            document.getElementById('planSavings').value = curr.budget.savings ? Number(curr.budget.savings).toLocaleString('en-US') : '';
-            document.getElementById('planFixed').value = curr.budget.fixed ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
+            document.getElementById('planIncome').value = (curr.budget.income !== undefined) ? Number(curr.budget.income).toLocaleString('en-US') : '';
+            document.getElementById('planSavings').value = (curr.budget.savings !== undefined) ? Number(curr.budget.savings).toLocaleString('en-US') : '';
+            document.getElementById('planFixed').value = (curr.budget.fixed !== undefined) ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
             document.getElementById('planFixedPaidStatus').innerText = `${formatNumber(totalFixedSpent)} از ${formatNumber(curr.budget.fixed || 0)} تومان`;
             document.getElementById('monthlyNotesArea').value = curr.notes || '';
             updateLiveDisposable();
@@ -987,7 +1054,6 @@
             });
         }
 
-        // Reminders Filter & Render (with Date Normalization)
         function renderReminders() {
             const pendingContainer = document.getElementById('pendingReminderList');
             const paidContainer = document.getElementById('paidReminderList');
@@ -1082,6 +1148,218 @@
             }
         }
 
+        // --- JALALI CALENDAR PICKER LOGIC ---
+        function initCalendarDropdowns() {
+            const ySel = document.getElementById('calYearSelect');
+            const mSel = document.getElementById('calMonthSelect');
+            ySel.innerHTML = '';
+            mSel.innerHTML = '';
+
+            for (let i = 1404; i <= 1415; i++) {
+                ySel.add(new Option(i.toString(), i.toString()));
+            }
+            MONTH_NAMES.forEach((name, idx) => {
+                mSel.add(new Option(name, (idx + 1).toString()));
+            });
+        }
+
+        function openCalendarPicker(targetInputId) {
+            activePickerTargetInputId = targetInputId;
+            const curVal = document.getElementById(targetInputId).value.trim();
+            const norm = normalizeJalaliDate(curVal) || getTodayJalali();
+            const [y, m] = norm.split('/');
+
+            document.getElementById('calYearSelect').value = y;
+            document.getElementById('calMonthSelect').value = parseInt(m, 10).toString();
+            renderCalendarGrid(norm);
+            openModal('calendarModal');
+        }
+
+        function renderCalendarGrid(selectedFullDate) {
+            const y = parseInt(document.getElementById('calYearSelect').value, 10);
+            const m = parseInt(document.getElementById('calMonthSelect').value, 10);
+            const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
+
+            const grid = document.getElementById('calDaysGrid');
+            grid.innerHTML = '';
+
+            const currentSelected = selectedFullDate || document.getElementById(activePickerTargetInputId)?.value || '';
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dStr = String(d).padStart(2, '0');
+                const mStr = String(m).padStart(2, '0');
+                const thisDate = `${y}/${mStr}/${dStr}`;
+                const isSelected = currentSelected === thisDate;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `py-2 rounded-xl text-xs font-semibold transition ${isSelected ? 'bg-[#0a84ff] text-white font-bold' : 'bg-white/[0.04] text-zinc-300 hover:bg-white/10'}`;
+                btn.innerText = d;
+                btn.onclick = () => {
+                    if (activePickerTargetInputId) {
+                        document.getElementById(activePickerTargetInputId).value = thisDate;
+                    }
+                    closeModal('calendarModal');
+                };
+                grid.appendChild(btn);
+            }
+        }
+
+        function selectCalendarToday() {
+            const today = getTodayJalali();
+            if (activePickerTargetInputId) {
+                document.getElementById(activePickerTargetInputId).value = today;
+            }
+            closeModal('calendarModal');
+        }
+
+        // --- CSV EXPORT & IMPORT ---
+        function exportToCSV() {
+            let csvRows = [];
+            csvRows.push(['نوع رکورد', 'شناسه', 'ماه/سال', 'تاریخ', 'دسته‌بندی/نوع', 'عنوان/توضیح', 'مبلغ (تومان)', 'جزئیات تکمیلی'].join(','));
+
+            // 1. Transactions
+            Object.keys(state.months).forEach(mKey => {
+                const m = state.months[mKey];
+                m.transactions.forEach(t => {
+                    csvRows.push([
+                        'تراکنش',
+                        t.id,
+                        mKey,
+                        t.date,
+                        t.type === 'expense' ? `هزینه (${t.category})` : `درآمد (${t.incomeType})`,
+                        `"${(t.desc || '').replace(/"/g, '""')}"`,
+                        t.amount,
+                        ''
+                    ].join(','));
+                });
+            });
+
+            // 2. Reminders
+            state.reminders.forEach(r => {
+                csvRows.push([
+                    'یادآور',
+                    r.id,
+                    r.dueDate ? r.dueDate.substring(0, 7).replace('/', '-') : '',
+                    r.dueDate,
+                    `دوره: ${r.cycle}`,
+                    `"${(r.title || '').replace(/"/g, '""')}"`,
+                    r.amount,
+                    r.totalCount ? `قسط ${r.installmentIndex || 1} از ${r.totalCount}` : ''
+                ].join(','));
+            });
+
+            // 3. Wishlist
+            state.wishlist.forEach(w => {
+                csvRows.push([
+                    '۳۰ روز انتظار',
+                    w.id,
+                    '',
+                    w.date,
+                    'خواسته',
+                    `"${(w.title || '').replace(/"/g, '""')}"`,
+                    w.amount,
+                    `"${(w.reason || '').replace(/"/g, '""')}"`
+                ].join(','));
+            });
+
+            // 4. Monthly Budgets & Notes
+            Object.keys(state.months).forEach(mKey => {
+                const m = state.months[mKey];
+                csvRows.push([
+                    'بودجه و یادداشت',
+                    mKey,
+                    mKey,
+                    '',
+                    `درآمد: ${m.budget.income} | پس‌انداز: ${m.budget.savings} | ثابت: ${m.budget.fixed}`,
+                    `"${(m.notes || '').replace(/"/g, '""')}"`,
+                    '',
+                    ''
+                ].join(','));
+            });
+
+            const csvContent = '\uFEFF' + csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kakeibo_backup_${getTodayJalali().replace(/\//g, '-')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importFromCSV(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const text = evt.target.result;
+                    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                    if (lines.length < 2) {
+                        alert('فایل CSV معتبر نیست.');
+                        return;
+                    }
+
+                    if (!confirm('آیا از بارگذاری و بازگردانی این فایل اطمینان دارید؟ اطلاعات جاری با فایل ادغام می‌شوند.')) return;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+                        const [type, id, mKey, date, cat, title, amountStr] = cols;
+                        const amt = cleanNumber(amountStr);
+
+                        if (type === 'تراکنش' && mKey) {
+                            ensureMonthExists(mKey);
+                            const isExpense = cat.includes('هزینه');
+                            const rawCat = cat.match(/\((.*?)\)/)?.[1] || 'needs';
+                            if (!state.months[mKey].transactions.some(x => x.id === id)) {
+                                state.months[mKey].transactions.push({
+                                    id: id || Date.now().toString() + i,
+                                    type: isExpense ? 'expense' : 'income',
+                                    category: isExpense ? rawCat : 'needs',
+                                    incomeType: isExpense ? undefined : rawCat,
+                                    amount: amt,
+                                    date: date || getTodayJalali(),
+                                    desc: title
+                                });
+                            }
+                        } else if (type === 'یادآور') {
+                            if (!state.reminders.some(r => r.id === id)) {
+                                state.reminders.push({
+                                    id: id || Date.now().toString() + i,
+                                    title: title,
+                                    amount: amt,
+                                    dueDate: date || getTodayJalali(),
+                                    cycle: 'monthly'
+                                });
+                            }
+                        } else if (type === '۳۰ روز انتظار') {
+                            if (!state.wishlist.some(w => w.id === id)) {
+                                state.wishlist.push({
+                                    id: id || Date.now().toString() + i,
+                                    title: title,
+                                    amount: amt,
+                                    date: date || getTodayJalali()
+                                });
+                            }
+                        }
+                    }
+
+                    saveState();
+                    renderAll();
+                    alert('داده‌های فایل اکسل با موفقیت وارد و ذخیره شدند.');
+                } catch (err) {
+                    alert('خطا در خواندن فایل CSV.');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            e.target.value = '';
+        }
+
+        // Confirmation Modal for Reminders
         function openPayConfirmModal(remId) {
             const rem = state.reminders.find(r => r.id === remId);
             if (!rem) return;
@@ -1213,7 +1491,6 @@
             renderAll();
         }
 
-        // 30-Day Wishlist Logic
         function renderWishlist() {
             const container = document.getElementById('wishlistContainer');
             container.innerHTML = '';
@@ -1237,10 +1514,10 @@
                     ${w.reason ? `<div class="text-[11px] text-zinc-400 bg-white/[0.02] p-2 rounded-xl border border-white/[0.03]">${w.reason}</div>` : ''}
                     <div class="flex gap-2 pt-1 border-t border-white/[0.04]">
                         <button onclick="fulfillWishlist('${w.id}')" class="flex-1 bg-[#30d158]/20 hover:bg-[#30d158]/30 text-[#30d158] font-bold py-1.5 rounded-xl text-[11px]">
-                            ✅ تصمیم به خرید نهایی
+                            ✅ خرید نهایی
                         </button>
                         <button onclick="cancelWishlist('${w.id}')" class="flex-1 bg-[#ff453a]/20 hover:bg-[#ff453a]/30 text-[#ff453a] font-bold py-1.5 rounded-xl text-[11px]">
-                            ❌ انصراف از خرید
+                            ❌ انصراف
                         </button>
                     </div>
                 `;
@@ -1302,7 +1579,6 @@
             renderWishlist();
         }
 
-        // Monthly Notes Auto-Save
         let noteSaveTimeout;
         function autoSaveMonthlyNotes() {
             document.getElementById('noteSaveStatus').innerText = 'در حال ذخیره...';
@@ -1317,7 +1593,6 @@
             }, 600);
         }
 
-        // Transactions Edit & Submit
         function editTransaction(txId) {
             const curr = state.months[state.activeMonth];
             const tx = curr.transactions.find(t => t.id === txId);
@@ -1525,6 +1800,7 @@
                 callback: async (resp) => {
                     if (resp.error) return;
                     accessToken = resp.access_token;
+                    localStorage.setItem('kakeibo_cached_token', accessToken);
                     await fetchUserProfile();
                     await fetchFromDrive();
                 }
@@ -1539,11 +1815,13 @@
                 const info = await res.json();
                 if (info && info.email) {
                     currentUserEmail = info.email;
+                    localStorage.setItem('kakeibo_cached_email', info.email);
+
                     document.getElementById('loginBtn').classList.add('hidden');
                     document.getElementById('userProfile').classList.remove('hidden');
                     document.getElementById('userEmailText').innerText = info.email;
-                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> درایو متصل';
-                    document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium';
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
                     
                     loadLocalState();
                     renderAll();
@@ -1565,11 +1843,13 @@
             accessToken = null;
             currentUserEmail = null;
             driveFileId = null;
+            localStorage.removeItem('kakeibo_cached_email');
+            localStorage.removeItem('kakeibo_cached_token');
 
             document.getElementById('loginBtn').classList.remove('hidden');
             document.getElementById('userProfile').classList.add('hidden');
             document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین';
-            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1 font-medium';
+            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1 font-medium whitespace-nowrap';
 
             loadLocalState();
             renderAll();
