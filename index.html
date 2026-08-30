@@ -645,4 +645,1262 @@
                 <div>
                     <label class="text-[11px] text-zinc-400 block mb-1">نوع واریزی درآمد</label>
                     <div class="space-y-2">
-                        <label class="flex
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
+                            <input type="radio" name="incType" value="planned" checked class="accent-[#30d158] mt-0.5">
+                            <div>
+                                <span class="font-bold text-white block">💼 واریز درآمد پیش‌بینی‌شده (حقوق اصلی)</span>
+                                <span class="text-[10px] text-zinc-400">فقط وصول حقوق ثبت می‌شود؛ سقف خرج ماه دوبار اضافه نمی‌شود.</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs cursor-pointer">
+                            <input type="radio" name="incType" value="extra" class="accent-[#0a84ff] mt-0.5">
+                            <div>
+                                <span class="font-bold text-white block">✨ درآمد یا پاداش جدید (مازاد)</span>
+                                <span class="text-[10px] text-[#0a84ff]">مستقیماً به مانده بودجه خرج روزمره و مجموع درآمد ماه افزوده می‌شود.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-zinc-400 block mb-1">مبلغ ورودی (تومان)</label>
+                    <input type="text" id="incAmount" oninput="formatInputNumber(this)" class="w-full ios-input rounded-2xl px-3.5 py-2.5 text-base font-bold text-[#30d158]" placeholder="۰" required autofocus>
+                </div>
+
+                <div class="relative">
+                    <label class="text-[11px] text-zinc-400 block mb-1">تاریخ شمسی</label>
+                    <div class="relative flex items-center">
+                        <input type="text" id="incDate" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white pr-3 pl-9" required>
+                        <button type="button" onclick="toggleInlineCalendar('incDate', 'incDateCal')" class="absolute left-2.5 text-zinc-400 hover:text-sky-400 p-1">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </button>
+                    </div>
+                    <div id="incDateCal" class="hidden mt-2 p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-xl space-y-2"></div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-zinc-400 block mb-1">منبع یا توضیح (اختیاری)</label>
+                    <input type="text" id="incDesc" class="w-full ios-input rounded-2xl px-3.5 py-2 text-xs text-white" placeholder="مثلاً: حقوق ماه، پاداش">
+                </div>
+
+                <button type="submit" id="incSubmitBtn" class="w-full bg-[#30d158] hover:bg-[#28cd41] active:scale-[0.98] text-black font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-500/20 text-xs transition">
+                    ثبت ورودی پول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 ios-blur border-t border-white/[0.08] z-30 pb-safe">
+        <div class="max-w-md mx-auto flex justify-between items-center py-2 px-2 text-xs text-zinc-400 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('daily')" class="tab-btn active min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="daily">
+                <i class="fa-solid fa-house text-sm"></i>
+                <span class="text-[9px] font-medium">روزمره</span>
+            </button>
+            <button onclick="switchTab('reminders')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition relative" data-tab="reminders">
+                <i class="fa-solid fa-bell text-sm"></i>
+                <span class="text-[9px] font-medium">یادآورها</span>
+                <span id="navRemBadge" class="hidden absolute top-0.5 right-3 w-1.5 h-1.5 rounded-full bg-[#ffd60a]"></span>
+            </button>
+            <button onclick="switchTab('wishlist')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="wishlist">
+                <i class="fa-solid fa-hourglass-half text-sm"></i>
+                <span class="text-[9px] font-medium">۳۰ روز انتظار</span>
+            </button>
+            <button onclick="switchTab('notes')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="notes">
+                <i class="fa-solid fa-note-sticky text-sm"></i>
+                <span class="text-[9px] font-medium">یادداشت</span>
+            </button>
+            <button onclick="switchTab('budget')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="budget">
+                <i class="fa-solid fa-pen-ruler text-sm"></i>
+                <span class="text-[9px] font-medium">بودجه</span>
+            </button>
+            <button onclick="switchTab('reflection')" class="tab-btn min-w-[50px] flex flex-col items-center gap-1 py-1 transition" data-tab="reflection">
+                <i class="fa-solid fa-chart-pie text-sm"></i>
+                <span class="text-[9px] font-medium">بازتاب</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        const CLIENT_ID = '1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
+
+        const MONTH_NAMES = [
+            'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+        ];
+
+        function getEmptyState() {
+            return {
+                activeMonth: '1405-06',
+                months: {},
+                reminders: [],
+                wishlist: []
+            };
+        }
+
+        let state = getEmptyState();
+        let currentUserEmail = localStorage.getItem('kakeibo_cached_email') || null;
+        let tokenClient;
+        let accessToken = localStorage.getItem('kakeibo_cached_token') || null;
+        let driveFileId = null;
+
+        function getStorageKey() {
+            return currentUserEmail ? `kakeibo_user_${currentUserEmail}` : 'kakeibo_guest_data';
+        }
+
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '۰';
+            return Number(num).toLocaleString('fa-IR');
+        }
+
+        function cleanNumber(str) {
+            if (str === '' || str === null || str === undefined) return 0;
+            const p2e = s => s.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            const cleaned = p2e(str).replace(/,/g, '').replace(/[^0-9]/g, '');
+            return cleaned === '' ? 0 : (parseInt(cleaned, 10) || 0);
+        }
+
+        function normalizeJalaliDate(dStr) {
+            if (!dStr) return '';
+            const p2e = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            let cleaned = p2e(dStr.toString().trim()).replace(/-/g, '/');
+            let parts = cleaned.split('/').map(p => p.trim());
+            if (parts.length >= 3) {
+                let y = parts[0];
+                let m = String(parseInt(parts[1], 10) || 1).padStart(2, '0');
+                let d = String(parseInt(parts[2], 10) || 1).padStart(2, '0');
+                return `${y}/${m}/${d}`;
+            }
+            return cleaned;
+        }
+
+        function formatInputNumber(input) {
+            if (input.value === '0' || input.value === '۰') {
+                input.value = '0';
+                if (input.id.startsWith('plan')) updateLiveDisposable();
+                return;
+            }
+            const raw = cleanNumber(input.value);
+            input.value = raw ? raw.toLocaleString('en-US') : (input.value.trim() === '' ? '' : '0');
+            if (input.id.startsWith('plan')) updateLiveDisposable();
+        }
+
+        function getTodayJalali() {
+            try {
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const parts = formatter.formatToParts(now);
+                const y = parts.find(p => p.type === 'year').value;
+                const m = parts.find(p => p.type === 'month').value;
+                const d = parts.find(p => p.type === 'day').value;
+                const p2e = s => s.replace(/[۰-۹]/g, dig => '۰۱۲۳۴۵۶۷۸۹'.indexOf(dig));
+                return `${p2e(y)}/${p2e(m)}/${p2e(d)}`;
+            } catch (e) {
+                return '1405/06/08';
+            }
+        }
+
+        function addJalaliMonths(jalaliDateStr, monthsToAdd) {
+            try {
+                const norm = normalizeJalaliDate(jalaliDateStr);
+                let [y, m, d] = norm.split('/').map(v => parseInt(v, 10));
+                let totalMonths = (y * 12 + (m - 1)) + monthsToAdd;
+                let newY = Math.floor(totalMonths / 12);
+                let newM = (totalMonths % 12) + 1;
+                let mStr = String(newM).padStart(2, '0');
+                let dStr = String(Math.min(d, newM > 6 ? 30 : 31)).padStart(2, '0');
+                return `${newY}/${mStr}/${dStr}`;
+            } catch (e) {
+                return jalaliDateStr;
+            }
+        }
+
+        // --- INLINE CALENDAR PICKER ---
+        function toggleInlineCalendar(inputId, calContainerId) {
+            const container = document.getElementById(calContainerId);
+            if (!container.classList.contains('hidden')) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            const curVal = normalizeJalaliDate(document.getElementById(inputId).value) || getTodayJalali();
+            let [curY, curM, curD] = curVal.split('/');
+            curY = parseInt(curY, 10);
+            curM = parseInt(curM, 10);
+            curD = parseInt(curD, 10);
+
+            renderInlineCalendarUI(inputId, calContainerId, curY, curM, curD);
+            container.classList.remove('hidden');
+        }
+
+        function renderInlineCalendarUI(inputId, calContainerId, y, m, selectedD) {
+            const container = document.getElementById(calContainerId);
+            const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
+
+            let yearOptions = '';
+            for (let yr = 1404; yr <= 1415; yr++) {
+                yearOptions += `<option value="${yr}" ${yr === y ? 'selected' : ''}>${yr}</option>`;
+            }
+
+            let monthOptions = '';
+            MONTH_NAMES.forEach((name, idx) => {
+                const mNum = idx + 1;
+                monthOptions += `<option value="${mNum}" ${mNum === m ? 'selected' : ''}>${name}</option>`;
+            });
+
+            let daysHtml = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isSel = d === selectedD;
+                daysHtml += `
+                    <button type="button" onclick="selectInlineDate('${inputId}', '${calContainerId}', ${y}, ${m}, ${d})" class="py-1.5 rounded-lg text-[11px] font-semibold transition ${isSel ? 'bg-[#0a84ff] text-white font-bold' : 'bg-white/[0.04] text-zinc-300 hover:bg-white/10'}">
+                        ${d}
+                    </button>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+                    <div class="flex items-center gap-1">
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', parseInt(this.value, 10), ${m}, ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none">
+                            ${yearOptions}
+                        </select>
+                        <select onchange="renderInlineCalendarUI('${inputId}', '${calContainerId}', ${y}, parseInt(this.value, 10), ${selectedD})" class="bg-[#1c1c1e] text-[11px] text-[#0a84ff] rounded-lg px-2 py-1 focus:outline-none">
+                            ${monthOptions}
+                        </select>
+                    </div>
+                    <button type="button" onclick="document.getElementById('${calContainerId}').classList.add('hidden')" class="text-zinc-400 hover:text-white text-xs p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-zinc-400 font-bold">
+                    <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center">
+                    ${daysHtml}
+                </div>
+            `;
+        }
+
+        function selectInlineDate(inputId, calContainerId, y, m, d) {
+            const mStr = String(m).padStart(2, '0');
+            const dStr = String(d).padStart(2, '0');
+            document.getElementById(inputId).value = `${y}/${mStr}/${dStr}`;
+            document.getElementById(calContainerId).classList.add('hidden');
+        }
+
+        window.addEventListener('load', () => {
+            loadLocalState();
+            populateYearAndMonthDropdowns();
+            initGoogleClient();
+            resetModalDates();
+
+            if (currentUserEmail) {
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('userProfile').classList.remove('hidden');
+                const avatarLetter = currentUserEmail.charAt(0).toUpperCase();
+                document.getElementById('userAvatarLetter').innerText = avatarLetter;
+                document.getElementById('userAvatarLetter').setAttribute('title', currentUserEmail);
+                document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                if (accessToken) fetchFromDrive();
+            }
+
+            renderAll();
+        });
+
+        function resetModalDates() {
+            const today = getTodayJalali();
+            document.getElementById('expDate').value = today;
+            document.getElementById('incDate').value = today;
+            document.getElementById('remDate').value = today;
+            document.getElementById('payTargetDate').value = today;
+        }
+
+        function populateYearAndMonthDropdowns() {
+            const yearSel = document.getElementById('globalYearSelect');
+            const monthSel = document.getElementById('globalMonthSelect');
+            yearSel.innerHTML = '';
+            monthSel.innerHTML = '';
+
+            const startYear = 1404;
+            const totalYears = 12;
+
+            for (let i = 0; i < totalYears; i++) {
+                const y = startYear + i;
+                yearSel.add(new Option(y.toString(), y.toString()));
+            }
+
+            MONTH_NAMES.forEach((name, idx) => {
+                const mNum = String(idx + 1).padStart(2, '0');
+                monthSel.add(new Option(name, mNum));
+            });
+
+            const [curYear, curMonth] = state.activeMonth.split('-');
+            yearSel.value = curYear || '1405';
+            monthSel.value = curMonth || '06';
+        }
+
+        function onDateSelectorChange() {
+            const y = document.getElementById('globalYearSelect').value;
+            const m = document.getElementById('globalMonthSelect').value;
+            const mKey = `${y}-${m}`;
+            changeActiveMonth(mKey);
+        }
+
+        function changeActiveMonth(mKey) {
+            state.activeMonth = mKey;
+            ensureMonthExists(mKey);
+            saveState();
+            renderAll();
+        }
+
+        function ensureMonthExists(mKey) {
+            if (!state.months[mKey]) {
+                state.months[mKey] = {
+                    budget: { income: 0, savings: 0, fixed: 0 },
+                    transactions: [],
+                    paidReminders: [],
+                    notes: ''
+                };
+            }
+            if (!state.months[mKey].paidReminders) state.months[mKey].paidReminders = [];
+            if (state.months[mKey].notes === undefined) state.months[mKey].notes = '';
+            if (!state.reminders) state.reminders = [];
+            if (!state.wishlist) state.wishlist = [];
+        }
+
+        function toggleCustomCycleInput(val) {
+            const customBox = document.getElementById('customCycleBox');
+            if (val === 'custom') {
+                customBox.classList.remove('hidden');
+            } else {
+                customBox.classList.add('hidden');
+            }
+        }
+
+        function renderAll() {
+            ensureMonthExists(state.activeMonth);
+            const curr = state.months[state.activeMonth];
+
+            const dispBudget = Math.max(0, (curr.budget.income || 0) - (curr.budget.savings || 0) - (curr.budget.fixed || 0));
+            let totalVariableSpent = 0;
+            let totalFixedSpent = 0;
+            let totalExtraIncome = 0;
+
+            curr.transactions.forEach(t => {
+                if (t.type === 'expense') {
+                    if (t.category === 'fixed') {
+                        totalFixedSpent += t.amount;
+                    } else {
+                        totalVariableSpent += t.amount;
+                    }
+                }
+                if (t.type === 'income' && t.incomeType === 'extra') {
+                    totalExtraIncome += t.amount;
+                }
+            });
+
+            const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
+            const daily = Math.round(Math.max(0, remBudget) / 30);
+
+            const remBudgetCard = document.getElementById('remBudgetCard');
+            const remBudgetDisplay = document.getElementById('remBudgetDisplay');
+            if (remBudget < 0) {
+                remBudgetCard.className = 'p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-red-950/70 border border-red-500/60 shadow-lg shadow-red-900/30';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a]';
+                remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
+            } else {
+                remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-emerald-950/50 border border-[#30d158]/40 shadow-lg shadow-emerald-900/20';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#30d158]';
+                remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
+            }
+
+            document.getElementById('dailyAllowanceDisplay').innerText = `سهمیه روز: ${formatNumber(daily)} تومان`;
+            document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalExtraIncome)} تومان`;
+            document.getElementById('incomeBreakdownDisplay').innerText = `پاداش/مازاد: ${formatNumber(totalExtraIncome)} تومان`;
+
+            const [y, m] = state.activeMonth.split('-');
+            const monthName = MONTH_NAMES[parseInt(m, 10) - 1];
+            document.getElementById('budgetMonthBadge').innerText = `${monthName} ${y}`;
+            document.getElementById('notesMonthBadge').innerText = `${monthName} ${y}`;
+            document.getElementById('reflectionPeriodBadge').innerText = `${monthName} ${y}`;
+
+            document.getElementById('planIncome').value = (curr.budget.income !== undefined) ? Number(curr.budget.income).toLocaleString('en-US') : '';
+            document.getElementById('planSavings').value = (curr.budget.savings !== undefined) ? Number(curr.budget.savings).toLocaleString('en-US') : '';
+            document.getElementById('planFixed').value = (curr.budget.fixed !== undefined) ? Number(curr.budget.fixed).toLocaleString('en-US') : '';
+            document.getElementById('planFixedPaidStatus').innerText = `${formatNumber(totalFixedSpent)} از ${formatNumber(curr.budget.fixed || 0)} تومان`;
+            document.getElementById('monthlyNotesArea').value = curr.notes || '';
+            updateLiveDisposable();
+
+            renderTxList(curr.transactions);
+            renderReminders();
+            renderWishlist();
+            renderReflection(state.activeMonth);
+        }
+
+        function renderTxList(list) {
+            const container = document.getElementById('txList');
+            document.getElementById('txCount').innerText = `${formatNumber(list.length)} مورد`;
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-xs font-medium">تراکنشی در این ماه ثبت نشده است.</div>`;
+                return;
+            }
+
+            const catMap = {
+                needs: { label: 'نیازها', icon: '🍜', color: 'text-[#ff453a]' },
+                wants: { label: 'خواسته‌ها', icon: '🛍️', color: 'text-[#ffd60a]' },
+                culture: { label: 'رشد و آموزش', icon: '📚', color: 'text-[#0a84ff]' },
+                unexpected: { label: 'غیرمنتظره', icon: '⚡', color: 'text-[#ff453a]' },
+                fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-[#5e5ce6]' }
+            };
+
+            [...list].reverse().forEach(t => {
+                const isExp = t.type === 'expense';
+                const catInfo = catMap[t.category] || {};
+                
+                let titleText = t.desc;
+                let subLabel = t.date;
+                let amountColor = 'text-[#30d158]';
+                let iconChar = '💰';
+
+                if (isExp) {
+                    amountColor = catInfo.color || 'text-[#ff453a]';
+                    iconChar = catInfo.icon || '💸';
+                    if (!titleText) titleText = catInfo.label;
+                    if (t.category === 'fixed') subLabel += ' • (هزینه ثابت)';
+                } else {
+                    if (t.incomeType === 'planned') {
+                        iconChar = '💼';
+                        if (!titleText) titleText = 'واریز حقوق/درآمد اصلی';
+                        subLabel += ' • (درآمد پیش‌بینی)';
+                    } else {
+                        iconChar = '✨';
+                        if (!titleText) titleText = 'درآمد/پاداش مازاد';
+                        subLabel += ' • (افزوده‌شده به بودجه)';
+                    }
+                }
+
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.04] text-xs hover:bg-white/[0.05] transition gap-2';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="text-base shrink-0">${iconChar}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-white truncate text-[13px]">${titleText}</div>
+                            <div class="text-[10px] text-zinc-400 mt-0.5">${subLabel}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="font-bold ${amountColor} text-[13px] whitespace-nowrap">${isExp ? '-' : '+'}${formatNumber(t.amount)} تومان</span>
+                        <div class="flex items-center gap-0.5">
+                            <button onclick="editTransaction('${t.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                            <button onclick="deleteTx('${t.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderReminders() {
+            const pendingContainer = document.getElementById('pendingReminderList');
+            const paidContainer = document.getElementById('paidReminderList');
+            const currMonthPaid = state.months[state.activeMonth].paidReminders || [];
+            
+            pendingContainer.innerHTML = '';
+            paidContainer.innerHTML = '';
+
+            let urgentCount = 0;
+            const [activeY, activeM] = state.activeMonth.split('-');
+
+            const thisMonthReminders = state.reminders.filter(r => {
+                if (!r.dueDate) return false;
+                const norm = normalizeJalaliDate(r.dueDate);
+                const [rY, rM] = norm.split('/');
+                return rY === activeY && rM === activeM;
+            });
+
+            thisMonthReminders.forEach(r => {
+                const isPaid = currMonthPaid.includes(r.id);
+
+                let installmentBadge = '';
+                if (r.installmentIndex && r.totalCount) {
+                    installmentBadge = `<span class="text-[10px] bg-amber-400/15 text-amber-300 font-medium px-2 py-0.5 rounded-full inline-block mt-1">قسط ${formatNumber(r.installmentIndex)} از ${formatNumber(r.totalCount)}</span>`;
+                }
+
+                if (isPaid) {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/[0.04] border border-emerald-500/20 text-xs opacity-80';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="text-[#30d158] text-base"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <div class="font-bold text-zinc-300 line-through">${r.title}</div>
+                                ${installmentBadge}
+                                <div class="text-[10px] text-zinc-500 mt-0.5">تسویه‌شده در این ماه • ${formatNumber(r.amount)} تومان</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="unmarkReminderPaid('${r.id}')" class="text-zinc-400 hover:text-amber-300 text-[11px] px-2.5 py-1 bg-white/[0.06] rounded-xl">
+                                لغو پرداخت
+                            </button>
+                        </div>
+                    `;
+                    paidContainer.appendChild(item);
+                } else {
+                    urgentCount++;
+
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs gap-2';
+                    item.innerHTML = `
+                        <div class="flex items-start gap-3 min-w-0 flex-1">
+                            <button onclick="openPayConfirmModal('${r.id}')" class="mt-0.5 w-5 h-5 rounded-full border-2 border-[#ffd60a] hover:bg-[#ffd60a]/20 flex items-center justify-center text-transparent hover:text-[#ffd60a] transition shrink-0" title="ثبت پرداخت">
+                                <i class="fa-solid fa-check text-[10px]"></i>
+                            </button>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-bold text-white text-[13px] leading-tight truncate">${r.title}</div>
+                                ${installmentBadge}
+                                <div class="text-[10px] text-zinc-400 mt-1">
+                                    سررسید: <span class="text-[#ffd60a] font-semibold">${r.dueDate}</span> ${r.notifyTime ? `(${r.notifyTime})` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1.5 shrink-0">
+                            <span class="font-bold text-[#a5a4f3] text-[13px] whitespace-nowrap">${formatNumber(r.amount)} تومان</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editReminder('${r.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                                <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    pendingContainer.appendChild(item);
+                }
+            });
+
+            if (pendingContainer.children.length === 0) {
+                pendingContainer.innerHTML = `<div class="text-center py-4 text-zinc-500 text-xs font-medium">هیچ یادآور یا سررسیدی برای این ماه تعریف نشده است.</div>`;
+            }
+            if (paidContainer.children.length === 0) {
+                paidContainer.innerHTML = `<div class="text-center py-3 text-zinc-600 text-[11px]">موردی در این ماه تسویه نشده است.</div>`;
+            }
+
+            const alertBox = document.getElementById('dueAlertBox');
+            const navBadge = document.getElementById('navRemBadge');
+            if (urgentCount > 0) {
+                alertBox.classList.remove('hidden');
+                navBadge.classList.remove('hidden');
+                document.getElementById('dueAlertText').innerText = `${formatNumber(urgentCount)} قسط / هزینه ثابت در انتظار پرداخت این ماه دارید!`;
+            } else {
+                alertBox.classList.add('hidden');
+                navBadge.classList.add('hidden');
+            }
+        }
+
+        // --- CSV EXPORT & IMPORT ---
+        function exportToCSV() {
+            let csvRows = [];
+            csvRows.push(['نوع رکورد', 'شناسه', 'ماه/سال', 'تاریخ', 'دسته‌بندی/نوع', 'عنوان/توضیح', 'مبلغ (تومان)', 'جزئیات تکمیلی'].join(','));
+
+            Object.keys(state.months).forEach(mKey => {
+                const m = state.months[mKey];
+                m.transactions.forEach(t => {
+                    csvRows.push([
+                        'تراکنش',
+                        t.id,
+                        mKey,
+                        t.date,
+                        t.type === 'expense' ? `هزینه (${t.category})` : `درآمد (${t.incomeType})`,
+                        `"${(t.desc || '').replace(/"/g, '""')}"`,
+                        t.amount,
+                        ''
+                    ].join(','));
+                });
+            });
+
+            state.reminders.forEach(r => {
+                csvRows.push([
+                    'یادآور',
+                    r.id,
+                    r.dueDate ? r.dueDate.substring(0, 7).replace('/', '-') : '',
+                    r.dueDate,
+                    `دوره: ${r.cycle}`,
+                    `"${(r.title || '').replace(/"/g, '""')}"`,
+                    r.amount,
+                    r.totalCount ? `قسط ${r.installmentIndex || 1} از ${r.totalCount}` : ''
+                ].join(','));
+            });
+
+            state.wishlist.forEach(w => {
+                csvRows.push([
+                    '۳۰ روز انتظار',
+                    w.id,
+                    '',
+                    w.date,
+                    'خواسته',
+                    `"${(w.title || '').replace(/"/g, '""')}"`,
+                    w.amount,
+                    `"${(w.reason || '').replace(/"/g, '""')}"`
+                ].join(','));
+            });
+
+            Object.keys(state.months).forEach(mKey => {
+                const m = state.months[mKey];
+                csvRows.push([
+                    'بودجه و یادداشت',
+                    mKey,
+                    mKey,
+                    '',
+                    `درآمد: ${m.budget.income} | پس‌انداز: ${m.budget.savings} | ثابت: ${m.budget.fixed}`,
+                    `"${(m.notes || '').replace(/"/g, '""')}"`,
+                    '',
+                    ''
+                ].join(','));
+            });
+
+            const csvContent = '\uFEFF' + csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kakeibo_backup_${getTodayJalali().replace(/\//g, '-')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importFromCSV(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const text = evt.target.result;
+                    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                    if (lines.length < 2) {
+                        alert('فایل CSV معتبر نیست.');
+                        return;
+                    }
+
+                    if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟')) return;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+                        const [type, id, mKey, date, cat, title, amountStr] = cols;
+                        const amt = cleanNumber(amountStr);
+
+                        if (type === 'تراکنش' && mKey) {
+                            ensureMonthExists(mKey);
+                            const isExpense = cat.includes('هزینه');
+                            const rawCat = cat.match(/\((.*?)\)/)?.[1] || 'needs';
+                            if (!state.months[mKey].transactions.some(x => x.id === id)) {
+                                state.months[mKey].transactions.push({
+                                    id: id || Date.now().toString() + i,
+                                    type: isExpense ? 'expense' : 'income',
+                                    category: isExpense ? rawCat : 'needs',
+                                    incomeType: isExpense ? undefined : rawCat,
+                                    amount: amt,
+                                    date: date || getTodayJalali(),
+                                    desc: title
+                                });
+                            }
+                        } else if (type === 'یادآور') {
+                            if (!state.reminders.some(r => r.id === id)) {
+                                state.reminders.push({
+                                    id: id || Date.now().toString() + i,
+                                    title: title,
+                                    amount: amt,
+                                    dueDate: date || getTodayJalali(),
+                                    cycle: 'monthly'
+                                });
+                            }
+                        } else if (type === '۳۰ روز انتظار') {
+                            if (!state.wishlist.some(w => w.id === id)) {
+                                state.wishlist.push({
+                                    id: id || Date.now().toString() + i,
+                                    title: title,
+                                    amount: amt,
+                                    date: date || getTodayJalali()
+                                });
+                            }
+                        }
+                    }
+
+                    saveState();
+                    renderAll();
+                    alert('اطلاعات با موفقیت بارگذاری شد.');
+                } catch (err) {
+                    alert('خطا در خواندن فایل CSV.');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            e.target.value = '';
+        }
+
+        function openPayConfirmModal(remId) {
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem) return;
+
+            document.getElementById('payTargetRemId').value = rem.id;
+            document.getElementById('payTargetTitle').value = rem.title;
+            document.getElementById('payTargetAmount').value = Number(rem.amount).toLocaleString('en-US');
+            document.getElementById('payTargetDate').value = getTodayJalali();
+            document.getElementById('payTargetDateCal').classList.add('hidden');
+            openModal('payConfirmModal');
+        }
+
+        function confirmPaymentSubmit(e) {
+            e.preventDefault();
+            const remId = document.getElementById('payTargetRemId').value;
+            const finalAmount = cleanNumber(document.getElementById('payTargetAmount').value);
+            const payDate = document.getElementById('payTargetDate').value.trim();
+
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem || !finalAmount) return;
+
+            if (!state.months[state.activeMonth].paidReminders) state.months[state.activeMonth].paidReminders = [];
+            state.months[state.activeMonth].paidReminders.push(remId);
+
+            const tx = {
+                id: Date.now().toString(),
+                type: 'expense',
+                category: 'fixed',
+                amount: finalAmount,
+                date: normalizeJalaliDate(payDate) || getTodayJalali(),
+                desc: `پرداخت قسط/یادآور: ${rem.title}`
+            };
+            state.months[state.activeMonth].transactions.push(tx);
+
+            saveState();
+            renderAll();
+            closeModal('payConfirmModal');
+        }
+
+        function unmarkReminderPaid(remId) {
+            if (!confirm('آیا وضعیت پرداخت این مورد لغو شود؟')) return;
+            const list = state.months[state.activeMonth].paidReminders || [];
+            state.months[state.activeMonth].paidReminders = list.filter(id => id !== remId);
+            saveState();
+            renderAll();
+        }
+
+        function openReminderCreateModal() {
+            document.getElementById('editRemId').value = '';
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-bell text-[#ffd60a]"></i> ثبت یادآور و قسط جدید';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره یادآور';
+            document.getElementById('remTitle').value = '';
+            document.getElementById('remAmount').value = '';
+            document.getElementById('remDate').value = getTodayJalali();
+            document.getElementById('remCycleWrap').classList.remove('hidden');
+            document.getElementById('remInstallmentsWrap').classList.remove('hidden');
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
+            openModal('reminderModal');
+        }
+
+        function editReminder(remId) {
+            const rem = state.reminders.find(r => r.id === remId);
+            if (!rem) return;
+
+            document.getElementById('editRemId').value = rem.id;
+            document.getElementById('remModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ffd60a]"></i> ویرایش یادآور';
+            document.getElementById('remSubmitBtn').innerText = 'ذخیره تغییرات';
+            document.getElementById('remTitle').value = rem.title;
+            document.getElementById('remAmount').value = Number(rem.amount).toLocaleString('en-US');
+            document.getElementById('remDate').value = rem.dueDate;
+            document.getElementById('remCycleWrap').classList.add('hidden');
+            document.getElementById('remInstallmentsWrap').classList.add('hidden');
+            document.getElementById('customCycleBox').classList.add('hidden');
+            document.getElementById('remDateCal').classList.add('hidden');
+            document.getElementById('remEndDateCal').classList.add('hidden');
+            openModal('reminderModal');
+        }
+
+        function submitReminder(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editRemId').value;
+            const title = document.getElementById('remTitle').value.trim();
+            const amount = cleanNumber(document.getElementById('remAmount').value);
+            const dueDate = normalizeJalaliDate(document.getElementById('remDate').value.trim());
+            const notifyTime = document.getElementById('remNotifyTime').value;
+
+            if (!title || !amount || !dueDate) return;
+
+            if (editId) {
+                const target = state.reminders.find(r => r.id === editId);
+                if (target) {
+                    target.title = title;
+                    target.amount = amount;
+                    target.dueDate = dueDate;
+                    target.notifyTime = notifyTime;
+                }
+            } else {
+                const cycle = document.getElementById('remCycle').value;
+                const totalCount = cleanNumber(document.getElementById('remTotalCount')?.value) || 1;
+                
+                let stepMonths = 1;
+                if (cycle === 'bimonthly') stepMonths = 2;
+                if (cycle === 'quarterly') stepMonths = 3;
+                if (cycle === 'yearly') stepMonths = 12;
+
+                const countToGenerate = cycle === 'once' ? 1 : Math.max(1, totalCount);
+
+                for (let i = 0; i < countToGenerate; i++) {
+                    const instDate = addJalaliMonths(dueDate, i * stepMonths);
+                    const remInstance = {
+                        id: (Date.now() + i).toString(),
+                        title: title,
+                        amount,
+                        dueDate: instDate,
+                        cycle,
+                        notifyTime,
+                        installmentIndex: countToGenerate > 1 ? (i + 1) : null,
+                        totalCount: countToGenerate > 1 ? countToGenerate : null
+                    };
+                    state.reminders.push(remInstance);
+                }
+            }
+
+            saveState();
+            renderAll();
+            closeModal('reminderModal');
+        }
+
+        function deleteReminder(remId) {
+            if (!confirm('آیا این یادآور حذف شود؟')) return;
+            state.reminders = state.reminders.filter(r => r.id !== remId);
+            saveState();
+            renderAll();
+        }
+
+        function renderWishlist() {
+            const container = document.getElementById('wishlistContainer');
+            container.innerHTML = '';
+
+            if (!state.wishlist || state.wishlist.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-xs font-medium">هیچ کالایی در لیست انتظار ۳۰ روزه قرار ندارد.</div>`;
+                return;
+            }
+
+            state.wishlist.forEach(w => {
+                const item = document.createElement('div');
+                item.className = 'p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs space-y-2';
+                item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-white text-[13px]">${w.title}</span>
+                            <div class="text-[10px] text-zinc-400 mt-0.5">ثبت‌شده در: ${w.date}</div>
+                        </div>
+                        <span class="font-bold text-[#0a84ff] text-[13px]">${formatNumber(w.amount)} تومان</span>
+                    </div>
+                    ${w.reason ? `<div class="text-[11px] text-zinc-400 bg-white/[0.02] p-2 rounded-xl border border-white/[0.03]">${w.reason}</div>` : ''}
+                    <div class="flex gap-2 pt-1 border-t border-white/[0.04]">
+                        <button onclick="fulfillWishlist('${w.id}')" class="flex-1 bg-[#30d158]/20 hover:bg-[#30d158]/30 text-[#30d158] font-bold py-1.5 rounded-xl text-[11px]">
+                            ✅ خرید نهایی
+                        </button>
+                        <button onclick="cancelWishlist('${w.id}')" class="flex-1 bg-[#ff453a]/20 hover:bg-[#ff453a]/30 text-[#ff453a] font-bold py-1.5 rounded-xl text-[11px]">
+                            ❌ انصراف
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function submitWishlist(e) {
+            e.preventDefault();
+            const title = document.getElementById('wishTitle').value.trim();
+            const amount = cleanNumber(document.getElementById('wishAmount').value);
+            const reason = document.getElementById('wishReason').value.trim();
+
+            if (!title || !amount) return;
+
+            const item = {
+                id: Date.now().toString(),
+                title,
+                amount,
+                reason,
+                date: getTodayJalali()
+            };
+
+            if (!state.wishlist) state.wishlist = [];
+            state.wishlist.push(item);
+            saveState();
+            renderWishlist();
+            closeModal('wishlistModal');
+            document.getElementById('wishTitle').value = '';
+            document.getElementById('wishAmount').value = '';
+            document.getElementById('wishReason').value = '';
+        }
+
+        function fulfillWishlist(id) {
+            const w = state.wishlist.find(x => x.id === id);
+            if (!w) return;
+            if (!confirm(`آیا مطمئن هستید که می‌خواهید «${w.title}» را به عنوان هزینه ثبت کنید؟`)) return;
+
+            const tx = {
+                id: Date.now().toString(),
+                type: 'expense',
+                category: 'wants',
+                amount: w.amount,
+                date: getTodayJalali(),
+                desc: `خرید بعد از دوره انتظار: ${w.title}`
+            };
+            state.months[state.activeMonth].transactions.push(tx);
+            state.wishlist = state.wishlist.filter(x => x.id !== id);
+
+            saveState();
+            renderAll();
+            alert('با موفقیت در هزینه‌های خواسته‌ها ثبت شد.');
+        }
+
+        function cancelWishlist(id) {
+            if (!confirm('آیا انصراف از این خرید تأیید می‌شود؟')) return;
+            state.wishlist = state.wishlist.filter(x => x.id !== id);
+            saveState();
+            renderWishlist();
+        }
+
+        let noteSaveTimeout;
+        function autoSaveMonthlyNotes() {
+            document.getElementById('noteSaveStatus').innerText = 'در حال ذخیره...';
+            document.getElementById('noteSaveStatus').className = 'text-amber-400';
+            clearTimeout(noteSaveTimeout);
+            noteSaveTimeout = setTimeout(() => {
+                ensureMonthExists(state.activeMonth);
+                state.months[state.activeMonth].notes = document.getElementById('monthlyNotesArea').value;
+                saveState();
+                document.getElementById('noteSaveStatus').innerText = 'ذخیره شد';
+                document.getElementById('noteSaveStatus').className = 'text-[#30d158]';
+            }, 600);
+        }
+
+        function editTransaction(txId) {
+            const curr = state.months[state.activeMonth];
+            const tx = curr.transactions.find(t => t.id === txId);
+            if (!tx) return;
+
+            if (tx.type === 'expense') {
+                document.getElementById('editExpId').value = tx.id;
+                document.getElementById('expModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#ff453a]"></i> ویرایش هزینه';
+                document.getElementById('expSubmitBtn').innerText = 'ذخیره تغییرات';
+                document.getElementById('expAmount').value = Number(tx.amount).toLocaleString('en-US');
+                document.getElementById('expDate').value = tx.date;
+                document.getElementById('expDesc').value = tx.desc || '';
+                document.getElementById('expDateCal').classList.add('hidden');
+                
+                const catRadio = document.querySelector(`input[name="expCat"][value="${tx.category}"]`);
+                if (catRadio) catRadio.checked = true;
+                
+                openModal('expenseModal');
+            } else if (tx.type === 'income') {
+                document.getElementById('editIncId').value = tx.id;
+                document.getElementById('incModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#30d158]"></i> ویرایش ورودی پول';
+                document.getElementById('incSubmitBtn').innerText = 'ذخیره تغییرات';
+                document.getElementById('incAmount').value = Number(tx.amount).toLocaleString('en-US');
+                document.getElementById('incDate').value = tx.date;
+                document.getElementById('incDesc').value = tx.desc || '';
+                document.getElementById('incDateCal').classList.add('hidden');
+                
+                const typeRadio = document.querySelector(`input[name="incType"][value="${tx.incomeType || 'planned'}"]`);
+                if (typeRadio) typeRadio.checked = true;
+                
+                openModal('incomeModal');
+            }
+        }
+
+        function submitExpense(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editExpId').value;
+            const amount = cleanNumber(document.getElementById('expAmount').value);
+            if (!amount) return;
+
+            const category = document.querySelector('input[name="expCat"]:checked').value;
+            const date = normalizeJalaliDate(document.getElementById('expDate').value.trim());
+            const desc = document.getElementById('expDesc').value.trim();
+
+            const curr = state.months[state.activeMonth];
+
+            if (editId) {
+                const target = curr.transactions.find(t => t.id === editId);
+                if (target) {
+                    target.amount = amount;
+                    target.category = category;
+                    target.date = date;
+                    target.desc = desc;
+                }
+            } else {
+                const tx = { id: Date.now().toString(), type: 'expense', amount, category, date, desc };
+                curr.transactions.push(tx);
+            }
+
+            saveState();
+            renderAll();
+            closeModal('expenseModal');
+            document.getElementById('editExpId').value = '';
+            document.getElementById('expAmount').value = '';
+            document.getElementById('expDesc').value = '';
+            document.getElementById('expSubmitBtn').innerText = 'ثبت نهایی هزینه';
+        }
+
+        function submitIncome(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editIncId').value;
+            const amount = cleanNumber(document.getElementById('incAmount').value);
+            if (!amount) return;
+
+            const incomeType = document.querySelector('input[name="incType"]:checked').value;
+            const date = normalizeJalaliDate(document.getElementById('incDate').value.trim());
+            const desc = document.getElementById('incDesc').value.trim();
+
+            const curr = state.months[state.activeMonth];
+
+            if (editId) {
+                const target = curr.transactions.find(t => t.id === editId);
+                if (target) {
+                    target.amount = amount;
+                    target.incomeType = incomeType;
+                    target.date = date;
+                    target.desc = desc;
+                }
+            } else {
+                const tx = { id: Date.now().toString(), type: 'income', incomeType, amount, date, desc };
+                curr.transactions.push(tx);
+            }
+
+            saveState();
+            renderAll();
+            closeModal('incomeModal');
+            document.getElementById('editIncId').value = '';
+            document.getElementById('incAmount').value = '';
+            document.getElementById('incDesc').value = '';
+            document.getElementById('incSubmitBtn').innerText = 'ثبت ورودی پول';
+        }
+
+        function deleteTx(id) {
+            if (!confirm('آیا این تراکنش حذف شود؟')) return;
+            const list = state.months[state.activeMonth].transactions;
+            state.months[state.activeMonth].transactions = list.filter(item => item.id !== id);
+            saveState();
+            renderAll();
+        }
+
+        function renderReflection(mKey) {
+            ensureMonthExists(mKey);
+            const m = state.months[mKey];
+            const cats = { needs: 0, wants: 0, culture: 0, unexpected: 0, fixed: 0 };
+            let totalVarSpent = 0;
+            let totalExtra = 0;
+
+            m.transactions.forEach(t => {
+                if (t.type === 'expense' && cats[t.category] !== undefined) {
+                    cats[t.category] += t.amount;
+                    if (t.category !== 'fixed') {
+                        totalVarSpent += t.amount;
+                    }
+                }
+                if (t.type === 'income' && t.incomeType === 'extra') {
+                    totalExtra += t.amount;
+                }
+            });
+
+            document.getElementById('refNeeds').innerText = `${formatNumber(cats.needs)} تومان`;
+            document.getElementById('refWants').innerText = `${formatNumber(cats.wants)} تومان`;
+            document.getElementById('refCulture').innerText = `${formatNumber(cats.culture)} تومان`;
+            document.getElementById('refUnexpected').innerText = `${formatNumber(cats.unexpected)} تومان`;
+
+            const calcPercent = val => totalVarSpent > 0 ? `${Math.round((val / totalVarSpent) * 100)}%` : '0%';
+            document.getElementById('barNeeds').style.width = calcPercent(cats.needs);
+            document.getElementById('barWants').style.width = calcPercent(cats.wants);
+            document.getElementById('barCulture').style.width = calcPercent(cats.culture);
+            document.getElementById('barUnexpected').style.width = calcPercent(cats.unexpected);
+
+            const totalMonthIncome = (m.budget.income || 0) + totalExtra;
+            document.getElementById('refPlanIncome').innerText = `${formatNumber(totalMonthIncome)} تومان`;
+            document.getElementById('refPlanSavings').innerText = `${formatNumber(m.budget.savings)} تومان`;
+            document.getElementById('refPlanFixed').innerText = `${formatNumber(cats.fixed)} از ${formatNumber(m.budget.fixed)} تومان`;
+            document.getElementById('refTotalSpent').innerText = `${formatNumber(totalVarSpent)} تومان`;
+
+            const actualSavings = totalMonthIncome - (m.budget.fixed || 0) - totalVarSpent;
+            document.getElementById('refActualSavings').innerText = `${formatNumber(actualSavings)} تومان`;
+        }
+
+        function updateLiveDisposable() {
+            const inc = cleanNumber(document.getElementById('planIncome').value);
+            const sav = cleanNumber(document.getElementById('planSavings').value);
+            const fix = cleanNumber(document.getElementById('planFixed').value);
+            const disp = Math.max(0, inc - sav - fix);
+            document.getElementById('calcDisposable').innerText = `${formatNumber(disp)} تومان`;
+        }
+
+        function saveMonthlyBudget(e) {
+            e.preventDefault();
+            const curr = state.months[state.activeMonth];
+            curr.budget = {
+                income: cleanNumber(document.getElementById('planIncome').value),
+                savings: cleanNumber(document.getElementById('planSavings').value),
+                fixed: cleanNumber(document.getElementById('planFixed').value)
+            };
+            saveState();
+            renderAll();
+            alert('بودجه این ماه با موفقیت ذخیره شد.');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function saveState() {
+            localStorage.setItem(getStorageKey(), JSON.stringify(state));
+            if (accessToken) syncToDrive();
+        }
+
+        function loadLocalState() {
+            const saved = localStorage.getItem(getStorageKey());
+            if (saved) {
+                try { 
+                    state = JSON.parse(saved); 
+                    if (!state.reminders) state.reminders = [];
+                    if (!state.wishlist) state.wishlist = [];
+                } catch (e) {
+                    state = getEmptyState();
+                }
+            } else {
+                state = getEmptyState();
+            }
+        }
+
+        function initGoogleClient() {
+            if (typeof google === 'undefined') return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: async (resp) => {
+                    if (resp.error) return;
+                    accessToken = resp.access_token;
+                    localStorage.setItem('kakeibo_cached_token', accessToken);
+                    await fetchUserProfile();
+                    await fetchFromDrive();
+                }
+            });
+        }
+
+        async function fetchUserProfile() {
+            try {
+                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const info = await res.json();
+                if (info && info.email) {
+                    currentUserEmail = info.email;
+                    localStorage.setItem('kakeibo_cached_email', info.email);
+
+                    document.getElementById('loginBtn').classList.add('hidden');
+                    document.getElementById('userProfile').classList.remove('hidden');
+                    const avatarLetter = info.email.charAt(0).toUpperCase();
+                    document.getElementById('userAvatarLetter').innerText = avatarLetter;
+                    document.getElementById('userAvatarLetter').setAttribute('title', info.email);
+                    
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                    
+                    loadLocalState();
+                    renderAll();
+                }
+            } catch (e) {
+                console.error('Fetch Profile error', e);
+            }
+        }
+
+        function handleAuthClick() {
+            if (!tokenClient) initGoogleClient();
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: 'select_account' });
+        }
+
+        function handleLogout() {
+            if (accessToken) {
+                google.accounts.oauth2.revoke(accessToken, () => {});
+            }
+            accessToken = null;
+            currentUserEmail = null;
+            driveFileId = null;
+            localStorage.removeItem('kakeibo_cached_email');
+            localStorage.removeItem('kakeibo_cached_token');
+
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('userProfile').classList.add('hidden');
+            document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین';
+            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1 font-medium whitespace-nowrap';
+
+            loadLocalState();
+            renderAll();
+        }
+
+        async function fetchFromDrive() {
+            try {
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const searchData = await searchRes.json();
+                if (searchData.files && searchData.files.length > 0) {
+                    driveFileId = searchData.files[0].id;
+                    const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
+                    const cloudData = await fileRes.json();
+                    if (cloudData && cloudData.months) {
+                        state = cloudData;
+                        if (!state.reminders) state.reminders = [];
+                        if (!state.wishlist) state.wishlist = [];
+                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                        populateYearAndMonthDropdowns();
+                        renderAll();
+                    }
+                } else {
+                    syncToDrive();
+                }
+            } catch (err) {
+                console.error('Fetch Drive error', err);
+            }
+        }
+
+        async function syncToDrive() {
+            if (!accessToken) return;
+            const fileContent = JSON.stringify(state);
+            const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
+
+            try {
+                if (!driveFileId) {
+                    const form = new FormData();
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', new Blob([fileContent], { type: 'application/json' }));
+                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        body: form
+                    });
+                    const data = await res.json();
+                    driveFileId = data.id;
+                } else {
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: fileContent
+                    });
+                }
+            } catch (err) {
+                console.error('Sync Drive error', err);
+            }
+        }
+    </script>
+</body>
+</html>
