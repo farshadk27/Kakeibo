@@ -2,86 +2,89 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Kakeibo Full Drive Scanner</title>
+<title>Kakeibo Revision Recovery</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 body{background:#080b12;color:#fff;font-family:tahoma;padding:25px}
-button{padding:12px 18px;border-radius:12px;border:0;background:#287cff;color:#fff;font-weight:bold;margin:5px}
+button{padding:12px 18px;border:0;border-radius:12px;background:#287cff;color:#fff;font-weight:bold;margin:5px}
 .card{background:#151b2b;padding:18px;border-radius:15px;margin:12px 0}
-.good{color:#20df91}
-.small{color:#aaa;font-size:13px}
-pre{background:#05070b;padding:12px;overflow:auto;direction:ltr;text-align:left}
+.good{color:#20df91}.bad{color:#ff6070}
 </style>
 </head>
 <body>
-<h2>Kakeibo Full Drive Scanner</h2>
-<p>تمام فایل‌های AppData درایو را بررسی می‌کند و دنبال نسخه‌های قدیمی‌تر می‌گردد.</p>
+<h2>Kakeibo Revision Recovery</h2>
+<p>تاریخچه نسخه‌های قبلی فایل kakeibo_store.json را بررسی می‌کند.</p>
 <button onclick="login()">Login Google</button>
-<button onclick="scan()">Full Scan</button>
+<button onclick="scan()">Scan Revisions</button>
 <div id="out"></div>
 
 <script>
 const CLIENT_ID="1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com";
 let token="";
+let fileId="";
 
 function login(){
- google.accounts.oauth2.initTokenClient({
- client_id:CLIENT_ID,
- scope:"https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email",
- callback:r=>{token=r.access_token;alert("Login OK")}
- }).requestAccessToken();
+google.accounts.oauth2.initTokenClient({
+client_id:CLIENT_ID,
+scope:"https://www.googleapis.com/auth/drive.appdata",
+callback:r=>{token=r.access_token;alert("Login OK")}
+}).requestAccessToken();
 }
 
-function findData(o,res){
- if(!o||typeof o!=="object") return;
- if(Array.isArray(o)){o.forEach(x=>findData(x,res));return;}
- if(o.amount && o.date) {
-   res.count++;
-   if(String(o.date)>res.latest) res.latest=o.date;
- }
- Object.values(o).forEach(x=>findData(x,res));
+async function getFile(){
+let r=await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='kakeibo_store.json'&fields=files(id,name)",{
+headers:{Authorization:"Bearer "+token}
+});
+let j=await r.json();
+fileId=j.files?.[0]?.id;
 }
 
-async function read(id){
- let r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,
- {headers:{Authorization:"Bearer "+token}});
- let t=await r.text();
- try{return JSON.parse(t)}catch{return {}}
+async function readRevision(id){
+let r=await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/revisions/${id}?alt=media`,{
+headers:{Authorization:"Bearer "+token}
+});
+return await r.text();
+}
+
+function analyze(t){
+try{
+let j=JSON.parse(t);
+let count=0, income="";
+if(j.months){
+Object.values(j.months).forEach(m=>{
+ if(m.transactions) count+=m.transactions.length;
+ if(m.budget?.income) income=m.budget.income;
+});
+}
+return {count,income};
+}catch{return {count:"?",income:"?"}}
 }
 
 async function scan(){
- if(!token)return alert("Login کن");
- out.innerHTML="در حال اسکن...";
- let r=await fetch(
- "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields=files(id,name,size,modifiedTime,createdTime)",
- {headers:{Authorization:"Bearer "+token}});
- let d=await r.json();
+if(!token)return alert("Login کن");
+document.getElementById("out").innerHTML="در حال بررسی...";
+await getFile();
+if(!fileId)return out.innerHTML="فایل پیدا نشد";
 
- let html="";
- for(let f of (d.files||[])){
-   let json=await read(f.id);
-   let res={count:0,latest:""};
-   findData(json,res);
+let r=await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/revisions?fields=revisions(id,modifiedTime,size)`,{
+headers:{Authorization:"Bearer "+token}
+});
+let data=await r.json();
 
-   let income="";
-   if(json.months){
-    Object.values(json.months).forEach(m=>{
-      if(m.budget && m.budget.income) income=m.budget.income;
-    })
-   }
-
-   html+=`
-   <div class="card">
-   <b>${f.name}</b><br>
-   تغییر: ${new Date(f.modifiedTime).toLocaleString("fa-IR")}<br>
-   حجم: ${f.size||0}<br>
-   تراکنش: <span class="good">${res.count}</span><br>
-   آخرین تاریخ دیتا: ${res.latest||"-"}<br>
-   درآمد پیدا شده: ${income||"-"}<br>
-   ID: ${f.id}
-   </div>`;
- }
- out.innerHTML=html||"فایلی پیدا نشد";
+let html="";
+for(let rev of (data.revisions||[])){
+let txt=await readRevision(rev.id);
+let a=analyze(txt);
+html+=`
+<div class="card">
+<b>Revision: ${rev.id}</b><br>
+تاریخ تغییر: ${new Date(rev.modifiedTime).toLocaleString("fa-IR")}<br>
+حجم: ${rev.size||"-"}<br>
+تراکنش: <span class="good">${a.count}</span><br>
+درآمد: ${a.income||"-"}
+</div>`;
+}
+out.innerHTML=html||"Revision پیدا نشد";
 }
 </script>
 </body>
