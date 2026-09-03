@@ -3185,28 +3185,49 @@
 
         async function fetchFromDrive() {
             try {
-                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
-                    headers: { Authorization: `Bearer ${accessToken}` }
-                });
-                const searchData = await searchRes.json();
-                if (searchData.files && searchData.files.length > 0) {
-                    driveFileId = searchData.files[0].id;
-                    const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+                const searchRes = await fetch(
+                    'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,name,modifiedTime)',
+                    {
                         headers: { Authorization: `Bearer ${accessToken}` }
-                    });
+                    }
+                );
+
+                const searchData = await searchRes.json();
+
+                if (searchData.files && searchData.files.length > 0) {
+                    // اگر چند فایل وجود داشت، جدیدترین نسخه را بخوان
+                    searchData.files.sort((a, b) =>
+                        new Date(b.modifiedTime) - new Date(a.modifiedTime)
+                    );
+
+                    driveFileId = searchData.files[0].id;
+
+                    const fileRes = await fetch(
+                        `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
+                        {
+                            headers: { Authorization: `Bearer ${accessToken}` }
+                        }
+                    );
+
                     const cloudData = await fileRes.json();
+
                     if (cloudData && cloudData.months) {
                         state = cloudData;
+
                         if (!state.reminders) state.reminders = [];
                         if (!state.wishlist) state.wishlist = [];
                         if (!state.checklist) state.checklist = [];
+
                         localStorage.setItem(getStorageKey(), JSON.stringify(state));
+
                         populateYearAndMonthDropdowns();
                         renderAll();
                     }
                 } else {
-                    syncToDrive();
+                    // فقط وقتی واقعاً فایل درایو وجود ندارد بساز
+                    await syncToDrive();
                 }
+
             } catch (err) {
                 console.error('Fetch Drive error', err);
             }
@@ -3214,28 +3235,69 @@
 
         async function syncToDrive() {
             if (!accessToken) return;
+
             const fileContent = JSON.stringify(state);
-            const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
+            const metadata = {
+                name: 'kakeibo_store.json',
+                parents: ['appDataFolder']
+            };
 
             try {
                 if (!driveFileId) {
+                    const searchRes = await fetch(
+                        'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,modifiedTime)',
+                        {
+                            headers: { Authorization: `Bearer ${accessToken}` }
+                        }
+                    );
+
+                    const searchData = await searchRes.json();
+
+                    if (searchData.files && searchData.files.length > 0) {
+                        searchData.files.sort((a, b) =>
+                            new Date(b.modifiedTime) - new Date(a.modifiedTime)
+                        );
+                        driveFileId = searchData.files[0].id;
+                    }
+                }
+
+                if (!driveFileId) {
                     const form = new FormData();
-                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                    form.append('file', new Blob([fileContent], { type: 'application/json' }));
-                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                        method: 'POST',
-                        headers: { Authorization: `Bearer ${accessToken}` },
-                        body: form
-                    });
+                    form.append(
+                        'metadata',
+                        new Blob([JSON.stringify(metadata)], { type: 'application/json' })
+                    );
+                    form.append(
+                        'file',
+                        new Blob([fileContent], { type: 'application/json' })
+                    );
+
+                    const res = await fetch(
+                        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+                        {
+                            method: 'POST',
+                            headers: { Authorization: `Bearer ${accessToken}` },
+                            body: form
+                        }
+                    );
+
                     const data = await res.json();
                     driveFileId = data.id;
+
                 } else {
-                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-                        method: 'PATCH',
-                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                        body: fileContent
-                    });
+                    await fetch(
+                        `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: fileContent
+                        }
+                    );
                 }
+
             } catch (err) {
                 console.error('Sync Drive error', err);
             }
