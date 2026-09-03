@@ -694,6 +694,17 @@
     color: #ff453a !important;
 }
 </style>
+
+<style id="kakeibo-negative-final-fix">
+#remBudgetCard.budget-negative {
+    background: linear-gradient(145deg, #5f1923, #2d0a12) !important;
+    border-color: rgba(255,69,58,.75) !important;
+    box-shadow: 0 18px 45px rgba(255,69,58,.28) !important;
+}
+#remBudgetCard.budget-negative #remBudgetDisplay {
+    color: #ff453a !important;
+}
+</style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col justify-between select-none overflow-x-hidden">
 
@@ -828,7 +839,7 @@
                 <select id="dailySortFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200">
                     <option value="newest" selected>جدیدترین</option>
                     <option value="oldest">قدیمی‌ترین</option>
-                    <option value="updated">براساس آخرین تغییرات</option>
+                    <option value="updated">آخرین تغییرات</option>
                 </select>
             </div>
 
@@ -2139,13 +2150,26 @@
                 return true;
             });
 
+            const getJalaliValue = (d) => {
+                try {
+                    const n = normalizeJalaliDate(d || '');
+                    const [y,m,day] = n.split('/').map(Number);
+                    return j2d(y,m,day);
+                } catch(e) { return 0; }
+            };
+
             filtered.sort((a, b) => {
                 if (sortVal === 'updated') {
                     return Number(b.updatedAt || b.createdAt || b.id || 0) - Number(a.updatedAt || a.createdAt || a.id || 0);
                 }
-                const dateA = normalizeJalaliDate(a.date || '');
-                const dateB = normalizeJalaliDate(b.date || '');
-                return sortVal === 'oldest' ? dateA.localeCompare(dateB) : dateB.localeCompare(dateA);
+
+                const diff = getJalaliValue(b.date) - getJalaliValue(a.date);
+                if (diff !== 0) return sortVal === 'oldest' ? -diff : diff;
+
+                // تاریخ برابر: جدیدتر ثبت شده بالاتر
+                return sortVal === 'oldest'
+                    ? Number(a.createdAt || a.id || 0) - Number(b.createdAt || b.id || 0)
+                    : Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0);
             });
 
             renderTxList(filtered);
