@@ -1592,7 +1592,8 @@
                 months: {},
                 reminders: [],
                 wishlist: [],
-                checklist: []
+                checklist: [],
+                updatedAt: 0
             };
         }
 
@@ -3173,6 +3174,7 @@
         }
 
         function saveState() {
+            state.updatedAt = Date.now();
             localStorage.setItem(getStorageKey(), JSON.stringify(state));
             if (accessToken) syncToDrive();
         }
@@ -3180,17 +3182,22 @@
         function loadLocalState() {
             const saved = localStorage.getItem(getStorageKey());
             if (saved) {
-                try { 
-                    state = JSON.parse(saved); 
-                    if (!state.reminders) state.reminders = [];
-                    if (!state.wishlist) state.wishlist = [];
-                    if (!state.checklist) state.checklist = [];
+                try {
+                    state = JSON.parse(saved);
                 } catch (e) {
                     state = getEmptyState();
                 }
             } else {
                 state = getEmptyState();
             }
+
+            if (!state || typeof state !== 'object') state = getEmptyState();
+            if (!state.months) state.months = {};
+            if (!state.reminders) state.reminders = [];
+            if (!state.wishlist) state.wishlist = [];
+            if (!state.checklist) state.checklist = [];
+            if (!state.activeMonth) state.activeMonth = '1405-06';
+            if (!state.updatedAt) state.updatedAt = 0;
         }
 
         function initGoogleClient() {
@@ -3261,27 +3268,68 @@
 
         async function fetchFromDrive() {
             try {
-                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)&q=name="kakeibo_store.json"', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
                 const searchData = await searchRes.json();
+
                 if (searchData.files && searchData.files.length > 0) {
-                    driveFileId = searchData.files[0].id;
+                    const driveFile = searchData.files[0];
+                    driveFileId = driveFile.id;
+
                     const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
                     const cloudData = await fileRes.json();
+
                     if (cloudData && cloudData.months) {
-                        state = cloudData;
-                        if (!state.reminders) state.reminders = [];
-                        if (!state.wishlist) state.wishlist = [];
-                        if (!state.checklist) state.checklist = [];
-                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                        const localRaw = localStorage.getItem(getStorageKey());
+                        let localData = null;
+
+                        try {
+                            localData = localRaw ? JSON.parse(localRaw) : null;
+                        } catch (e) {
+                            localData = null;
+                        }
+
+                        if (!localData || typeof localData !== 'object') localData = getEmptyState();
+                        if (!localData.months) localData.months = {};
+                        if (!localData.reminders) localData.reminders = [];
+                        if (!localData.wishlist) localData.wishlist = [];
+                        if (!localData.checklist) localData.checklist = [];
+                        if (!localData.activeMonth) localData.activeMonth = state.activeMonth || '1405-06';
+
+                        const driveModifiedAt = driveFile.modifiedTime ? new Date(driveFile.modifiedTime).getTime() : 0;
+                        const localUpdatedAt = Number(localData.updatedAt || 0);
+                        const cloudUpdatedAt = Number(cloudData.updatedAt || driveModifiedAt || 0);
+
+                        if (!cloudData.updatedAt && driveModifiedAt) {
+                            cloudData.updatedAt = driveModifiedAt;
+                        }
+                        if (!localData.updatedAt) {
+                            localData.updatedAt = 0;
+                        }
+                        if (!cloudData.reminders) cloudData.reminders = [];
+                        if (!cloudData.wishlist) cloudData.wishlist = [];
+                        if (!cloudData.checklist) cloudData.checklist = [];
+                        if (!cloudData.activeMonth) cloudData.activeMonth = localData.activeMonth || '1405-06';
+
+                        const shouldUseDrive = cloudUpdatedAt >= localUpdatedAt;
+
+                        if (shouldUseDrive) {
+                            state = cloudData;
+                            localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                        } else {
+                            state = localData;
+                            await syncToDrive();
+                        }
+
                         populateYearAndMonthDropdowns();
                         renderAll();
                     }
                 } else {
-                    syncToDrive();
+                    if (!state.updatedAt) state.updatedAt = Date.now();
+                    await syncToDrive();
                 }
             } catch (err) {
                 console.error('Fetch Drive error', err);
@@ -3290,10 +3338,22 @@
 
         async function syncToDrive() {
             if (!accessToken) return;
+            if (!state.updatedAt) state.updatedAt = Date.now();
+
             const fileContent = JSON.stringify(state);
             const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
 
             try {
+                if (!driveFileId) {
+                    const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name)&q=name="kakeibo_store.json"', {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
+                    const searchData = await searchRes.json();
+                    if (searchData.files && searchData.files.length > 0) {
+                        driveFileId = searchData.files[0].id;
+                    }
+                }
+
                 if (!driveFileId) {
                     const form = new FormData();
                     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
