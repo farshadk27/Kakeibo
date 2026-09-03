@@ -109,8 +109,43 @@ function normalizeDate(d){
   return x;
 }
 
+function deepScan(obj, result={}, path=""){
+  result.count = result.count || 0;
+  result.latest = result.latest || "";
+
+  if(!obj || typeof obj !== "object") return result;
+
+  if(Array.isArray(obj)){
+    obj.forEach((v,i)=>deepScan(v,result,path+"["+i+"]"));
+    return result;
+  }
+
+  const keys = Object.keys(obj).map(x=>x.toLowerCase());
+
+  const hasAmount = keys.some(k=>["amount","price","value","cost"].includes(k));
+  const hasDate = keys.some(k=>["date","createdat","updatedat","time"].includes(k));
+
+  if(hasAmount || hasDate){
+    if(obj.amount !== undefined || obj.price !== undefined || obj.cost !== undefined){
+      result.count++;
+    }
+    const d = obj.date || obj.createdAt || obj.updatedAt || "";
+    if(d && String(d) > String(result.latest)) result.latest = d;
+  }
+
+  Object.entries(obj).forEach(([k,v])=>{
+    deepScan(v,result,path+"."+k);
+  });
+
+  return result;
+}
+
 function analyzeState(json){
   let tx=0, latest="", months=0, reminders=0, wishlist=0, checklist=0;
+  const deep = deepScan(json);
+
+  tx = deep.count;
+  latest = deep.latest;
   const monthKeys=[];
 
   if(json && json.months && typeof json.months==="object"){
