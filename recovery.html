@@ -2,349 +2,86 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kakeibo Recovery</title>
+<title>Kakeibo Full Drive Scanner</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
-:root{
-  --bg:#070a12;--card:#111827;--card2:#172033;--text:#f8fafc;--muted:#94a3b8;
-  --blue:#2f7cff;--green:#19d982;--red:#ff4d5e;--border:rgba(255,255,255,.09)
-}
-*{box-sizing:border-box}
-body{
-  margin:0;padding:24px 14px 50px;background:linear-gradient(180deg,#050816,#090d17);
-  color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif
-}
-.wrap{max-width:900px;margin:auto}
-h1{font-size:24px;margin:0 0 8px}
-.sub{color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:18px}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
-button{
-  appearance:none;border:1px solid var(--border);border-radius:14px;padding:11px 15px;
-  background:var(--card2);color:white;font-weight:700;cursor:pointer
-}
-button.primary{background:var(--blue)}
-button.green{background:#087a4a}
-button.red{background:#7f1d1d}
-button:disabled{opacity:.45;cursor:not-allowed}
-#status{
-  padding:11px 13px;border-radius:14px;background:var(--card);
-  border:1px solid var(--border);font-size:13px;margin-bottom:16px;color:var(--muted)
-}
-.file{
-  background:linear-gradient(145deg,#121a2b,#0d1422);border:1px solid var(--border);
-  border-radius:18px;padding:16px;margin:12px 0
-}
-.file.selected{outline:2px solid var(--blue)}
-.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-.name{font-weight:800;font-size:16px}
-.meta{font-size:12px;color:var(--muted);line-height:1.9;margin-top:7px}
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.badge{font-size:11px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.06);color:#cbd5e1}
-.badge.good{background:rgba(25,217,130,.12);color:#62efad}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
-.preview{
-  margin-top:12px;padding:12px;border-radius:14px;background:#05070c;border:1px solid var(--border);
-  max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;
-  direction:ltr;text-align:left;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px
-}
-.hidden{display:none}
-.empty{padding:28px;text-align:center;color:var(--muted)}
+body{background:#080b12;color:#fff;font-family:tahoma;padding:25px}
+button{padding:12px 18px;border-radius:12px;border:0;background:#287cff;color:#fff;font-weight:bold;margin:5px}
+.card{background:#151b2b;padding:18px;border-radius:15px;margin:12px 0}
+.good{color:#20df91}
+.small{color:#aaa;font-size:13px}
+pre{background:#05070b;padding:12px;overflow:auto;direction:ltr;text-align:left}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Kakeibo Drive Recovery</h1>
-  <div class="sub">
-    همه فایل‌های مخفی Kakeibo در Google Drive AppData را بر اساس آخرین تغییر نشان می‌دهد.
-    هر نسخه را می‌توانی Preview کنی و فایل CSV سازگار با Import خود اپ بگیری.
-  </div>
-
-  <div class="toolbar">
-    <button class="primary" onclick="login()">Login Google</button>
-    <button onclick="scan()">Scan Drive</button>
-  </div>
-
-  <div id="status">هنوز وارد حساب گوگل نشده‌ای.</div>
-  <div id="files"></div>
-</div>
+<h2>Kakeibo Full Drive Scanner</h2>
+<p>تمام فایل‌های AppData درایو را بررسی می‌کند و دنبال نسخه‌های قدیمی‌تر می‌گردد.</p>
+<button onclick="login()">Login Google</button>
+<button onclick="scan()">Full Scan</button>
+<div id="out"></div>
 
 <script>
-const CLIENT_ID = "1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com";
-const SCOPES = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email";
-let token = "";
-let fileCache = new Map();
-
-function esc(s){
-  return String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-}
-
-function setStatus(t){ document.getElementById("status").textContent=t; }
+const CLIENT_ID="1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com";
+let token="";
 
 function login(){
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    callback: async (r)=>{
-      if(r.error){ setStatus("خطای ورود: "+r.error); return; }
-      token=r.access_token;
-      try{
-        const u=await fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+token}});
-        const info=await u.json();
-        setStatus("وارد شدی: "+(info.email || "Google account")+" — حالا Scan Drive را بزن.");
-      }catch(e){
-        setStatus("ورود انجام شد. حالا Scan Drive را بزن.");
-      }
-    }
-  });
-  client.requestAccessToken({prompt:"select_account"});
+ google.accounts.oauth2.initTokenClient({
+ client_id:CLIENT_ID,
+ scope:"https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email",
+ callback:r=>{token=r.access_token;alert("Login OK")}
+ }).requestAccessToken();
 }
 
-function normalizeDate(d){
-  if(!d) return "";
-  const p2e=s=>String(s).replace(/[۰-۹]/g,x=>"۰۱۲۳۴۵۶۷۸۹".indexOf(x)).replace(/[٠-٩]/g,x=>"٠١٢٣٤٥٦٧٨٩".indexOf(x));
-  let x=p2e(d).replace(/-/g,"/");
-  const p=x.split("/");
-  if(p.length>=3) return `${p[0]}/${String(parseInt(p[1])||1).padStart(2,"0")}/${String(parseInt(p[2])||1).padStart(2,"0")}`;
-  return x;
+function findData(o,res){
+ if(!o||typeof o!=="object") return;
+ if(Array.isArray(o)){o.forEach(x=>findData(x,res));return;}
+ if(o.amount && o.date) {
+   res.count++;
+   if(String(o.date)>res.latest) res.latest=o.date;
+ }
+ Object.values(o).forEach(x=>findData(x,res));
 }
 
-function deepScan(obj, result={}, path=""){
-  result.count = result.count || 0;
-  result.latest = result.latest || "";
-
-  if(!obj || typeof obj !== "object") return result;
-
-  if(Array.isArray(obj)){
-    obj.forEach((v,i)=>deepScan(v,result,path+"["+i+"]"));
-    return result;
-  }
-
-  const keys = Object.keys(obj).map(x=>x.toLowerCase());
-
-  const hasAmount = keys.some(k=>["amount","price","value","cost"].includes(k));
-  const hasDate = keys.some(k=>["date","createdat","updatedat","time"].includes(k));
-
-  if(hasAmount || hasDate){
-    if(obj.amount !== undefined || obj.price !== undefined || obj.cost !== undefined){
-      result.count++;
-    }
-    const d = obj.date || obj.createdAt || obj.updatedAt || "";
-    if(d && String(d) > String(result.latest)) result.latest = d;
-  }
-
-  Object.entries(obj).forEach(([k,v])=>{
-    deepScan(v,result,path+"."+k);
-  });
-
-  return result;
-}
-
-function analyzeState(json){
-  let tx=0, latest="", months=0, reminders=0, wishlist=0, checklist=0;
-  const deep = deepScan(json);
-
-  tx = deep.count;
-  latest = deep.latest;
-  const monthKeys=[];
-
-  if(json && json.months && typeof json.months==="object"){
-    const entries=Object.entries(json.months);
-    months=entries.length;
-    for(const [mKey,m] of entries){
-      monthKeys.push(mKey);
-      const arr=Array.isArray(m?.transactions)?m.transactions:[];
-      tx+=arr.length;
-      for(const t of arr){
-        const d=normalizeDate(t?.date);
-        if(d && (!latest || d>latest)) latest=d;
-      }
-    }
-  }
-
-  reminders=Array.isArray(json?.reminders)?json.reminders.length:0;
-  wishlist=Array.isArray(json?.wishlist)?json.wishlist.length:0;
-  checklist=Array.isArray(json?.checklist)?json.checklist.length:0;
-
-  return {
-    tx, latest, months, reminders, wishlist, checklist,
-    activeMonth:json?.activeMonth || "",
-    monthKeys:monthKeys.sort()
-  };
-}
-
-async function getFileJson(id){
-  if(fileCache.has(id)) return fileCache.get(id);
-  const r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{
-    headers:{Authorization:"Bearer "+token}
-  });
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  const text=await r.text();
-  let json;
-  try{ json=JSON.parse(text); }
-  catch(e){ json={__raw:text,__parseError:true}; }
-  fileCache.set(id,json);
-  return json;
+async function read(id){
+ let r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,
+ {headers:{Authorization:"Bearer "+token}});
+ let t=await r.text();
+ try{return JSON.parse(t)}catch{return {}}
 }
 
 async function scan(){
-  if(!token){ alert("اول Login Google را بزن."); return; }
-  setStatus("در حال خواندن فایل‌های Drive...");
-  fileCache.clear();
+ if(!token)return alert("Login کن");
+ out.innerHTML="در حال اسکن...";
+ let r=await fetch(
+ "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields=files(id,name,size,modifiedTime,createdTime)",
+ {headers:{Authorization:"Bearer "+token}});
+ let d=await r.json();
 
-  try{
-    const r=await fetch(
-      "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=1000&orderBy=modifiedTime%20desc&fields=files(id,name,size,modifiedTime,createdTime,mimeType)",
-      {headers:{Authorization:"Bearer "+token}}
-    );
-    const data=await r.json();
-    if(!r.ok) throw new Error(data?.error?.message || "Drive API error");
+ let html="";
+ for(let f of (d.files||[])){
+   let json=await read(f.id);
+   let res={count:0,latest:""};
+   findData(json,res);
 
-    const files=data.files || [];
-    const host=document.getElementById("files");
-    host.innerHTML="";
+   let income="";
+   if(json.months){
+    Object.values(json.months).forEach(m=>{
+      if(m.budget && m.budget.income) income=m.budget.income;
+    })
+   }
 
-    if(!files.length){
-      host.innerHTML='<div class="empty">هیچ فایلی در appDataFolder پیدا نشد.</div>';
-      setStatus("اسکن تمام شد؛ فایلی پیدا نشد.");
-      return;
-    }
-
-    for(const f of files){
-      let analysis={tx:"?",latest:"",months:"?",reminders:"?",wishlist:"?",checklist:"?",activeMonth:""};
-      let readError="";
-      try{
-        const json=await getFileJson(f.id);
-        if(!json.__parseError) analysis=analyzeState(json);
-        else readError="JSON نامعتبر / ساختار غیر JSON";
-      }catch(e){ readError=e.message; }
-
-      const card=document.createElement("div");
-      card.className="file";
-      card.id="file_"+f.id;
-      card.innerHTML=`
-        <div class="row">
-          <div>
-            <div class="name">${esc(f.name || "(بدون نام)")}</div>
-            <div class="meta">
-              آخرین تغییر: ${esc(new Date(f.modifiedTime).toLocaleString("fa-IR"))}<br>
-              ساخته شده: ${esc(new Date(f.createdTime).toLocaleString("fa-IR"))}<br>
-              حجم: ${esc(f.size || "0")} bytes<br>
-              ID: <span dir="ltr">${esc(f.id)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="badges">
-          <span class="badge good">تراکنش: ${esc(analysis.tx)}</span>
-          <span class="badge">آخرین تاریخ دیتا: ${esc(analysis.latest || "—")}</span>
-          <span class="badge">ماه‌ها: ${esc(analysis.months)}</span>
-          <span class="badge">Active: ${esc(analysis.activeMonth || "—")}</span>
-          <span class="badge">یادآور: ${esc(analysis.reminders)}</span>
-          <span class="badge">۳۰ روز: ${esc(analysis.wishlist)}</span>
-          <span class="badge">چک‌لیست: ${esc(analysis.checklist)}</span>
-        </div>
-
-        ${readError ? `<div class="meta" style="color:#ff7b86">خطا: ${esc(readError)}</div>` : ""}
-
-        <div class="actions">
-          <button onclick="togglePreview('${f.id}')">Preview JSON</button>
-          <button class="green" onclick="downloadJson('${f.id}','${esc(f.name)}')">Download JSON</button>
-          <button class="primary" onclick="downloadCsv('${f.id}')">Download CSV برای Import اپ</button>
-        </div>
-        <pre id="preview_${f.id}" class="preview hidden"></pre>
-      `;
-      host.appendChild(card);
-    }
-    setStatus(`${files.length} فایل پیدا شد. لیست از جدیدترین تغییر به قدیمی‌ترین مرتب شده.`);
-  }catch(e){
-    console.error(e);
-    setStatus("خطا در Scan Drive: "+e.message);
-  }
-}
-
-async function togglePreview(id){
-  const p=document.getElementById("preview_"+id);
-  if(!p) return;
-  if(!p.classList.contains("hidden")){
-    p.classList.add("hidden");
-    return;
-  }
-  try{
-    const json=await getFileJson(id);
-    p.textContent=JSON.stringify(json,null,2);
-    p.classList.remove("hidden");
-  }catch(e){
-    p.textContent="ERROR: "+e.message;
-    p.classList.remove("hidden");
-  }
-}
-
-function downloadBlob(text,type,name){
-  const blob=new Blob([text],{type});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-
-async function downloadJson(id,name){
-  const json=await getFileJson(id);
-  const safe=(name || "kakeibo_recovered.json").replace(/[^\w.\-]+/g,"_");
-  downloadBlob(JSON.stringify(json,null,2),"application/json;charset=utf-8",safe.endsWith(".json")?safe:safe+".json");
-}
-
-function csvEscape(v){
-  const s=v===null||v===undefined?"":String(v);
-  return `"${s.replace(/"/g,'""')}"`;
-}
-
-function monthKeyFromDate(dateStr){
-  const n=normalizeDate(dateStr);
-  const p=n.split("/");
-  return p.length>=2?`${p[0]}-${p[1]}`:"";
-}
-
-async function downloadCsv(id){
-  const state=await getFileJson(id);
-  if(!state || !state.months){
-    alert("این فایل ساختار Kakeibo قابل تبدیل ندارد.");
-    return;
-  }
-
-  const rows=[];
-  rows.push(["نوع رکورد","شناسه","ماه/سال","تاریخ","دسته‌بندی/نوع","عنوان/توضیح","مبلغ (تومان)","جزئیات JSON"]);
-
-  Object.keys(state.months).sort().forEach(mKey=>{
-    const m=state.months[mKey] || {};
-    rows.push(["بودجه",`budget_${mKey}`,mKey,"","","","",JSON.stringify(m.budget||{})]);
-    rows.push(["یادداشت",`notes_${mKey}`,mKey,"","",m.notes||"","",""]);
-    (m.paidReminders||[]).forEach(remId=>rows.push(["پرداخت یادآور",remId,mKey,"","","","",""]));
-    (m.transactions||[]).forEach(t=>rows.push([
-      "تراکنش",t.id||"",mKey,t.date||"",
-      t.type==="expense"?`هزینه (${t.category||""})`:`درآمد (${t.incomeType||""})`,
-      t.title||t.desc||"",t.amount||0,JSON.stringify(t)
-    ]));
-  });
-
-  (state.reminders||[]).forEach(r=>rows.push([
-    "یادآور",r.id||"",monthKeyFromDate(r.dueDate),r.dueDate||"",r.cycle||"",
-    r.title||"",r.amount||0,JSON.stringify(r)
-  ]));
-
-  (state.wishlist||[]).forEach(w=>rows.push([
-    "۳۰ روز انتظار",w.id||"","",w.date||"","خواسته",w.title||"",w.amount||0,JSON.stringify(w)
-  ]));
-
-  (state.checklist||[]).forEach(c=>rows.push([
-    "چک‌لیست",c.id||"",c.date?monthKeyFromDate(c.date):"",c.date||"",
-    c.completed?"انجام‌شده":"در انتظار",c.title||"",c.amount||0,JSON.stringify(c)
-  ]));
-
-  rows.push(["تنظیمات","app_state_meta",state.activeMonth||"","","","","",JSON.stringify({activeMonth:state.activeMonth||""})]);
-
-  const csv="\uFEFF"+rows.map(r=>r.map(csvEscape).join(",")).join("\n");
-  downloadBlob(csv,"text/csv;charset=utf-8",`kakeibo_recovered_${Date.now()}.csv`);
+   html+=`
+   <div class="card">
+   <b>${f.name}</b><br>
+   تغییر: ${new Date(f.modifiedTime).toLocaleString("fa-IR")}<br>
+   حجم: ${f.size||0}<br>
+   تراکنش: <span class="good">${res.count}</span><br>
+   آخرین تاریخ دیتا: ${res.latest||"-"}<br>
+   درآمد پیدا شده: ${income||"-"}<br>
+   ID: ${f.id}
+   </div>`;
+ }
+ out.innerHTML=html||"فایلی پیدا نشد";
 }
 </script>
 </body>
