@@ -2213,7 +2213,7 @@
                 fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-[#5e5ce6]' }
             };
 
-            [...list].reverse().forEach(t => {
+            list.forEach(t => {
                 const isExp = t.type === 'expense';
                 const catInfo = catMap[t.category] || {};
                 let titleText = t.title || t.desc || '';
