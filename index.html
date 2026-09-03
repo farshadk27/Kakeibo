@@ -3253,44 +3253,85 @@ function compareJalaliForSort(a, b) {
             return score;
         }
 
+        function mergeKakeiboStates(localData, cloudData) {
+            if (!localData || !localData.months) return cloudData || localData;
+            if (!cloudData || !cloudData.months) return localData;
+
+            const merged = JSON.parse(JSON.stringify(cloudData));
+
+            merged.months = merged.months || {};
+            Object.keys(localData.months).forEach(mKey => {
+                if (!merged.months[mKey]) {
+                    merged.months[mKey] = localData.months[mKey];
+                    return;
+                }
+
+                const localMonth = localData.months[mKey];
+                const cloudMonth = merged.months[mKey];
+
+                const txMap = new Map();
+                [...(cloudMonth.transactions || []), ...(localMonth.transactions || [])]
+                    .forEach(t => txMap.set(String(t.id), t));
+                cloudMonth.transactions = Array.from(txMap.values());
+
+                cloudMonth.budget = Object.assign({}, localMonth.budget || {}, cloudMonth.budget || {});
+                if ((localMonth.notes || '').length > (cloudMonth.notes || '').length) {
+                    cloudMonth.notes = localMonth.notes;
+                }
+            });
+
+            ['reminders', 'wishlist', 'checklist'].forEach(key => {
+                const map = new Map();
+                [...(cloudData[key] || []), ...(localData[key] || [])]
+                    .forEach(item => map.set(String(item.id), item));
+                merged[key] = Array.from(map.values());
+            });
+
+            return merged;
+        }
+
         async function fetchFromDrive() {
             try {
                 const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
+
                 const searchData = await searchRes.json();
+
                 if (searchData.files && searchData.files.length > 0) {
                     searchData.files.sort((a,b) => new Date(b.modifiedTime || 0) - new Date(a.modifiedTime || 0));
                     driveFileId = searchData.files[0].id;
+
                     const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
+
                     const cloudData = await fileRes.json();
-                    const localRaw = localStorage.getItem(getStorageKey());
+
                     let localData = null;
-                    try { localData = localRaw ? JSON.parse(localRaw) : null; } catch(e) {}
+                    try {
+                        localData = JSON.parse(localStorage.getItem(getStorageKey()) || 'null');
+                    } catch(e) {}
 
-                    // جلوگیری از پاک شدن دیتای کامل‌تر با فایل Drive ناقص/قدیمی
-                    const cloudScore = getStateDataScore(cloudData);
-                    const localScore = getStateDataScore(localData);
-
-                    if (cloudScore >= localScore && cloudData && cloudData.months) {
-                        state = cloudData;
-                    } else if (localData && localData.months) {
-                        state = localData;
-                        // نسخه کامل‌تر را دوباره روی Drive ذخیره کن
-                        setTimeout(() => syncToDrive(), 500);
-                    }
+                    // همیشه دیتای Drive و Local را ترکیب می‌کند تا تراکنش‌های قدیمی حذف نشوند
+                    state = mergeKakeiboStates(localData, cloudData);
 
                     if (!state.reminders) state.reminders = [];
                     if (!state.wishlist) state.wishlist = [];
                     if (!state.checklist) state.checklist = [];
+
                     localStorage.setItem(getStorageKey(), JSON.stringify(state));
+
                     populateYearAndMonthDropdowns();
                     renderAll();
+
+                    // بعد از merge نسخه کامل را روی Drive نگه می‌دارد
+                    await syncToDrive();
+
                 } else {
                     await syncToDrive();
                 }
+
             } catch (err) {
                 console.error('Fetch Drive error', err);
             }
@@ -3298,6 +3339,7 @@ function compareJalaliForSort(a, b) {
 
         async function syncToDrive() {
             if (!accessToken) return;
+
             const fileContent = JSON.stringify(state);
             const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
 
@@ -3306,20 +3348,33 @@ function compareJalaliForSort(a, b) {
                     const form = new FormData();
                     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
                     form.append('file', new Blob([fileContent], { type: 'application/json' }));
+
                     const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
                         method: 'POST',
                         headers: { Authorization: `Bearer ${accessToken}` },
                         body: form
                     });
+
                     const data = await res.json();
                     driveFileId = data.id;
+
                 } else {
                     await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
                         method: 'PATCH',
-                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: fileContent
                     });
                 }
+
+                const status = document.getElementById('syncStatus');
+                if (status) {
+                    status.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> همگام‌سازی شد';
+                    status.className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                }
+
             } catch (err) {
                 console.error('Sync Drive error', err);
             }
