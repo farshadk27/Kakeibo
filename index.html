@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>دفترچه مالی کاکیبو | Kakeibo</title>
+    <title>Kakeibo</title>
     
     <link rel="icon" type="image/jpeg" href="./logo.jpg?v=11">
     <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=11">
@@ -2017,7 +2017,26 @@
             }
         }
 
-        function renderAll() {
+        
+function updateDailyBudgetColor() {
+    const card = document.getElementById('remBudgetCard');
+    const display = document.getElementById('remBudgetDisplay');
+    if (!card || !display) return;
+
+    const value = Number(
+        display.innerText
+        .replace(/,/g,'')
+        .replace(/[^\d\-]/g,'')
+    );
+
+    if (value < 0) {
+        card.classList.add('budget-negative');
+    } else {
+        card.classList.remove('budget-negative');
+    }
+}
+
+function renderAll() {
             const sortEl = document.getElementById('dailySortFilter');
             if (sortEl) sortEl.value = getSortPreference();
             ensureMonthExists(state.activeMonth);
@@ -2047,11 +2066,12 @@
             const remBudgetCard = document.getElementById('remBudgetCard');
             const remBudgetDisplay = document.getElementById('remBudgetDisplay');
             if (remBudget < 0) {
-                remBudgetCard.className = 'p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-red-950/70 border border-red-500/60 shadow-lg shadow-red-900/30';
-                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a]';
+                remBudgetCard.className = 'budget-negative p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-red-950/70 border border-red-500/60 shadow-lg shadow-red-900/30';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a] !important';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             } else {
                 remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-emerald-950/50 border border-[#30d158]/40 shadow-lg shadow-emerald-900/20';
+                remBudgetCard.classList.remove('budget-negative');
                 remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#30d158]';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             }
@@ -3286,5 +3306,9 @@ function compareJalaliForSort(a, b) {
 #remBudgetCard.budget-negative {
     background: linear-gradient(145deg, rgba(120,20,35,.9), rgba(55,8,15,.95)) !important;
     border-color: rgba(255,69,58,.55) !important;
+}
+#remBudgetCard.budget-negative #remBudgetDisplay {
+    color: #ff453a !important;
+    text-shadow: 0 0 24px rgba(255,69,58,.35) !important;
 }
 </style>
