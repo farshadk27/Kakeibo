@@ -3264,6 +3264,7 @@
                 const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
+
                 const searchData = await searchRes.json();
 
                 if (searchData.files && searchData.files.length > 0) {
@@ -3274,16 +3275,29 @@
                     });
 
                     const cloudData = await fileRes.json();
+                    const localRaw = localStorage.getItem(getStorageKey());
+                    let localData = null;
 
-                    // فقط دیتای واقعی را جایگزین کن؛ هیچ state خالی روی دیتای کاربر overwrite نشود
+                    try {
+                        localData = localRaw ? JSON.parse(localRaw) : null;
+                    } catch(e) {}
+
+                    // فقط وقتی دیتای Drive واقعی است جایگزین کن
+                    // هیچ دیتای خالی یا ناقص روی اطلاعات قبلی ننویس
                     if (cloudData && cloudData.months && Object.keys(cloudData.months).length > 0) {
-                        state = cloudData;
+                        const cloudCount = Object.keys(cloudData.months).length;
+                        const localCount = localData && localData.months ? Object.keys(localData.months).length : 0;
+
+                        if (cloudCount >= localCount || localCount === 0) {
+                            state = cloudData;
+                            localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                        } else {
+                            state = localData;
+                        }
 
                         if (!state.reminders) state.reminders = [];
                         if (!state.wishlist) state.wishlist = [];
                         if (!state.checklist) state.checklist = [];
-
-                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
 
                         populateYearAndMonthDropdowns();
                         renderAll();
@@ -3296,7 +3310,7 @@
             }
         }
 
-        async function syncToDrive() {
+                async function syncToDrive() {
             if (!accessToken) return;
             const fileContent = JSON.stringify(state);
             const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
