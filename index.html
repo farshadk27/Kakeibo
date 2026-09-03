@@ -801,6 +801,14 @@
                         <option value="fixed">🔒 هزینه ثابت</option>
                         <option value="income">💰 درآمدها / ورودی</option>
                     </select>
+                    <select id="dailySortSelect" onchange="applyTxFilters(); saveDailySort()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200 mt-2">
+                        <option value="date_desc">مرتب‌سازی: تاریخ (جدیدترین)</option>
+                        <option value="date_asc">تاریخ (قدیمی‌ترین)</option>
+                        <option value="created_desc">آخرین ثبت</option>
+                        <option value="updated_desc">آخرین تغییر</option>
+                        <option value="amount_desc">بیشترین مبلغ</option>
+                        <option value="amount_asc">کمترین مبلغ</option>
+                    </select>
 
                     <div class="relative flex items-center">
                         <input type="text" id="dailyDateFilter" placeholder="فیلتر بر اساس روز" readonly onclick="toggleInlineCalendar('dailyDateFilter', 'dailyDateFilterCal')" class="w-full ios-input rounded-xl pr-2.5 pl-7 py-1.5 text-[11px] text-zinc-200 cursor-pointer">
@@ -2044,8 +2052,8 @@
                 remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a]';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             } else {
-                remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-emerald-950/50 border border-[#30d158]/40 shadow-lg shadow-emerald-900/20';
-                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#30d158]';
+                remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 ios-blur bg-[#0a84ff]/10 border border-[#0a84ff]/30 shadow-lg shadow-blue-900/20';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#0a84ff]';
                 remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             }
 
@@ -2067,6 +2075,8 @@
             document.getElementById('monthlyNotesArea').value = curr.notes || '';
             updateLiveDisposable();
 
+            const sortSelect = document.getElementById('dailySortSelect');
+            if (sortSelect) sortSelect.value = localStorage.getItem('kakeibo_daily_sort') || 'date_desc';
             applyTxFilters();
             renderChecklist();
             renderReminders();
@@ -2116,7 +2126,23 @@
                 return true;
             });
 
-            renderTxList(filtered);
+            const sortMode = localStorage.getItem('kakeibo_daily_sort') || 'date_desc';
+            const sorted = [...filtered].sort((a, b) => {
+                if (sortMode === 'created_desc') return (Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0));
+                if (sortMode === 'updated_desc') return (Number(b.updatedAt || b.createdAt || b.id || 0) - Number(a.updatedAt || a.createdAt || a.id || 0));
+                if (sortMode === 'amount_desc') return (b.amount || 0) - (a.amount || 0);
+                if (sortMode === 'amount_asc') return (a.amount || 0) - (b.amount || 0);
+                const da = normalizeJalaliDate(a.date || '');
+                const db = normalizeJalaliDate(b.date || '');
+                return sortMode === 'date_asc' ? da.localeCompare(db) : db.localeCompare(da);
+            });
+
+            renderTxList(sorted);
+        }
+
+        function saveDailySort() {
+            const el = document.getElementById('dailySortSelect');
+            if (el) localStorage.setItem('kakeibo_daily_sort', el.value);
         }
 
         function renderTxList(list) {
