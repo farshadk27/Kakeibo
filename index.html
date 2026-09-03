@@ -9,81 +9,7 @@
     <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=11">
     <link rel="apple-touch-icon" href="./logo.jpg?v=11">
 
-    <script src="https://cdn.tailwindcss.com">
-async function debugDriveFiles() {
-    if (!accessToken) {
-        alert("اول با گوگل لاگین کن");
-        return;
-    }
-
-    try {
-        const res = await fetch(
-            'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,name,size,modifiedTime)',
-            {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            }
-        );
-
-        const data = await res.json();
-        let report = "Drive Debug Report\n\n";
-
-        if (!data.files || data.files.length === 0) {
-            report += "هیچ فایل kakeibo_store.json پیدا نشد.";
-        } else {
-            for (const file of data.files) {
-                report += "----------------------\n";
-                report += "ID: " + file.id + "\n";
-                report += "Modified: " + file.modifiedTime + "\n";
-                report += "Size: " + (file.size || "unknown") + "\n";
-
-                try {
-                    const fileRes = await fetch(
-                        `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
-                        {
-                            headers: { Authorization: `Bearer ${accessToken}` }
-                        }
-                    );
-
-                    const content = await fileRes.json();
-
-                    let count = 0;
-                    let latest = "";
-
-                    if (content.months) {
-                        Object.keys(content.months).forEach(y => {
-                            Object.keys(content.months[y]).forEach(m => {
-                                const monthData = content.months[y][m];
-                                if (Array.isArray(monthData.transactions)) {
-                                    count += monthData.transactions.length;
-
-                                    monthData.transactions.forEach(t => {
-                                        if (t.date && t.date > latest) {
-                                            latest = t.date;
-                                        }
-                                    });
-                                }
-                            });
-                        });
-                    }
-
-                    report += "Transactions: " + count + "\n";
-                    report += "Latest transaction date: " + latest + "\n";
-
-                } catch(e) {
-                    report += "Read error: " + e.message + "\n";
-                }
-            }
-        }
-
-        console.log(report);
-        alert(report);
-
-    } catch(err) {
-        alert("Debug error: " + err.message);
-    }
-}
-
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -389,7 +315,7 @@ async function debugDriveFiles() {
             font-size: 13px !important;
             color: #8290aa !important;
         }
-        #dailyCatFilter, #dailyDateFilter {
+        #dailyCatFilter, #dailyDateFilter, #dailySortFilter {
             min-height: 36px;
             border-radius: 14px !important;
         }
@@ -866,6 +792,11 @@ async function debugDriveFiles() {
                 </div>
                 
                 <div class="grid grid-cols-2 gap-2">
+                    <select id="dailySortFilter" onchange="saveSortPreference(); applyTxFilters()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200">
+                        <option value="newest">جدیدترین</option>
+                        <option value="oldest">قدیمی‌ترین</option>
+                        <option value="updated">آخرین تغییرات</option>
+                    </select>
                     <select id="dailyCatFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200">
                         <option value="all">همه دسته‌بندی‌ها</option>
                         <option value="needs">🍜 نیازها</option>
@@ -2087,6 +2018,8 @@ async function debugDriveFiles() {
         }
 
         function renderAll() {
+            const sortEl = document.getElementById('dailySortFilter');
+            if (sortEl) sortEl.value = getSortPreference();
             ensureMonthExists(state.activeMonth);
             const curr = state.months[state.activeMonth];
 
@@ -2148,7 +2081,23 @@ async function debugDriveFiles() {
             renderReflection(state.activeMonth);
         }
 
-        // --- FILTER & SEARCH IN DAILY TRANSACTIONS ---
+        
+function getSortPreference() {
+    return localStorage.getItem('kakeibo_tx_sort') || 'newest';
+}
+
+function saveSortPreference() {
+    const el = document.getElementById('dailySortFilter');
+    if (el) localStorage.setItem('kakeibo_tx_sort', el.value);
+}
+
+function compareJalaliForSort(a, b) {
+    const pa = normalizeJalaliDate(a).split('/').map(Number);
+    const pb = normalizeJalaliDate(b).split('/').map(Number);
+    return (pa[0]-pb[0]) || (pa[1]-pb[1]) || (pa[2]-pb[2]);
+}
+
+// --- FILTER & SEARCH IN DAILY TRANSACTIONS ---
         function applyTxFilters() {
             ensureMonthExists(state.activeMonth);
             const list = state.months[state.activeMonth].transactions || [];
@@ -2190,6 +2139,15 @@ async function debugDriveFiles() {
                 return true;
             });
 
+            const sortMode = getSortPreference();
+            if (sortMode === 'oldest') {
+                filtered.sort((a,b) => compareJalaliForSort(a.date, b.date));
+            } else if (sortMode === 'updated') {
+                filtered.sort((a,b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+            } else {
+                filtered.sort((a,b) => compareJalaliForSort(b.date, a.date));
+            }
+
             renderTxList(filtered);
         }
 
@@ -2211,7 +2169,7 @@ async function debugDriveFiles() {
                 fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-[#5e5ce6]' }
             };
 
-            [...list].reverse().forEach(t => {
+            list.forEach(t => {
                 const isExp = t.type === 'expense';
                 const catInfo = catMap[t.category] || {};
                 let titleText = t.title || t.desc || '';
@@ -3170,9 +3128,14 @@ async function debugDriveFiles() {
             }
         }
 
+        let syncTimer = null;
+
         function saveState() {
             localStorage.setItem(getStorageKey(), JSON.stringify(state));
-            if (accessToken) syncToDrive();
+            if (accessToken) {
+                clearTimeout(syncTimer);
+                syncTimer = setTimeout(() => syncToDrive(), 700);
+            }
         }
 
         function loadLocalState() {
@@ -3259,49 +3222,29 @@ async function debugDriveFiles() {
 
         async function fetchFromDrive() {
             try {
-                const searchRes = await fetch(
-                    'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,name,modifiedTime)',
-                    {
-                        headers: { Authorization: `Bearer ${accessToken}` }
-                    }
-                );
-
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
                 const searchData = await searchRes.json();
-
                 if (searchData.files && searchData.files.length > 0) {
-                    // اگر چند فایل وجود داشت، جدیدترین نسخه را بخوان
-                    searchData.files.sort((a, b) =>
-                        new Date(b.modifiedTime) - new Date(a.modifiedTime)
-                    );
-
+                    searchData.files.sort((a,b) => new Date(b.modifiedTime || 0) - new Date(a.modifiedTime || 0));
                     driveFileId = searchData.files[0].id;
-
-                    const fileRes = await fetch(
-                        `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
-                        {
-                            headers: { Authorization: `Bearer ${accessToken}` }
-                        }
-                    );
-
+                    const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
                     const cloudData = await fileRes.json();
-
                     if (cloudData && cloudData.months) {
                         state = cloudData;
-
                         if (!state.reminders) state.reminders = [];
                         if (!state.wishlist) state.wishlist = [];
                         if (!state.checklist) state.checklist = [];
-
                         localStorage.setItem(getStorageKey(), JSON.stringify(state));
-
                         populateYearAndMonthDropdowns();
                         renderAll();
                     }
                 } else {
-                    // فقط وقتی واقعاً فایل درایو وجود ندارد بساز
-                    await syncToDrive();
+                    syncToDrive();
                 }
-
             } catch (err) {
                 console.error('Fetch Drive error', err);
             }
@@ -3309,69 +3252,28 @@ async function debugDriveFiles() {
 
         async function syncToDrive() {
             if (!accessToken) return;
-
             const fileContent = JSON.stringify(state);
-            const metadata = {
-                name: 'kakeibo_store.json',
-                parents: ['appDataFolder']
-            };
+            const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
 
             try {
                 if (!driveFileId) {
-                    const searchRes = await fetch(
-                        'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,modifiedTime)',
-                        {
-                            headers: { Authorization: `Bearer ${accessToken}` }
-                        }
-                    );
-
-                    const searchData = await searchRes.json();
-
-                    if (searchData.files && searchData.files.length > 0) {
-                        searchData.files.sort((a, b) =>
-                            new Date(b.modifiedTime) - new Date(a.modifiedTime)
-                        );
-                        driveFileId = searchData.files[0].id;
-                    }
-                }
-
-                if (!driveFileId) {
                     const form = new FormData();
-                    form.append(
-                        'metadata',
-                        new Blob([JSON.stringify(metadata)], { type: 'application/json' })
-                    );
-                    form.append(
-                        'file',
-                        new Blob([fileContent], { type: 'application/json' })
-                    );
-
-                    const res = await fetch(
-                        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-                        {
-                            method: 'POST',
-                            headers: { Authorization: `Bearer ${accessToken}` },
-                            body: form
-                        }
-                    );
-
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', new Blob([fileContent], { type: 'application/json' }));
+                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        body: form
+                    });
                     const data = await res.json();
                     driveFileId = data.id;
-
                 } else {
-                    await fetch(
-                        `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,
-                        {
-                            method: 'PATCH',
-                            headers: {
-                                Authorization: `Bearer ${accessToken}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: fileContent
-                        }
-                    );
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: fileContent
+                    });
                 }
-
             } catch (err) {
                 console.error('Sync Drive error', err);
             }
@@ -3379,3 +3281,10 @@ async function debugDriveFiles() {
     </script>
 </body>
 </html>
+
+<style>
+#remBudgetCard.budget-negative {
+    background: linear-gradient(145deg, rgba(120,20,35,.9), rgba(55,8,15,.95)) !important;
+    border-color: rgba(255,69,58,.55) !important;
+}
+</style>
