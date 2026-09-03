@@ -9,7 +9,81 @@
     <link rel="shortcut icon" type="image/jpeg" href="./logo.jpg?v=11">
     <link rel="apple-touch-icon" href="./logo.jpg?v=11">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+async function debugDriveFiles() {
+    if (!accessToken) {
+        alert("اول با گوگل لاگین کن");
+        return;
+    }
+
+    try {
+        const res = await fetch(
+            'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"&fields=files(id,name,size,modifiedTime)',
+            {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            }
+        );
+
+        const data = await res.json();
+        let report = "Drive Debug Report\n\n";
+
+        if (!data.files || data.files.length === 0) {
+            report += "هیچ فایل kakeibo_store.json پیدا نشد.";
+        } else {
+            for (const file of data.files) {
+                report += "----------------------\n";
+                report += "ID: " + file.id + "\n";
+                report += "Modified: " + file.modifiedTime + "\n";
+                report += "Size: " + (file.size || "unknown") + "\n";
+
+                try {
+                    const fileRes = await fetch(
+                        `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
+                        {
+                            headers: { Authorization: `Bearer ${accessToken}` }
+                        }
+                    );
+
+                    const content = await fileRes.json();
+
+                    let count = 0;
+                    let latest = "";
+
+                    if (content.months) {
+                        Object.keys(content.months).forEach(y => {
+                            Object.keys(content.months[y]).forEach(m => {
+                                const monthData = content.months[y][m];
+                                if (Array.isArray(monthData.transactions)) {
+                                    count += monthData.transactions.length;
+
+                                    monthData.transactions.forEach(t => {
+                                        if (t.date && t.date > latest) {
+                                            latest = t.date;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+
+                    report += "Transactions: " + count + "\n";
+                    report += "Latest transaction date: " + latest + "\n";
+
+                } catch(e) {
+                    report += "Read error: " + e.message + "\n";
+                }
+            }
+        }
+
+        console.log(report);
+        alert(report);
+
+    } catch(err) {
+        alert("Debug error: " + err.message);
+    }
+}
+
+</script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
