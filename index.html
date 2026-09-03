@@ -95,7 +95,11 @@
             overscroll-behavior: contain;
         }
 
-        /* Apple-inspired premium UI skin */
+
+        /* =========================================================
+           Kakeibo — Apple-inspired premium UI skin
+           Visual-only layer. Application logic / IDs remain intact.
+           ========================================================= */
         :root {
             --ios-bg: #050816;
             --ios-card: rgba(15, 23, 42, 0.68);
@@ -207,6 +211,7 @@
             z-index: 2;
         }
 
+        /* General Apple-like cards */
         #appMain .rounded-3xl {
             border-radius: 26px !important;
         }
@@ -294,7 +299,7 @@
             border-radius: 50%; background: rgba(255,255,255,.12);
         }
 
-        /* Search / filters */
+        /* Search / filters as compact command center */
         #tab-daily > .ios-blur.rounded-3xl.p-3\.5 {
             padding: 12px !important;
             background: linear-gradient(145deg, rgba(20,28,48,.82), rgba(10,15,29,.82)) !important;
@@ -315,7 +320,7 @@
             border-radius: 14px !important;
         }
 
-        /* Transaction list */
+        /* Transaction panel / list */
         #tab-daily > .ios-blur.rounded-3xl.p-4 {
             padding: 14px !important;
             background: linear-gradient(155deg, rgba(18,25,43,.79), rgba(7,12,24,.82)) !important;
@@ -356,6 +361,7 @@
         }
         #txList button:hover { background: rgba(255,255,255,.09); }
 
+        /* Date filter = floating premium popover */
         #dailyDateFilterCal {
             background: linear-gradient(155deg, rgba(25,34,55,.98), rgba(8,14,27,.985)) !important;
             border: 1px solid rgba(255,255,255,.11) !important;
@@ -371,6 +377,7 @@
         }
         #dailyDateFilterCal button:active { transform: scale(.92); }
 
+        /* All secondary sections */
         .tab-content > .ios-blur,
         .tab-content > div.ios-blur {
             border-color: rgba(255,255,255,.075) !important;
@@ -382,6 +389,7 @@
             box-shadow: 0 12px 25px rgba(47,124,255,.18) !important;
         }
 
+        /* Bottom sheets / modals */
         #checklistModal, #payConfirmModal, #wishlistModal, #reminderModal, #expenseModal, #incomeModal {
             background: rgba(1,4,12,.72) !important;
             backdrop-filter: blur(18px) !important;
@@ -417,6 +425,7 @@
             box-shadow: 0 14px 30px rgba(255,201,40,.14) !important;
         }
 
+        /* Premium floating bottom nav */
         body > nav.fixed.bottom-0 {
             position: fixed !important;
             left: 50% !important;
@@ -467,11 +476,13 @@
         .tab-btn[data-tab="daily"] span { color: white !important; font-size: 8.5px !important; }
         .tab-btn:active { transform: scale(.93); }
 
+        /* Fine typography / separators */
         h1, h2, h3, .font-bold { letter-spacing: -.025em; }
         .text-zinc-400 { color: #9ba5b9 !important; }
         .text-zinc-500 { color: #738097 !important; }
         hr, [class*="border-white/"] { border-color: rgba(255,255,255,.07); }
 
+        /* Desktop: preserve mobile-app proportions */
         @media (min-width: 640px) {
             #appMain { max-width: 480px !important; }
             #appHeader > div { max-width: 480px !important; }
@@ -481,6 +492,7 @@
             }
         }
 
+        /* Small iPhones: keep header controls usable */
         @media (max-width: 390px) {
             #appHeader { padding-left: 8px !important; padding-right: 8px !important; }
             #appHeader > div { gap: 4px !important; padding-left: 6px; padding-right: 6px; }
@@ -500,11 +512,13 @@
             *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
         }
 
+        /* ===== iPhone safe-area + overlay stability fixes ===== */
         :root {
             --app-header-content-h: 66px;
             --app-bottom-nav-h: 78px;
         }
 
+        /* A previous generic ID rule could beat Tailwind's .fixed class. */
         #appHeader {
             position: fixed !important;
             top: 0 !important;
@@ -524,6 +538,7 @@
             min-height: 100dvh;
         }
 
+        /* Remove accidental top gaps inside every tab. */
         .tab-content {
             margin-top: 0 !important;
             padding-top: 0 !important;
@@ -537,6 +552,7 @@
             margin: 0 !important;
         }
 
+        /* Modals must always sit above both fixed bars. */
         #checklistModal, #payConfirmModal, #wishlistModal, #reminderModal, #expenseModal, #incomeModal {
             z-index: 600 !important;
             padding-top: env(safe-area-inset-top) !important;
@@ -557,11 +573,13 @@
             padding-bottom: 8px;
         }
 
+        /* Calendar/select popovers inside sheets should not be hidden by the fixed nav. */
         #remDateCal, #remEndDateCal, #checkDateCal, #payDateCal, #wishDateCal,
         #expDateCal, #incDateCal, #dailyDateFilterCal {
             z-index: 680 !important;
         }
 
+        /* iOS time input: keep a practical touch target without filling the whole sheet. */
         #remNotifyTime {
             width: 100% !important;
             max-width: 180px;
@@ -570,6 +588,7 @@
             text-align: center;
         }
 
+        /* Dedicated edit-scope chooser for recurring installments. */
         body.modal-open { overflow: hidden !important; }
 
         #seriesEditChoiceModal {
@@ -584,6 +603,8 @@
             #appMain { padding-left: 12px !important; padding-right: 12px !important; }
         }
 
+
+        /* ===== v3: fixed shell + middle-only scrolling ===== */
         :root {
             --measured-header-h: calc(74px + env(safe-area-inset-top));
             --measured-nav-h: calc(88px + env(safe-area-inset-bottom));
@@ -658,22 +679,6 @@
             #appMain { padding-left: 16px !important; padding-right: 16px !important; }
         }
 
-        /* Budget card negative state */
-        #remBudgetCard.budget-negative {
-            background: linear-gradient(145deg, rgba(80,20,30,.96), rgba(35,12,20,.96)) !important;
-            border-color: rgba(255,80,100,.65) !important;
-            box-shadow: 0 0 35px rgba(255,60,80,.18) !important;
-        }
-        #remBudgetCard.budget-negative #remBudgetDisplay,
-        #remBudgetDisplay.budget-negative-text {
-            color: #ff6478 !important;
-            text-shadow: 0 0 18px rgba(255,80,100,.35) !important;
-        }
-        #dailySortFilter {
-            min-height: 44px !important;
-            height: 44px !important;
-            border-radius: 14px !important;
-        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col justify-between select-none overflow-x-hidden">
@@ -685,9 +690,9 @@
                 <img src="./logo.jpg?v=11" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1c1c1e/0a84ff?text=K';" class="w-8 h-8 rounded-full object-cover border border-white/10 shadow-sm shrink-0">
                 <div class="flex flex-col">
                     <h1 class="font-bold text-[13px] tracking-tight whitespace-nowrap text-white">دفترچه کاکیبو</h1>
-                    <button onclick="handleManualSync()" id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap hover:opacity-80 transition cursor-pointer" title="کلیک برای همگام‌سازی">
+                    <span id="syncStatus" class="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین
-                    </button>
+                    </span>
                 </div>
             </div>
 
@@ -712,7 +717,7 @@
                     </button>
 
                     <div id="userProfile" class="hidden flex items-center gap-1 bg-[#1c1c1e] border border-white/10 p-1 rounded-xl">
-                        <div id="userAvatarLetter" title="" class="w-5 h-5 rounded-lg bg-sky-500/20 text-sky-400 font-bold text-[10px] flex items-center justify-center uppercase font-mono cursor-pointer" onclick="handleManualSync()">
+                        <div id="userAvatarLetter" title="" class="w-5 h-5 rounded-lg bg-sky-500/20 text-sky-400 font-bold text-[10px] flex items-center justify-center uppercase font-mono">
                             U
                         </div>
                         <button onclick="handleLogout()" title="خروج از حساب" class="w-5 h-5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-[#ff453a] flex items-center justify-center transition">
@@ -787,7 +792,7 @@
                 </div>
                 
                 <div class="grid grid-cols-2 gap-2">
-                    <select id="dailyCatFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-3 py-2 text-[11px] text-zinc-200">
+                    <select id="dailyCatFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-2.5 py-1.5 text-[11px] text-zinc-200">
                         <option value="all">همه دسته‌بندی‌ها</option>
                         <option value="needs">🍜 نیازها</option>
                         <option value="wants">🛍️ خواسته‌ها</option>
@@ -805,12 +810,6 @@
                         <div id="dailyDateFilterCal" class="hidden fixed z-[9999] p-3 bg-[#2c2c2e] border border-white/10 rounded-2xl shadow-2xl space-y-2"></div>
                     </div>
                 </div>
-
-                <select id="dailySortFilter" onchange="applyTxFilters()" class="w-full ios-input rounded-xl px-3 py-2 text-[11px] text-zinc-200">
-                    <option value="newest" selected>جدیدترین</option>
-                    <option value="oldest">قدیمی‌ترین</option>
-                    <option value="updated">آخرین تغییرات</option>
-                </select>
             </div>
 
             <div class="ios-blur rounded-3xl p-4">
@@ -838,6 +837,7 @@
                 </button>
             </div>
 
+            <!-- SECTION 1: TIME-BOUND -->
             <div class="ios-blur rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between px-1 border-b border-white/[0.06] pb-2">
                     <h3 class="font-bold text-[11px] text-[#0a84ff] flex items-center gap-1.5">
@@ -848,6 +848,7 @@
                 <div id="timeboundChecklist" class="space-y-2"></div>
             </div>
 
+            <!-- SECTION 2: TIMELESS -->
             <div class="ios-blur rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between px-1 border-b border-white/[0.06] pb-2">
                     <h3 class="font-bold text-[11px] text-[#ffd60a] flex items-center gap-1.5">
@@ -1200,7 +1201,7 @@
         </div>
     </div>
 
-    <!-- MODAL: REMINDER -->
+    <!-- MODAL: REMINDER (FIXED LAYOUT & EXTENDED CONTROLS) -->
     <div id="reminderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-[#1c1c1e] border border-white/10 w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -1248,6 +1249,7 @@
                     </div>
                 </div>
 
+                <!-- ALERTS CONFIG: CLEAN RESPONSIVE GRID -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] text-zinc-400 block mb-1">ساعت هشدار</label>
@@ -1303,6 +1305,7 @@
                     </div>
                 </div>
 
+                <!-- Recurring edits are handled by a save-time choice popup. -->
                 <div id="remSeriesUpdateWrap" class="hidden"></div>
 
                 <button type="submit" id="remSubmitBtn" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
@@ -1503,6 +1506,8 @@
     </nav>
 
     <script>
+
+        // Keep the scrollable content exactly between the fixed header and bottom bar.
         function syncFixedShellMetrics() {
             const header = document.getElementById('appHeader');
             const nav = document.querySelector('body > nav.fixed.bottom-0');
@@ -1523,8 +1528,7 @@
         window.addEventListener('orientationchange', () => setTimeout(syncFixedShellMetrics, 120));
 
         const CLIENT_ID = '1040294367701-rhoj2ubfs2b46ogo1ckjhv1k0fo080lt.apps.googleusercontent.com';
-        // Allow drive.appdata and drive.file for complete compatibility with files saved in appDataFolder or Drive root
-        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
 
         const MONTH_NAMES = [
             'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
@@ -1545,26 +1549,10 @@
         let currentUserEmail = localStorage.getItem('kakeibo_cached_email') || null;
         let tokenClient;
         let accessToken = localStorage.getItem('kakeibo_cached_token') || null;
-        let driveFileId = localStorage.getItem('kakeibo_cached_file_id') || null;
-        let isSyncing = false;
+        let driveFileId = null;
 
         function getStorageKey() {
             return currentUserEmail ? `kakeibo_user_${currentUserEmail}` : 'kakeibo_guest_data';
-        }
-
-        function hasAnyData(s) {
-            if (!s) return false;
-            if (s.reminders && s.reminders.length > 0) return true;
-            if (s.wishlist && s.wishlist.length > 0) return true;
-            if (s.checklist && s.checklist.length > 0) return true;
-            if (s.months) {
-                for (const m of Object.values(s.months)) {
-                    if (m.transactions && m.transactions.length > 0) return true;
-                    if (m.notes && m.notes.trim()) return true;
-                    if (m.budget && (m.budget.income || m.budget.savings || m.budget.fixed)) return true;
-                }
-            }
-            return false;
         }
 
         function formatNumber(num) {
@@ -1750,7 +1738,7 @@
                 .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
                 .replace(/[ۀة]/g, 'ه')
                 .replace(/[أإ]/g, 'ا')
-                .replace(/‌/g, ' ')
+                .replace(/\u200c/g, ' ')
                 .replace(/\s+/g, ' ');
         }
 
@@ -1779,6 +1767,8 @@
                 const selectedDay = selectedFull ? Number(selectedFull.split('/')[2]) : 1;
                 renderInlineCalendarUI(inputId, calContainerId, ay, am, selectedDay);
 
+                // Move the filter calendar to document.body so backdrop-filter/stacking
+                // contexts can never place the transaction list above it.
                 if (container.parentElement !== document.body) document.body.appendChild(container);
                 container.classList.remove('hidden');
                 positionDailyFilterCalendar();
@@ -1807,6 +1797,7 @@
             cal.style.left = `${Math.max(sidePad, Math.min(rect.left, viewportW - desiredW - sidePad))}px`;
             cal.style.right = 'auto';
 
+            // Measure after width is set, then choose below or above automatically.
             const calH = cal.getBoundingClientRect().height;
             const spaceBelow = viewportH - rect.bottom - gap;
             const spaceAbove = rect.top - gap;
@@ -1828,6 +1819,7 @@
             const container = document.getElementById(calContainerId);
             const daysInMonth = getJalaliMonthLength(y, m);
             const firstDayJdn = j2d(y, m, 1);
+            // JDN % 7: Monday=0 ... Sunday=6. Persian grid starts Saturday.
             const firstWeekdayOffset = mod(firstDayJdn + 2, 7);
             const lockToActiveMonth = inputId === 'dailyDateFilter';
 
@@ -1912,14 +1904,9 @@
                 const avatarLetter = currentUserEmail.charAt(0).toUpperCase();
                 document.getElementById('userAvatarLetter').innerText = avatarLetter;
                 document.getElementById('userAvatarLetter').setAttribute('title', currentUserEmail);
-                updateSyncUI('online', 'آنلاین');
-                if (accessToken) {
-                    fetchFromDrive();
-                } else {
-                    updateSyncUI('offline', 'نیاز به اتصال مجدد');
-                }
-            } else {
-                updateSyncUI('offline', 'آفلاین');
+                document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                if (accessToken) fetchFromDrive();
             }
 
             renderAll();
@@ -2052,16 +2039,15 @@
 
             const remBudgetCard = document.getElementById('remBudgetCard');
             const remBudgetDisplay = document.getElementById('remBudgetDisplay');
-
-            remBudgetCard.classList.remove('budget-negative');
-            remBudgetDisplay.classList.remove('budget-negative-text');
-
             if (remBudget < 0) {
-                remBudgetCard.classList.add('budget-negative');
-                remBudgetDisplay.classList.add('budget-negative-text');
+                remBudgetCard.className = 'p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-red-950/70 border border-red-500/60 shadow-lg shadow-red-900/30';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#ff453a]';
+                remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
+            } else {
+                remBudgetCard.className = 'ios-blur p-4 rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all duration-300 bg-emerald-950/50 border border-[#30d158]/40 shadow-lg shadow-emerald-900/20';
+                remBudgetDisplay.className = 'text-xl font-bold tracking-tight text-[#30d158]';
+                remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
             }
-
-            remBudgetDisplay.innerText = `${formatNumber(remBudget)} تومان`;
 
             document.getElementById('dailyAllowanceDisplay').innerText = `سهمیه روز: ${formatNumber(daily)} تومان`;
             document.getElementById('totalIncomeDisplay').innerText = `${formatNumber((curr.budget.income || 0) + totalExtraIncome)} تومان`;
@@ -2098,7 +2084,6 @@
             const catVal = document.getElementById('dailyCatFilter').value;
             const dateInput = document.getElementById('dailyDateFilter');
             const dateVal = dateInput.dataset.selectedDate || '';
-            const sortVal = document.getElementById('dailySortFilter')?.value || 'newest';
             const numericSearch = cleanNumber(rawSearch);
 
             const catLabels = {
@@ -2131,27 +2116,6 @@
                 return true;
             });
 
-            const getJalaliValue = (d) => {
-                try {
-                    const n = normalizeJalaliDate(d || '');
-                    const [y,m,day] = n.split('/').map(Number);
-                    return j2d(y,m,day);
-                } catch(e) { return 0; }
-            };
-
-            filtered.sort((a, b) => {
-                if (sortVal === 'updated') {
-                    return Number(b.updatedAt || b.createdAt || b.id || 0) - Number(a.updatedAt || a.createdAt || a.id || 0);
-                }
-
-                const diff = getJalaliValue(b.date) - getJalaliValue(a.date);
-                if (diff !== 0) return sortVal === 'oldest' ? -diff : diff;
-
-                return sortVal === 'oldest'
-                    ? Number(a.createdAt || a.id || 0) - Number(b.createdAt || b.id || 0)
-                    : Number(b.createdAt || b.id || 0) - Number(a.createdAt || a.id || 0);
-            });
-
             renderTxList(filtered);
         }
 
@@ -2173,7 +2137,7 @@
                 fixed: { label: 'هزینه ثابت', icon: '🔒', color: 'text-[#5e5ce6]' }
             };
 
-            list.forEach(t => {
+            [...list].reverse().forEach(t => {
                 const isExp = t.type === 'expense';
                 const catInfo = catMap[t.category] || {};
                 let titleText = t.title || t.desc || '';
@@ -2526,7 +2490,9 @@
             document.getElementById('remCycleWrap').classList.add('hidden');
             document.getElementById('remInstallmentsWrap').classList.add('hidden');
             document.getElementById('customCycleBox').classList.add('hidden');
+
             document.getElementById('remSeriesUpdateWrap').classList.add('hidden');
+
             document.getElementById('remDateCal').classList.add('hidden');
             document.getElementById('remEndDateCal').classList.add('hidden');
             openModal('reminderModal');
@@ -2704,8 +2670,7 @@
             (state.checklist || []).forEach(c => rows.push(['چک‌لیست', c.id, c.date ? monthKeyFromDate(c.date) : '', c.date || '', c.completed ? 'انجام‌شده' : 'در انتظار', c.title || '', c.amount || 0, JSON.stringify(c)]));
             rows.push(['تنظیمات', 'app_state_meta', state.activeMonth || '', '', '', '', '', JSON.stringify({ activeMonth: state.activeMonth })]);
 
-            const csvContent = '﻿' + rows.map(row => row.map(csvEscape).join(',')).join('
-');
+            const csvContent = '\uFEFF' + rows.map(row => row.map(csvEscape).join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2733,9 +2698,7 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const lines = evt.target.result.replace(/^﻿/, '').split(/
-?
-/).filter(line => line.trim());
+                    const lines = evt.target.result.replace(/^\uFEFF/, '').split(/\r?\n/).filter(line => line.trim());
                     if (lines.length < 2) return alert('فایل CSV معتبر نیست.');
                     if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟ داده‌های هم‌نام با شناسه یکسان به‌روزرسانی می‌شوند.')) return;
 
@@ -2811,6 +2774,7 @@
 
             const txMonth = monthKeyFromDate(payDate);
             ensureMonthExists(txMonth);
+            // Prevent duplicate fixed-expense rows for the same reminder.
             Object.values(state.months).forEach(m => {
                 m.transactions = (m.transactions || []).filter(t => t.reminderId !== remId);
             });
@@ -2990,10 +2954,10 @@
                     const idx = (m.transactions || []).findIndex(t => t.id === editId);
                     if (idx >= 0) { existing = m.transactions.splice(idx, 1)[0]; break; }
                 }
-                const tx = { ...(existing || {}), id: editId, type: 'expense', amount, category, date, desc, updatedAt: Date.now() };
+                const tx = { ...(existing || {}), id: editId, type: 'expense', amount, category, date, desc };
                 state.months[targetMonth].transactions.push(tx);
             } else {
-                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'expense', amount, category, date, desc, createdAt: Date.now(), updatedAt: Date.now() });
+                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'expense', amount, category, date, desc });
             }
 
             saveState(); renderAll(); closeModal('expenseModal');
@@ -3020,11 +2984,11 @@
                     const idx = (m.transactions || []).findIndex(t => t.id === editId);
                     if (idx >= 0) { existing = m.transactions.splice(idx, 1)[0]; break; }
                 }
-                const tx = { ...(existing || {}), id: editId, type: 'income', incomeType, amount, date, desc, updatedAt: Date.now() };
+                const tx = { ...(existing || {}), id: editId, type: 'income', incomeType, amount, date, desc };
                 delete tx.category;
                 state.months[targetMonth].transactions.push(tx);
             } else {
-                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'income', incomeType, amount, date, desc, createdAt: Date.now(), updatedAt: Date.now() });
+                state.months[targetMonth].transactions.push({ id: Date.now().toString(), type: 'income', incomeType, amount, date, desc });
             }
 
             saveState(); renderAll(); closeModal('incomeModal');
@@ -3132,52 +3096,13 @@
             }
         }
 
-        function updateSyncUI(status, label) {
-            const syncEl = document.getElementById('syncStatus');
-            if (!syncEl) return;
-            if (status === 'syncing') {
-                syncEl.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-sky-400"></i> ' + (label || 'در حال همگام‌سازی...');
-                syncEl.className = 'text-[10px] text-sky-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap cursor-pointer';
-            } else if (status === 'online') {
-                syncEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> ' + (label || 'آنلاین');
-                syncEl.className = 'text-[10px] text-[#30d158] flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap cursor-pointer';
-            } else if (status === 'expired') {
-                syncEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> ' + (label || 'ورود مجدد به گوگل');
-                syncEl.className = 'text-[10px] text-red-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap cursor-pointer font-bold';
-            } else {
-                syncEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> ' + (label || 'آفلاین');
-                syncEl.className = 'text-[10px] text-amber-400 flex items-center gap-1 mt-0.5 font-medium whitespace-nowrap cursor-pointer';
-            }
-        }
-
-        let syncDebounceTimer = null;
         function saveState() {
             localStorage.setItem(getStorageKey(), JSON.stringify(state));
-            if (accessToken) {
-                clearTimeout(syncDebounceTimer);
-                syncDebounceTimer = setTimeout(() => {
-                    syncToDrive();
-                }, 800);
-            }
+            if (accessToken) syncToDrive();
         }
 
         function loadLocalState() {
-            let saved = localStorage.getItem(getStorageKey());
-            
-            // If user logged in and user storage is empty, check if guest storage had data and migrate
-            if (!saved && currentUserEmail) {
-                const guestSaved = localStorage.getItem('kakeibo_guest_data');
-                if (guestSaved) {
-                    try {
-                        const parsed = JSON.parse(guestSaved);
-                        if (hasAnyData(parsed)) {
-                            saved = guestSaved;
-                            localStorage.setItem(getStorageKey(), guestSaved);
-                        }
-                    } catch(e) {}
-                }
-            }
-
+            const saved = localStorage.getItem(getStorageKey());
             if (saved) {
                 try { 
                     state = JSON.parse(saved); 
@@ -3193,27 +3118,18 @@
         }
 
         function initGoogleClient() {
-            if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) return;
-            try {
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES,
-                    callback: async (resp) => {
-                        if (resp.error) {
-                            console.error('OAuth callback error:', resp);
-                            updateSyncUI('offline', 'خطا در احراز هویت');
-                            return;
-                        }
-                        accessToken = resp.access_token;
-                        localStorage.setItem('kakeibo_cached_token', accessToken);
-                        updateSyncUI('syncing', 'دریافت حساب...');
-                        await fetchUserProfile();
-                        await fetchFromDrive();
-                    }
-                });
-            } catch (e) {
-                console.error('initGoogleClient error', e);
-            }
+            if (typeof google === 'undefined') return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: async (resp) => {
+                    if (resp.error) return;
+                    accessToken = resp.access_token;
+                    localStorage.setItem('kakeibo_cached_token', accessToken);
+                    await fetchUserProfile();
+                    await fetchFromDrive();
+                }
+            });
         }
 
         async function fetchUserProfile() {
@@ -3221,10 +3137,6 @@
                 const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
-                if (!res.ok) {
-                    if (res.status === 401) handleTokenExpired();
-                    return;
-                }
                 const info = await res.json();
                 if (info && info.email) {
                     currentUserEmail = info.email;
@@ -3236,8 +3148,10 @@
                     document.getElementById('userAvatarLetter').innerText = avatarLetter;
                     document.getElementById('userAvatarLetter').setAttribute('title', info.email);
                     
+                    document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
+                    document.getElementById('syncStatus').className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
+                    
                     loadLocalState();
-                    populateYearAndMonthDropdowns();
                     renderAll();
                 }
             } catch (e) {
@@ -3245,181 +3159,85 @@
             }
         }
 
-        function handleTokenExpired() {
-            updateSyncUI('expired', 'نشست منقضی شده (ورود مجدد)');
-            accessToken = null;
-            localStorage.removeItem('kakeibo_cached_token');
-        }
-
         function handleAuthClick() {
             if (!tokenClient) initGoogleClient();
-            if (tokenClient) {
-                tokenClient.requestAccessToken({ prompt: currentUserEmail ? '' : 'select_account' });
-            } else {
-                alert('کتابخانه گوگل در دسترس نیست. لطفاً اتصال اینترنت خود را بررسی کرده و صفحه را تازه کنید.');
-            }
-        }
-
-        function handleManualSync() {
-            if (!accessToken) {
-                handleAuthClick();
-            } else {
-                fetchFromDrive(true);
-            }
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: 'select_account' });
         }
 
         function handleLogout() {
             if (accessToken) {
-                try {
-                    google.accounts.oauth2.revoke(accessToken, () => {});
-                } catch(e) {}
+                google.accounts.oauth2.revoke(accessToken, () => {});
             }
             accessToken = null;
             currentUserEmail = null;
             driveFileId = null;
             localStorage.removeItem('kakeibo_cached_email');
             localStorage.removeItem('kakeibo_cached_token');
-            localStorage.removeItem('kakeibo_cached_file_id');
 
             document.getElementById('loginBtn').classList.remove('hidden');
             document.getElementById('userProfile').classList.add('hidden');
-            updateSyncUI('offline', 'آفلاین');
+            document.getElementById('syncStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> آفلاین';
+            document.getElementById('syncStatus').className = 'text-[10px] text-amber-400 flex items-center gap-1 font-medium whitespace-nowrap';
 
             loadLocalState();
             renderAll();
         }
 
-        // Search helper that safely queries Drive API using single quotes and proper URL encoding
-        async function queryDriveFile(spaceName) {
-            const q = encodeURIComponent("name = 'kakeibo_store.json' and trashed = false");
-            const url = `https://www.googleapis.com/drive/v3/files?spaces=${spaceName}&q=${q}&fields=files(id,name,modifiedTime,size)&orderBy=modifiedTime desc`;
-            const res = await fetch(url, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            if (!res.ok) {
-                if (res.status === 401) {
-                    handleTokenExpired();
-                }
-                return null;
-            }
-            const data = await res.json();
-            return (data.files && data.files.length > 0) ? data.files : null;
-        }
-
-        async function fetchFromDrive(isUserTriggered = false) {
-            if (!accessToken || isSyncing) return;
-            isSyncing = true;
-            updateSyncUI('syncing', 'در حال همگام‌سازی...');
-
+        async function fetchFromDrive() {
             try {
-                // 1. First search in appDataFolder
-                let files = await queryDriveFile('appDataFolder');
-
-                // 2. If not found in appDataFolder, search in regular Drive (root) for backwards compatibility
-                if (!files || files.length === 0) {
-                    files = await queryDriveFile('drive');
-                }
-
-                if (files && files.length > 0) {
-                    // Pick the most recently modified file
-                    const bestFile = files[0];
-                    driveFileId = bestFile.id;
-                    localStorage.setItem('kakeibo_cached_file_id', driveFileId);
-
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const searchData = await searchRes.json();
+                if (searchData.files && searchData.files.length > 0) {
+                    driveFileId = searchData.files[0].id;
                     const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
-
-                    if (fileRes.ok) {
-                        const cloudData = await fileRes.json();
-                        if (cloudData && typeof cloudData === 'object' && cloudData.months) {
-                            // If cloud has data, adopt cloud state
-                            state = cloudData;
-                            if (!state.reminders) state.reminders = [];
-                            if (!state.wishlist) state.wishlist = [];
-                            if (!state.checklist) state.checklist = [];
-                            
-                            localStorage.setItem(getStorageKey(), JSON.stringify(state));
-                            populateYearAndMonthDropdowns();
-                            renderAll();
-                            updateSyncUI('online', 'همگام‌سازی شد');
-                            if (isUserTriggered) alert('داده‌ها با موفقیت از گوگل درایو بازیابی شدند.');
-                        } else {
-                            // Cloud file empty or invalid; if local state has data, sync local to cloud
-                            if (hasAnyData(state)) {
-                                await syncToDrive();
-                            } else {
-                                updateSyncUI('online', 'آنلاین');
-                            }
-                        }
-                    } else {
-                        if (fileRes.status === 401) handleTokenExpired();
-                        else updateSyncUI('online', 'خطا در خواندن فایل');
+                    const cloudData = await fileRes.json();
+                    if (cloudData && cloudData.months) {
+                        state = cloudData;
+                        if (!state.reminders) state.reminders = [];
+                        if (!state.wishlist) state.wishlist = [];
+                        if (!state.checklist) state.checklist = [];
+                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                        populateYearAndMonthDropdowns();
+                        renderAll();
                     }
                 } else {
-                    // No file found anywhere in Drive
-                    // If local state has data, create the file on Drive!
-                    if (hasAnyData(state)) {
-                        await syncToDrive();
-                    } else {
-                        updateSyncUI('online', 'آنلاین (داده‌ای نیست)');
-                    }
+                    syncToDrive();
                 }
             } catch (err) {
                 console.error('Fetch Drive error', err);
-                updateSyncUI('offline', 'خطا در اتصال به درایو');
-            } finally {
-                isSyncing = false;
             }
         }
 
         async function syncToDrive() {
             if (!accessToken) return;
             const fileContent = JSON.stringify(state);
+            const metadata = { name: 'kakeibo_store.json', parents: ['appDataFolder'] };
 
             try {
                 if (!driveFileId) {
-                    // Step 1: Create metadata
-                    const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+                    const form = new FormData();
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', new Blob([fileContent], { type: 'application/json' }));
+                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
                         method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: 'kakeibo_store.json',
-                            parents: ['appDataFolder']
-                        })
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        body: form
                     });
-
-                    if (!createRes.ok) {
-                        if (createRes.status === 401) handleTokenExpired();
-                        return;
-                    }
-
-                    const createData = await createRes.json();
-                    driveFileId = createData.id;
-                    localStorage.setItem('kakeibo_cached_file_id', driveFileId);
-                }
-
-                // Step 2: Upload content via media PATCH
-                const patchRes = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json; charset=UTF-8'
-                    },
-                    body: fileContent
-                });
-
-                if (patchRes.ok) {
-                    updateSyncUI('online', 'ذخیره در درایو شد');
-                } else if (patchRes.status === 401) {
-                    handleTokenExpired();
+                    const data = await res.json();
+                    driveFileId = data.id;
+                } else {
+                    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: fileContent
+                    });
                 }
             } catch (err) {
                 console.error('Sync Drive error', err);
-                updateSyncUI('offline', 'خطای ذخیره در درایو');
             }
         }
     </script>
