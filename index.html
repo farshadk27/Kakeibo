@@ -3240,6 +3240,19 @@ function compareJalaliForSort(a, b) {
             renderAll();
         }
 
+        function getStateDataScore(data) {
+            if (!data || !data.months) return 0;
+            let score = Object.keys(data.months).length * 1000;
+            Object.values(data.months).forEach(m => {
+                score += (m.transactions || []).length * 10;
+                score += (m.notes ? 1 : 0);
+            });
+            score += (data.reminders || []).length * 5;
+            score += (data.wishlist || []).length * 5;
+            score += (data.checklist || []).length * 5;
+            return score;
+        }
+
         async function fetchFromDrive() {
             try {
                 const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name="kakeibo_store.json"', {
@@ -3253,17 +3266,30 @@ function compareJalaliForSort(a, b) {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     });
                     const cloudData = await fileRes.json();
-                    if (cloudData && cloudData.months) {
+                    const localRaw = localStorage.getItem(getStorageKey());
+                    let localData = null;
+                    try { localData = localRaw ? JSON.parse(localRaw) : null; } catch(e) {}
+
+                    // جلوگیری از پاک شدن دیتای کامل‌تر با فایل Drive ناقص/قدیمی
+                    const cloudScore = getStateDataScore(cloudData);
+                    const localScore = getStateDataScore(localData);
+
+                    if (cloudScore >= localScore && cloudData && cloudData.months) {
                         state = cloudData;
-                        if (!state.reminders) state.reminders = [];
-                        if (!state.wishlist) state.wishlist = [];
-                        if (!state.checklist) state.checklist = [];
-                        localStorage.setItem(getStorageKey(), JSON.stringify(state));
-                        populateYearAndMonthDropdowns();
-                        renderAll();
+                    } else if (localData && localData.months) {
+                        state = localData;
+                        // نسخه کامل‌تر را دوباره روی Drive ذخیره کن
+                        setTimeout(() => syncToDrive(), 500);
                     }
+
+                    if (!state.reminders) state.reminders = [];
+                    if (!state.wishlist) state.wishlist = [];
+                    if (!state.checklist) state.checklist = [];
+                    localStorage.setItem(getStorageKey(), JSON.stringify(state));
+                    populateYearAndMonthDropdowns();
+                    renderAll();
                 } else {
-                    syncToDrive();
+                    await syncToDrive();
                 }
             } catch (err) {
                 console.error('Fetch Drive error', err);
