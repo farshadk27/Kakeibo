@@ -2161,11 +2161,26 @@ function compareJalaliForSort(a, b) {
 
             const sortMode = getSortPreference();
             if (sortMode === 'oldest') {
-                filtered.sort((a,b) => compareJalaliForSort(a.date, b.date));
+                filtered.sort((a,b) => {
+                    const dateCompare = compareJalaliForSort(a.date, b.date);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.createdAt || a.updatedAt || a.id || 0) - (b.createdAt || b.updatedAt || b.id || 0);
+                });
             } else if (sortMode === 'updated') {
-                filtered.sort((a,b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+                filtered.sort((a,b) => {
+                    const aTime = Number(a.updatedAt || a.createdAt || a.id || 0);
+                    const bTime = Number(b.updatedAt || b.createdAt || b.id || 0);
+                    return bTime - aTime;
+                });
             } else {
-                filtered.sort((a,b) => compareJalaliForSort(b.date, a.date));
+                filtered.sort((a,b) => {
+                    const dateCompare = compareJalaliForSort(b.date, a.date);
+                    if (dateCompare !== 0) return dateCompare;
+                    // در یک روز، آیتمی که دیرتر ثبت شده بالاتر نمایش داده می‌شود
+                    const aTime = Number(a.createdAt || a.updatedAt || a.id || 0);
+                    const bTime = Number(b.createdAt || b.updatedAt || b.id || 0);
+                    return bTime - aTime;
+                });
             }
 
             renderTxList(filtered);
