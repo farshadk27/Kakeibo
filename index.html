@@ -2767,7 +2767,16 @@ function compareJalaliForSort(a, b) {
                 try {
                     const lines = evt.target.result.replace(/^\uFEFF/, '').split(/\r?\n/).filter(line => line.trim());
                     if (lines.length < 2) return alert('فایل CSV معتبر نیست.');
-                    if (!confirm('آیا از بارگذاری این فایل اطمینان دارید؟ داده‌های هم‌نام با شناسه یکسان به‌روزرسانی می‌شوند.')) return;
+                    if (!confirm('آیا می‌خواهید این فایل به طور کامل جایگزین اطلاعات فعلی شود؟ اطلاعات فعلی حذف می‌شود و فقط فایل وارد شده باقی می‌ماند.')) return;
+
+                    // Import کامل: جلوگیری از ترکیب دیتای قدیمی و جدید
+                    state = {
+                        months: {},
+                        reminders: [],
+                        wishlist: [],
+                        checklist: [],
+                        activeMonth: ''
+                    };
 
                     for (let i = 1; i < lines.length; i++) {
                         const cols = parseCSVLine(lines[i]);
@@ -3340,8 +3349,8 @@ function compareJalaliForSort(a, b) {
                     populateYearAndMonthDropdowns();
                     renderAll();
 
-                    // بعد از merge نسخه کامل را روی Drive نگه می‌دارد
-                    await syncToDrive();
+                    // بعد از Login روی Drive overwrite نمی‌کنیم.
+                    // ذخیره فقط بعد از تغییر واقعی کاربر انجام می‌شود تا دیتای سالم پاک نشود.
 
                 } else {
                     await syncToDrive();
