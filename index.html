@@ -2062,7 +2062,11 @@ function renderAll() {
             });
 
             const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
-            const daily = Math.round(Math.max(0, remBudget) / 30);
+            const now = new Date();
+            const currentDay = now.getDate();
+            const daysInCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const remainingDays = Math.max(1, daysInCurrentMonth - currentDay + 1);
+            const daily = Math.round(Math.max(0, remBudget) / remainingDays);
 
             const remBudgetCard = document.getElementById('remBudgetCard');
             const remBudgetDisplay = document.getElementById('remBudgetDisplay');
@@ -3396,7 +3400,7 @@ function compareJalaliForSort(a, b) {
 
                 const status = document.getElementById('syncStatus');
                 if (status) {
-                    status.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> همگام‌سازی شد';
+                    status.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span> آنلاین';
                     status.className = 'text-[10px] text-[#30d158] flex items-center gap-1 font-medium whitespace-nowrap';
                 }
 
@@ -3416,7 +3420,7 @@ function setSyncStatus(type){
     const map={
         offline:['bg-amber-400','text-amber-400','آفلاین'],
         online:['bg-[#30d158]','text-[#30d158]','آنلاین'],
-        synced:['bg-[#30d158]','text-[#30d158]','همگام‌سازی شد']
+        synced:['bg-[#30d158]','text-[#30d158]','آنلاین']
     };
     const x=map[type]||map.offline;
     el.innerHTML=`<span class="w-1.5 h-1.5 rounded-full ${x[0]}"></span> ${x[2]}`;
