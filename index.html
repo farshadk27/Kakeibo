@@ -700,6 +700,7 @@
                 <button onclick="exportToCSV()" title="دریافت فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs transition active:scale-95">
                     <i class="fa-solid fa-file-excel text-[#30d158]"></i>
                 </button>
+                <button onclick="openRestorePage()" title="Restore بکاپ" class="w-7 h-7 rounded-xl bg-[#2c2c2e] border border-white/10 flex items-center justify-center text-zinc-300 text-xs transition active:scale-95"><i class="fa-solid fa-clock-rotate-left text-[#ffc928]"></i></button>
                 <label title="بارگذاری فایل اکسل (CSV)" class="w-7 h-7 rounded-xl bg-[#2c2c2e] hover:bg-[#3a3a3c] border border-white/10 flex items-center justify-center text-zinc-300 text-xs cursor-pointer transition active:scale-95">
                     <i class="fa-solid fa-file-import text-[#0a84ff]"></i>
                     <input type="file" accept=".csv" onchange="importFromCSV(event)" class="hidden">
@@ -3403,7 +3404,103 @@ function compareJalaliForSort(a, b) {
                 console.error('Sync Drive error', err);
             }
         }
-    </script>
+    
+
+/* ===== Kakeibo Drive Backup System v1 ===== */
+const KAKEIBO_BACKUP_PREFIX = 'kakeibo_snapshot_';
+const KAKEIBO_BACKUP_KEEP = 30;
+
+function setSyncStatus(type){
+    const el=document.getElementById('syncStatus');
+    if(!el) return;
+    const map={
+        offline:['bg-amber-400','text-amber-400','آفلاین'],
+        online:['bg-[#30d158]','text-[#30d158]','آنلاین'],
+        synced:['bg-[#30d158]','text-[#30d158]','همگام‌سازی شد']
+    };
+    const x=map[type]||map.offline;
+    el.innerHTML=`<span class="w-1.5 h-1.5 rounded-full ${x[0]}"></span> ${x[2]}`;
+    el.className=`text-[10px] ${x[1]} flex items-center gap-1 font-medium whitespace-nowrap`;
+}
+
+function getBackupFileName(date){
+    return KAKEIBO_BACKUP_PREFIX + date.replaceAll('/','-') + '.json';
+}
+
+async function createDriveSnapshot(isMonthEnd=false){
+    if(!accessToken) return;
+    try{
+        const today=getTodayJalali();
+        const metadata={
+            name:getBackupFileName(today)+(isMonthEnd?'_month_end':''),
+            parents:['appDataFolder']
+        };
+        const payload={
+            createdAt:Date.now(),
+            date:today,
+            monthEnd:isMonthEnd,
+            state:state
+        };
+        const form=new FormData();
+        form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
+        form.append('file',new Blob([JSON.stringify(payload)],{type:'application/json'}));
+        await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`},body:form});
+        await cleanupDriveSnapshots();
+    }catch(e){console.error('Snapshot error',e)}
+}
+
+async function cleanupDriveSnapshots(){
+    if(!accessToken)return;
+    try{
+        const r=await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name contains "kakeibo_snapshot_"&fields=files(id,name,createdTime)',{headers:{Authorization:`Bearer ${accessToken}`}});
+        const d=await r.json();
+        let files=(d.files||[]).sort((a,b)=>new Date(b.createdTime)-new Date(a.createdTime));
+        const remove=files.filter((f,i)=>i>=KAKEIBO_BACKUP_KEEP && !f.name.includes('_month_end'));
+        for(const f of remove){
+            await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`,{method:'DELETE',headers:{Authorization:`Bearer ${accessToken}`}});
+        }
+    }catch(e){console.error('Cleanup backup error',e)}
+}
+
+async function listDriveSnapshots(){
+    if(!accessToken)return [];
+    const r=await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name contains "kakeibo_snapshot_"&fields=files(id,name,createdTime)',{headers:{Authorization:`Bearer ${accessToken}`}});
+    const d=await r.json();
+    return (d.files||[]).sort((a,b)=>new Date(b.createdTime)-new Date(a.createdTime));
+}
+
+async function openRestorePage(){
+    const box=document.getElementById('restoreList');
+    if(!box)return;
+    const files=await listDriveSnapshots();
+    box.innerHTML=files.length?files.map(f=>`<button class="w-full text-right p-3 rounded-xl bg-white/5 mb-2" onclick="restoreSnapshot('${f.id}')">${f.name}<br><small>${new Date(f.createdTime).toLocaleString('fa-IR')}</small></button>`).join(''):'بکاپی وجود ندارد';
+    document.getElementById('restoreModal').classList.remove('hidden');
+}
+
+async function restoreSnapshot(id){
+    if(!accessToken)return;
+    if(!confirm('Restore جایگزینی کامل انجام شود؟ دیتای فعلی با این نسخه جایگزین می‌شود.'))return;
+    try{
+        const r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
+        const data=await r.json();
+        state=data.state;
+        localStorage.setItem(getStorageKey(),JSON.stringify(state));
+        await syncToDrive();
+        renderAll();
+        document.getElementById('restoreModal').classList.add('hidden');
+        alert('Restore کامل شد');
+    }catch(e){alert('Restore ناموفق بود')}
+}
+
+setInterval(()=>{ if(accessToken) createDriveSnapshot(false); },24*60*60*1000);
+</script>
+
+<div id="restoreModal" class="hidden fixed inset-0 z-[1000] bg-black/70 p-5">
+ <div class="max-w-md mx-auto mt-20 ios-blur rounded-3xl p-4">
+  <div class="flex justify-between mb-3"><b>Restore نسخه پشتیبان</b><button onclick="document.getElementById('restoreModal').classList.add('hidden')">✕</button></div>
+  <div id="restoreList"></div>
+ </div>
+</div>
 </body>
 </html>
 
