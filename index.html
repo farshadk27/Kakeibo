@@ -2062,10 +2062,13 @@ function renderAll() {
             });
 
             const remBudget = (dispBudget + totalExtraIncome) - totalVariableSpent;
-            const now = new Date();
-            const currentDay = now.getDate();
-            const daysInCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const remainingDays = Math.max(1, daysInCurrentMonth - currentDay + 1);
+            // Calculate remaining days using Persian (Jalali) calendar, not Gregorian
+            const todayJ = getTodayJalali().split('/').map(Number);
+            const currentJYear = todayJ[0];
+            const currentJMonth = todayJ[1];
+            const currentJDay = todayJ[2];
+            const daysInCurrentJMonth = getJalaliMonthLength(currentJYear, currentJMonth);
+            const remainingDays = Math.max(1, daysInCurrentJMonth - currentJDay);
             const daily = Math.round(Math.max(0, remBudget) / remainingDays);
 
             const remBudgetCard = document.getElementById('remBudgetCard');
