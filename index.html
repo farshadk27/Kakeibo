@@ -85,16 +85,14 @@
 
         /* ---------- 2. Base ---------- */
         body, input, textarea, select, button {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
-            font-optical-sizing: auto;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
         }
 
         html, body {
             background-color: #000 !important;
             color: var(--label-1);
             -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
+            letter-spacing: -0.01em;
             width: 100%;
             height: 100%;
             min-height: 100%;
@@ -108,8 +106,6 @@
             min-height: 100dvh !important;
             display: block !important;
             overflow-x: hidden;
-            font: 400 100%/1.5 'Vazirmatn', system-ui, sans-serif;
-            letter-spacing: 0;
             background:
                 radial-gradient(760px 520px at 88% -4%, rgba(10, 132, 255, 0.10), transparent 62%),
                 radial-gradient(660px 480px at 4% 16%, rgba(94, 92, 230, 0.075), transparent 66%),
@@ -138,18 +134,11 @@
 
         #appHeader, #appMain, nav { position: relative; }
 
-        /* ---------- 3. Typography: tracking & leading are size-specific ---------- */
-        h1, h2, h3 { letter-spacing: -0.021em; line-height: 1.25; }
-        .font-black, .font-bold { letter-spacing: -0.018em; }
-
-        .text-xl, .text-2xl, .text-base {
-            letter-spacing: -0.022em;
-            line-height: 1.15;
-        }
-        .text-\[13px\] { letter-spacing: -0.012em; line-height: 1.45; }
-        .text-xs { letter-spacing: -0.004em; line-height: 1.55; }
-        .text-\[11px\] { letter-spacing: 0.004em; line-height: 1.6; }
-        .text-\[10px\], .text-\[9px\], .text-\[8.5px\] { letter-spacing: 0.012em; line-height: 1.55; }
+        /* ---------- 3. Typography ----------
+           Vazirmatn already ships its own tracking and numeral shapes, so the
+           only tracking here is the one the original build used. Numerals are
+           left completely alone — no tabular-nums, no extra tracking. */
+        h1, h2, h3, .font-bold { letter-spacing: -0.025em; }
 
         /* Vibrancy: text over translucent material is brighter + slightly heavier. */
         .text-zinc-300 { color: var(--label-1) !important; }
@@ -157,13 +146,6 @@
         .text-zinc-500 { color: var(--label-3) !important; }
         .text-zinc-600 { color: var(--label-4) !important; }
         label.text-\[11px\], label.text-\[10px\] { font-weight: 500; }
-
-        /* Persian numerals read better with a hair more space. */
-        #remBudgetDisplay, #totalIncomeDisplay, #calcDisposable,
-        #refActualSavings, #refTotalSpent {
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.024em;
-        }
 
         /* ---------- 4. Materials ---------- */
         .ios-blur {
@@ -252,7 +234,7 @@
             border: 1px solid rgba(10, 132, 255, .34) !important;
             box-shadow: 0 0 0 3px rgba(10, 132, 255, .08), 0 6px 18px rgba(10, 132, 255, .20) !important;
         }
-        #appHeader h1 { font-size: 12.5px !important; letter-spacing: -0.02em; }
+        #appHeader h1 { font-size: 12.5px !important; }
         #syncStatus { color: var(--label-2) !important; }
 
         #globalYearSelect, #globalMonthSelect,
@@ -305,11 +287,19 @@
         #appMain .rounded-3xl { border-radius: var(--r-card) !important; }
         #appMain .rounded-2xl { border-radius: var(--r-field) !important; }
 
+        /* Alert banner: a compact notice that keeps clear air under it so it
+           never crowds the cards below. */
         #dueAlertBox {
             background: linear-gradient(145deg, rgba(255, 214, 10, .10), rgba(255, 214, 10, .045)) !important;
             border: 1px solid rgba(255, 214, 10, .24) !important;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .30);
+            padding: 10px 12px !important;
+            margin-bottom: 12px !important;
+            gap: 10px;
         }
+        #dueAlertBox .w-7 { width: 26px !important; height: 26px !important; }
+        #dueAlertText { line-height: 1.5; }
+        #dueAlertBox button { padding: 5px 12px !important; white-space: nowrap; }
 
         /* Daily hero pair */
         #tab-daily > .grid.grid-cols-2 > div {
@@ -385,7 +375,6 @@
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, .16);
             font-size: 13px !important;
-            letter-spacing: -0.014em;
         }
         #tab-daily > .flex.gap-2\.5 > button:first-child {
             background: linear-gradient(180deg, #ff5f55, #f01f2d) !important;
@@ -476,7 +465,6 @@
         #txCount {
             background: var(--fill-1) !important;
             border: 1px solid var(--hairline);
-            font-variant-numeric: tabular-nums;
         }
 
         /* Section headers inside cards: hairline, not a heavy rule */
@@ -576,7 +564,6 @@
         #dailyDateFilterCal button {
             border-radius: 10px !important;
             min-height: 30px;
-            font-variant-numeric: tabular-nums;
         }
         #remDateCal button:active, #remEndDateCal button:active, #checkDateCal button:active,
         #payTargetDateCal button:active, #expDateCal button:active, #incDateCal button:active,
@@ -765,7 +752,7 @@
                 transform var(--t-press) ease-out;
         }
         .tab-btn i { font-size: 13px !important; }
-        .tab-btn span { font-size: 8px !important; letter-spacing: 0; }
+        .tab-btn span { font-size: 8px !important; }
         .tab-btn:hover:not(.active) { color: var(--label-2) !important; }
         .tab-btn.active:not([data-tab="daily"]) {
             color: #5ea9ff !important;
