@@ -774,6 +774,34 @@
         .tab-btn:active { transform: scale(.92); }
         #navRemBadge { box-shadow: 0 0 0 2px rgba(0, 0, 0, .55); }
 
+        /* ---------- 11b. Toast ---------- */
+        #kakeiboToast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(var(--measured-nav-h) + 6px);
+            transform: translate(-50%, 14px);
+            z-index: 950;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            max-width: min(26rem, calc(100vw - 28px));
+            padding: 11px 15px;
+            border-radius: 18px;
+            font-size: 11.5px;
+            line-height: 1.6;
+            color: var(--label-1);
+            background: var(--mat-thick);
+            border: 1px solid var(--hairline-strong);
+            box-shadow: var(--shadow-float);
+            backdrop-filter: blur(34px) saturate(180%);
+            -webkit-backdrop-filter: blur(34px) saturate(180%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--t-quick) var(--spring), transform var(--t-move) var(--spring);
+        }
+        #kakeiboToast.show { opacity: 1; transform: translate(-50%, 0); }
+        #kakeiboToast i { color: var(--ios-blue); font-size: 14px; }
+
         /* ---------- 12. Responsive ---------- */
         @media (min-width: 640px) {
             #appHeader > div { max-width: 480px !important; margin-inline: auto; }
@@ -1041,9 +1069,14 @@
                     </h2>
                     <p class="text-[11px] text-zinc-400 mt-0.5">مدیریت چک‌ها، وام‌ها و هزینه‌های ثابت</p>
                 </div>
-                <button onclick="openReminderCreateModal()" class="bg-[#ffd60a] hover:bg-yellow-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
-                    <i class="fa-solid fa-plus text-xs"></i> جدید
-                </button>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="exportAllRemindersToICS()" title="افزودن همه سررسیدها به تقویم آیفون" class="w-9 h-9 rounded-2xl bg-white/[0.06] hover:bg-white/[0.10] border border-white/10 flex items-center justify-center text-[#0a84ff] transition active:scale-95">
+                        <i class="fa-regular fa-calendar-plus text-sm"></i>
+                    </button>
+                    <button onclick="openReminderCreateModal()" class="bg-[#ffd60a] hover:bg-yellow-400 active:scale-95 text-black font-bold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                        <i class="fa-solid fa-plus text-xs"></i> جدید
+                    </button>
+                </div>
             </div>
 
             <div class="ios-blur rounded-3xl p-4 space-y-3">
@@ -1483,6 +1516,14 @@
                 <button type="submit" id="remSubmitBtn" class="w-full bg-[#ffd60a] hover:bg-yellow-400 active:scale-[0.98] text-black font-bold py-3 rounded-2xl shadow-lg shadow-yellow-500/20 text-xs transition mt-2">
                     ذخیره یادآور
                 </button>
+
+                <button type="button" onclick="exportReminderFormToICS()" class="w-full bg-white/[0.06] hover:bg-white/[0.10] active:scale-[0.98] border border-white/10 text-white font-semibold py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-calendar-plus text-[#0a84ff]"></i>
+                    افزودن سررسیدها به تقویم آیفون
+                </button>
+                <p class="text-[10px] text-zinc-500 leading-5 text-center px-1">
+                    یک فایل تقویم (.ics) ساخته می‌شود؛ با باز کردن آن، همه سررسیدها با همین ساعت و همین «چند روز قبل» داخل اپ تقویم آیفون ثبت می‌شوند و گوشی نوتیف می‌دهد.
+                </p>
             </form>
         </div>
     </div>
@@ -2654,6 +2695,7 @@ function compareJalaliForSort(a, b) {
                         <div class="flex flex-col items-end gap-1.5 shrink-0">
                             <span class="font-bold text-[#a5a4f3] text-[13px] whitespace-nowrap">${formatNumber(r.amount)} تومان</span>
                             <div class="flex items-center gap-1">
+                                <button onclick="exportReminderToICS('${r.id}')" class="text-zinc-400 hover:text-[#0a84ff] p-1" title="افزودن به تقویم آیفون"><i class="fa-regular fa-calendar-plus text-[11px]"></i></button>
                                 <button onclick="editReminder('${r.id}')" class="text-zinc-400 hover:text-white p-1" title="ویرایش"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
                                 <button onclick="deleteReminder('${r.id}')" class="text-zinc-500 hover:text-[#ff453a] p-1" title="حذف"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                             </div>
@@ -3674,6 +3716,332 @@ setInterval(()=>{ if(accessToken) createDriveSnapshot(false); },24*60*60*1000);
   <div id="restoreList"></div>
  </div>
 </div>
+    <script>
+    /* =========================================================================
+       KAKEIBO — Apple Calendar / iPhone alert export (.ics)
+       Turns a reminder (or a whole installment series) into a calendar file the
+       iPhone can subscribe to, so the due-date alert arrives on the phone
+       without opening this app. Nothing else in the app is affected.
+       ========================================================================= */
+    (function () {
+        'use strict';
+
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function icsEscape(v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,')
+                .replace(/\r?\n/g, '\\n');
+        }
+
+        /* RFC 5545 line folding, counted in UTF-8 octets so Persian text is safe. */
+        function icsFold(line) {
+            var enc = new TextEncoder();
+            var out = '', cur = '', bytes = 0, limit = 73, first = true;
+            var chars = Array.from(line);
+            for (var i = 0; i < chars.length; i++) {
+                var b = enc.encode(chars[i]).length;
+                if (bytes + b > limit) {
+                    out += (first ? '' : '\r\n ') + cur;
+                    first = false;
+                    cur = ''; bytes = 0; limit = 72;
+                }
+                cur += chars[i];
+                bytes += b;
+            }
+            return out + (first ? '' : '\r\n ') + cur;
+        }
+
+        function utcStamp(d) {
+            return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' +
+                   pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+        }
+
+        /* Floating local time — the alert fires at this clock time on the phone. */
+        function localStamp(d) {
+            return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' +
+                   pad(d.getHours()) + pad(d.getMinutes()) + '00';
+        }
+
+        function jalaliToDate(jDateStr, timeStr) {
+            var norm = normalizeJalaliDate(jDateStr);
+            if (!norm) return null;
+            var p = norm.split('/').map(Number);
+            if (!p[0] || !p[1] || !p[2]) return null;
+            var g = d2g(j2d(p[0], p[1], p[2]));
+            var t = (timeStr || '09:00').split(':');
+            var hh = Math.min(23, Math.max(0, parseInt(t[0], 10) || 0));
+            var mm = Math.min(59, Math.max(0, parseInt(t[1], 10) || 0));
+            return new Date(g.gy, g.gm - 1, g.gd, hh, mm, 0, 0);
+        }
+
+        var CYCLE_LABEL = {
+            once: 'یک‌بار پرداخت',
+            monthly: 'ماهانه',
+            bimonthly: 'هر دو ماه یک‌بار',
+            quarterly: 'هر سه ماه یک‌بار (فصلی)',
+            yearly: 'سالانه',
+            custom: 'دوره سفارشی'
+        };
+
+        function cycleLabel(rem) {
+            if (rem.cycle === 'custom') {
+                var unit = rem.customUnit === 'months' ? 'ماه' : 'روز';
+                return 'هر ' + formatNumber(rem.customInterval || 1) + ' ' + unit + ' یک‌بار';
+            }
+            return CYCLE_LABEL[rem.cycle] || 'یک‌بار پرداخت';
+        }
+
+        function notifyLabel(days) {
+            var n = parseInt(days, 10);
+            if (!n) return 'دقیقاً در روز سررسید';
+            return formatNumber(n) + ' روز قبل از سررسید';
+        }
+
+        /* ---- One VEVENT per installment -----------------------------------
+           The dates are generated from the Jalali calendar, so a Gregorian
+           RRULE would slowly drift. Emitting each due date as its own event
+           keeps every alert on exactly the right day. */
+        function buildEvent(rem, stamp) {
+            var start = jalaliToDate(rem.dueDate, rem.notifyTime);
+            if (!start) return null;
+            var end = new Date(start.getTime() + 30 * 60000);
+
+            var seriesText = (rem.installmentIndex && rem.totalCount)
+                ? 'قسط ' + formatNumber(rem.installmentIndex) + ' از ' + formatNumber(rem.totalCount)
+                : '';
+
+            var summary = rem.title + (seriesText ? ' (' + seriesText + ')' : '');
+
+            var desc = [
+                'مبلغ: ' + formatNumber(rem.amount) + ' تومان',
+                'تاریخ سررسید: ' + rem.dueDate,
+                seriesText,
+                'دوره تکرار: ' + cycleLabel(rem),
+                'هشدار: ' + notifyLabel(rem.notifyDays) + ' — ساعت ' + (rem.notifyTime || '09:00'),
+                '',
+                'ثبت‌شده از دفترچه کاکیبو'
+            ].filter(Boolean).join('\n');
+
+            var days = parseInt(rem.notifyDays, 10) || 0;
+
+            var lines = [
+                'BEGIN:VEVENT',
+                'UID:kakeibo-' + icsEscape(rem.id) + '@kakeibo.app',
+                'DTSTAMP:' + stamp,
+                'DTSTART:' + localStamp(start),
+                'DTEND:' + localStamp(end),
+                'SUMMARY:' + icsEscape(summary),
+                'DESCRIPTION:' + icsEscape(desc),
+                'CATEGORIES:' + icsEscape('یادآور مالی'),
+                'STATUS:CONFIRMED',
+                'TRANSP:TRANSPARENT'
+            ];
+
+            /* Early warning, exactly as configured in the app. */
+            if (days > 0) {
+                lines.push('BEGIN:VALARM', 'ACTION:DISPLAY',
+                           'DESCRIPTION:' + icsEscape(summary + ' — ' + formatNumber(days) + ' روز تا سررسید'),
+                           'TRIGGER:-P' + days + 'D', 'END:VALARM');
+            }
+            /* And one on the due date itself, so the day is never missed. */
+            lines.push('BEGIN:VALARM', 'ACTION:DISPLAY',
+                       'DESCRIPTION:' + icsEscape(summary + ' — امروز سررسید است'),
+                       'TRIGGER:PT0S', 'END:VALARM');
+
+            lines.push('END:VEVENT');
+            return lines;
+        }
+
+        function buildICS(reminders, calName) {
+            var stamp = utcStamp(new Date());
+            var out = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Kakeibo//Persian Finance Reminders//FA',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'X-WR-CALNAME:' + icsEscape(calName || 'دفترچه کاکیبو'),
+                'X-APPLE-CALENDAR-COLOR:#FFD60A'
+            ];
+            var count = 0;
+            reminders.forEach(function (r) {
+                var ev = buildEvent(r, stamp);
+                if (ev) { out = out.concat(ev); count++; }
+            });
+            out.push('END:VCALENDAR');
+            if (!count) return null;
+            return out.map(icsFold).join('\r\n') + '\r\n';
+        }
+
+        function safeFileName(name) {
+            return (name || 'kakeibo').replace(/[\\/:*?"<>|#]+/g, '-').slice(0, 40).trim() || 'kakeibo';
+        }
+
+        function downloadICS(content, name) {
+            var blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = safeFileName(name) + '.ics';
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 2000);
+        }
+
+        /* ---- Toast --------------------------------------------------------- */
+        var toastTimer = null;
+        function toast(msg) {
+            var el = document.getElementById('kakeiboToast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'kakeiboToast';
+                document.body.appendChild(el);
+            }
+            el.innerHTML = '<i class="fa-regular fa-calendar-check"></i><span>' + msg + '</span>';
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { el.classList.remove('show'); }, 6000);
+        }
+
+        /* ---- Date generation for a not-yet-saved series --------------------- */
+        function buildInstallmentDates(dueDate, cycle, rawCount, endDate, customInterval, customUnit) {
+            var dates = [];
+            var maxItems = rawCount || 600;
+            for (var i = 0; i < maxItems; i++) {
+                var instDate = dueDate;
+                if (i > 0) {
+                    if (cycle === 'monthly') instDate = addJalaliMonths(dueDate, i);
+                    else if (cycle === 'bimonthly') instDate = addJalaliMonths(dueDate, i * 2);
+                    else if (cycle === 'quarterly') instDate = addJalaliMonths(dueDate, i * 3);
+                    else if (cycle === 'yearly') instDate = addJalaliMonths(dueDate, i * 12);
+                    else if (cycle === 'custom') instDate = customUnit === 'months'
+                        ? addJalaliMonths(dueDate, i * customInterval)
+                        : addJalaliDays(dueDate, i * customInterval);
+                }
+                if (cycle === 'once' && i > 0) break;
+                if (endDate && compareJalaliDates(instDate, endDate) > 0) break;
+                dates.push(instDate);
+                if (cycle === 'once') break;
+            }
+            if (!dates.length) dates.push(dueDate);
+            return dates;
+        }
+
+        /* ---- Public actions ------------------------------------------------ */
+
+        /* Export straight from the open reminder form — works while creating a
+           new reminder and while editing an existing one. */
+        window.exportReminderFormToICS = function () {
+            var title = document.getElementById('remTitle').value.trim();
+            var amount = cleanNumber(document.getElementById('remAmount').value);
+            var dueDate = normalizeJalaliDate(document.getElementById('remDate').value.trim());
+            var notifyTime = document.getElementById('remNotifyTime').value || '09:00';
+            var notifyDays = document.getElementById('remNotifyDays').value;
+            if (notifyDays === 'custom') {
+                notifyDays = document.getElementById('remCustomNotifyDaysVal').value || '0';
+            }
+
+            if (!title || !dueDate) {
+                alert('برای ساخت فایل تقویم، عنوان و تاریخ سررسید را وارد کنید.');
+                return;
+            }
+
+            var editId = document.getElementById('editRemId').value;
+            var list = [];
+
+            if (editId) {
+                var target = (state.reminders || []).find(function (r) { return r.id === editId; });
+                if (!target) return;
+                var group = target.seriesId
+                    ? state.reminders.filter(function (r) { return r.seriesId === target.seriesId; })
+                    : [target];
+                list = group.map(function (r) {
+                    return Object.assign({}, r, {
+                        title: title, amount: amount,
+                        notifyTime: notifyTime, notifyDays: notifyDays,
+                        dueDate: r.id === editId ? dueDate : r.dueDate
+                    });
+                });
+            } else {
+                var cycle = document.getElementById('remCycle').value;
+                var rawCount = cleanNumber(document.getElementById('remTotalCount').value);
+                var endDate = normalizeJalaliDate(document.getElementById('remEndDate').value.trim());
+                var customInterval = Math.max(1, cleanNumber(document.getElementById('remCustomIntervalVal').value) || 1);
+                var customUnit = document.getElementById('remCustomIntervalUnit').value || 'days';
+
+                if (cycle !== 'once' && !rawCount && !endDate) {
+                    alert('برای یادآور تکرارشونده، «تعداد کل اقساط» یا «تاریخ پایان» را وارد کنید تا سررسیدها ساخته شوند.');
+                    return;
+                }
+
+                var dates = buildInstallmentDates(dueDate, cycle, rawCount, endDate, customInterval, customUnit);
+                list = dates.map(function (d, i) {
+                    return {
+                        id: 'draft-' + Date.now() + '-' + i,
+                        title: title, amount: amount, dueDate: d, cycle: cycle,
+                        notifyTime: notifyTime, notifyDays: notifyDays,
+                        installmentIndex: dates.length > 1 ? i + 1 : null,
+                        totalCount: dates.length > 1 ? dates.length : null,
+                        customInterval: cycle === 'custom' ? customInterval : null,
+                        customUnit: cycle === 'custom' ? customUnit : null
+                    };
+                });
+            }
+
+            emit(list, title);
+        };
+
+        /* Export one saved reminder — the whole series when it belongs to one. */
+        window.exportReminderToICS = function (remId) {
+            var rem = (state.reminders || []).find(function (r) { return r.id === remId; });
+            if (!rem) return;
+            var group = rem.seriesId
+                ? state.reminders.filter(function (r) { return r.seriesId === rem.seriesId; })
+                : [rem];
+            emit(group, rem.title);
+        };
+
+        /* Export every reminder that has not been settled yet. */
+        window.exportAllRemindersToICS = function () {
+            var all = state.reminders || [];
+            if (!all.length) {
+                alert('هنوز یادآوری ثبت نشده است.');
+                return;
+            }
+            var paid = [];
+            Object.values(state.months || {}).forEach(function (m) {
+                paid = paid.concat(m.paidReminders || []);
+            });
+            var pending = all.filter(function (r) { return paid.indexOf(r.id) === -1; });
+            if (!pending.length) {
+                alert('همه یادآورها تسویه شده‌اند؛ موردی برای افزودن به تقویم نیست.');
+                return;
+            }
+            emit(pending, 'همه یادآورهای کاکیبو');
+        };
+
+        function emit(list, name) {
+            var ics = buildICS(list, 'کاکیبو — ' + name);
+            if (!ics) {
+                alert('تاریخ سررسید معتبر نیست؛ فایل تقویم ساخته نشد.');
+                return;
+            }
+            downloadICS(ics, 'kakeibo-' + name);
+            var n = list.length;
+            toast(n > 1
+                ? formatNumber(n) + ' سررسید آماده شد — فایل را باز کنید و «Add All» را بزنید'
+                : 'سررسید آماده شد — فایل را باز کنید و «Add All» را بزنید');
+        }
+    })();
+    </script>
+
     <script>
     /* =========================================================================
        KAKEIBO — Apple-style interaction layer
